@@ -89,7 +89,8 @@ def markTrackWithSampleName(list_of_samples, screen_matrix, selected = None):
 		for i in range(len(screen_matrix[0])):
 			if(i % 6 == 2 and tracks <= 8):
 				for j in range(5):
-					if tracks-1 == selected:
+					if j > len(list_of_samples[tracks-1])-1: break
+					if tracks-1 == selected and selected is not None:
 						screen_matrix[0][i+j] = changeStringBgColor("grey", list_of_samples[tracks-1][j])
 					else:
 						screen_matrix[0][i+j] = changeStringBgColor("blue", list_of_samples[tracks-1][j])
@@ -292,14 +293,14 @@ def printScreenMatrix( screen_matrix):
 
 
 
-def main(list_of_samples, pattern, bpm_value = 110, swing_value = 30, vol_value = 10, selected_button = None, selected_note_element = None):
+def main(list_of_samples, pattern, bpm_value = 110, swing_value = 30, vol_value = 10, selected_button = None, selected_note_element = None, selected_instrument = None):
 	#clear()
 	screen_matrix = createScreenMatrix()
 	sceeen_matrix = fillMatrix(screen_matrix)
 	screen_matrix = drawNumbersAndFrames(1, screen_matrix)
-	screen_matrix = markTrackWithSampleName(list_of_samples, screen_matrix, selected = 1)
+	screen_matrix = markTrackWithSampleName(list_of_samples, screen_matrix, selected = selected_instrument)
 	screen_matrix = drawPatternNumber(screen_matrix)
-	screen_matrix = drawNotes(screen_matrix, pattern)
+	screen_matrix = drawNotes(screen_matrix, pattern, selected_note_element)
 	screen_matrix = createVerticalGreyLines(screen_matrix)
 	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value)
 	screen_matrix = drawMenu(screen_matrix, selected_button)
@@ -335,7 +336,7 @@ def createExamplePattern():
 
 if __name__ == "__main__":
 	example_pattern = createExamplePattern()
-	main(list_of_samples = ["folder/kick_deep_132.mp3"], pattern = example_pattern, selected_note_element = [2, 1, 1])
+	main(list_of_samples = ["folder/kick_deep_132.mp3", "a"], pattern = example_pattern, selected_note_element = [3, 3, 3])
 
 	
 #

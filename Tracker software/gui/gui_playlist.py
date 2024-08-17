@@ -91,7 +91,7 @@ def drawPatterns(screen_matrix, selected_pattern, playlist, first_number, cursor
 				if playlist[i][j] is not None:
 					pattern_number_length = len(str(playlist[i][j]))
 					for k in range(pattern_number_length):
-						if cursor[0] == i and cursor[1] == j:
+						if cursor is not None and cursor[0] == i and cursor[1] == j:
 							screen_matrix[j+1][x+k] = formatTextAsSelected(str(playlist[i][j])[k])
 						elif j % 2 == 0:
 							screen_matrix[j+1][x+k] = changeStringBgColor("black grey", str(playlist[i][j])[k])
@@ -100,11 +100,11 @@ def drawPatterns(screen_matrix, selected_pattern, playlist, first_number, cursor
 		x += 6
 	return screen_matrix
 
-def main(list_of_instruments, bpm_value, swing_value, vol_value, playlist, selected_pattern = None, first_number = 1, cursor = None):
+def main(list_of_instruments, bpm_value, swing_value, vol_value, playlist, selected_pattern = None, first_number = 1, cursor = None, selected_instrument = None):
 	screen_matrix = createScreenMatrix()
 	screen_matrix = fillMatrix(screen_matrix)
 	screen_matrix = drawNumbersAndFrames(first_number, screen_matrix = screen_matrix)
-	screen_matrix = markTrackWithSampleName(screen_matrix = screen_matrix, list_of_samples = list_of_instruments)
+	screen_matrix = markTrackWithSampleName(screen_matrix = screen_matrix, list_of_samples = list_of_instruments, selected = selected_instrument)
 	screen_matrix = drawInformationThatItIsPlalist(screen_matrix)
 	screen_matrix = drawMenu(screen_matrix)
 	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value)
@@ -117,4 +117,4 @@ def main(list_of_instruments, bpm_value, swing_value, vol_value, playlist, selec
 if __name__ == "__main__":
 	playlist = [[1, None, 2, None],[4000,400,32,134]]
 	selected_pattern = [1, 2]
-	main(list_of_instruments = ["Drums", "M1CH1"], bpm_value = 200, swing_value = 50, vol_value = 90, playlist = playlist)
+	main(list_of_instruments = ["Drums", "M1C1"], bpm_value = 200, swing_value = 50, vol_value = 90, playlist = playlist)

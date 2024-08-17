@@ -1,7 +1,10 @@
 from changeTextColor import changeStringFontColor, changeStringBgColor
 import sys
 import os
-sys.path.insert(0, '/home/obojetnie/scripts/libs')
+from pick_file import getOutputLinux
+pwd = getOutputLinux("pwd")
+libs_path = pwd[:-3] + "libs"
+sys.path.insert(0, libs_path)
 from keypad import Keypad
 
 clear = lambda: os.system("clear")
@@ -192,4 +195,3 @@ def userInputFilename(is_dir):
 			printKeyboard(filename, is_dir)
 			#printKeyboard(str(y) + str(x))
 	return filename
-

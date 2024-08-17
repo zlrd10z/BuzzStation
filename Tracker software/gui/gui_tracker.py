@@ -335,5 +335,11 @@ def createExamplePattern():
 
 if __name__ == "__main__":
 	example_pattern = createExamplePattern()
-	main(["folder/kick_deep_132.mp3"], example_pattern, None, [1, 1, 1])
+	main(["folder/kick_deep_132.mp3"], example_pattern, None, [2, 1, 1])
 
+	
+#
+#selected_note_element = [3, 1, 2])
+#3track, if there would be three tracks: kick snare hihat, the hihat would be choosen
+#1 - first note
+#2 - selected quarter note's volume

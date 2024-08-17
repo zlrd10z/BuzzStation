@@ -210,7 +210,7 @@ def getStartingNoteAndOctave(selected_note):
 		
 	return start_note, octave
 		
-def main(selected_note=None, selecteded_beat=None, pattern=None, selected_menu_button=None, bpm_value, swing_value, channel_number, playing,):
+def main(bpm_value, swing_value, channel_number, pattern_number, playing = False, selected_note=None, selecteded_beat=None, pattern=None, selected_menu_button=None):
 	start_note, octave = getStartingNoteAndOctave(selected_note)
 	
 	screen_matrix = createScreenMatrix()
@@ -218,8 +218,8 @@ def main(selected_note=None, selecteded_beat=None, pattern=None, selected_menu_b
 	screen_matrix = drawVerticalLinesForBetterVisibility(screen_matrix)
 	screen_matrix = drawPiano(screen_matrix, octave, start_note)
 	screen_matrix = drawQuarterTime(screen_matrix)
-	screen_matrix = drawPatternNumber(screen_matrix, pattern_number = 1)
-	screen_matrix = drawSwingBPMValueAndMidiChannelNumber(screen_matrix, bpm_value = 100, swing_value = 40, channel_number = 1)
+	screen_matrix = drawPatternNumber(screen_matrix, pattern_number)
+	screen_matrix = drawSwingBPMValueAndMidiChannelNumber(screen_matrix, bpm_value, swing_value, channel_number)
 	screen_matrix = drawIsPlaying(screen_matrix, playing)
 	screen_matrix = drawButtons(screen_matrix, selected_menu_button)
 	if pattern is not None:
@@ -248,5 +248,5 @@ if __name__ == "__main__":
 
 	example_pattern = createExamplePattern()
 	print(example_pattern)
-	main(pattern = example_pattern, selected_note = "C7", selecteded_beat = 0, menu = True)
+	main(bpm_value=111, swing_value=31, channel_number=14, pattern_number = 45, pattern = example_pattern, selected_note = "C7", selecteded_beat = 0, selected_menu_button = 2)
 	#main()

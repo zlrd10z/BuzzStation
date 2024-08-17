@@ -210,7 +210,7 @@ def getStartingNoteAndOctave(selected_note):
 		
 	return start_note, octave
 		
-def main(selected_note, selecteded_beat, pattern=None, selected_menu_button = None):
+def main(selected_note=None, selecteded_beat=None, pattern=None, selected_menu_button=None, bpm_value, swing_value, channel_number, playing,):
 	start_note, octave = getStartingNoteAndOctave(selected_note)
 	
 	screen_matrix = createScreenMatrix()
@@ -220,31 +220,33 @@ def main(selected_note, selecteded_beat, pattern=None, selected_menu_button = No
 	screen_matrix = drawQuarterTime(screen_matrix)
 	screen_matrix = drawPatternNumber(screen_matrix, pattern_number = 1)
 	screen_matrix = drawSwingBPMValueAndMidiChannelNumber(screen_matrix, bpm_value = 100, swing_value = 40, channel_number = 1)
-	screen_matrix = drawIsPlaying(screen_matrix, True)
+	screen_matrix = drawIsPlaying(screen_matrix, playing)
 	screen_matrix = drawButtons(screen_matrix, selected_menu_button)
-	screen_matrix = drawNotesOnPianoRoll(screen_matrix, pattern = pattern)
+	if pattern is not None:
+		screen_matrix = drawNotesOnPianoRoll(screen_matrix, pattern = pattern)
 	if selected_menu_button is None:
 		screen_matrix = drawCursor(screen_matrix, selected_note, selecteded_beat)
 	printGUI(screen_matrix)
 
 
-def createExamplePattern():
-	pattern = []
-	for i in range(16):
-		l = []
-		pattern.append(l)
-	
-	#                   note, note length
-	pattern[0].append(["C#5", 1])
-	pattern[0].append(["D#5", 1])
-	pattern[0].append(["C#7", 1])
-	pattern[1].append(["C#5", 1])
-	pattern[4].append(["C#5", 3])
-	return pattern
+
 	
 if __name__ == "__main__":
+	def createExamplePattern():
+		pattern = []
+		for i in range(16):
+			l = []
+			pattern.append(l)
+
+		#                   note, note length
+		pattern[0].append(["C#5", 1])
+		pattern[0].append(["D#5", 1])
+		pattern[0].append(["C#7", 1])
+		pattern[1].append(["C#5", 1])
+		pattern[4].append(["C#5", 3])
+		return pattern
+
 	example_pattern = createExamplePattern()
 	print(example_pattern)
 	main(pattern = example_pattern, selected_note = "C7", selecteded_beat = 0, menu = True)
 	#main()
-

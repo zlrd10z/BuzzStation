@@ -192,7 +192,7 @@ def drawPatternNumber(screen_matrix, pattern_numer = 1):
 			screen_matrix[0][x + i] = changeStringBgColor("blue", info_text[i])
 	return screen_matrix
 
-def drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value = 140, swing_value = 0, vol_value = 10):
+def drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 3 + 6*8
 	info_text = "BPM:    Swing:  mVOL:   "
@@ -292,7 +292,7 @@ def printScreenMatrix( screen_matrix):
 
 
 
-def main(list_of_samples, pattern, selected_button = None, selected_note_element = None):
+def main(list_of_samples, pattern, bpm_value = 110, swing_value = 30, vol_value = 10, selected_button = None, selected_note_element = None):
 	#clear()
 	screen_matrix = createScreenMatrix()
 	sceeen_matrix = fillMatrix(screen_matrix)
@@ -301,7 +301,7 @@ def main(list_of_samples, pattern, selected_button = None, selected_note_element
 	screen_matrix = drawPatternNumber(screen_matrix)
 	screen_matrix = drawNotes(screen_matrix, pattern)
 	screen_matrix = createVerticalGreyLines(screen_matrix)
-	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix)
+	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value)
 	screen_matrix = drawMenu(screen_matrix, selected_button)
 	screen_matrix = drawIsPlaying(screen_matrix)
 	printScreenMatrix(screen_matrix)
@@ -335,7 +335,7 @@ def createExamplePattern():
 
 if __name__ == "__main__":
 	example_pattern = createExamplePattern()
-	main(["folder/kick_deep_132.mp3"], example_pattern, None, [2, 1, 1])
+	main(list_of_samples = ["folder/kick_deep_132.mp3"], pattern = example_pattern, selected_note_element = [2, 1, 1])
 
 	
 #

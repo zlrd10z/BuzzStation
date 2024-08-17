@@ -2,9 +2,21 @@ import os, sys
 import subprocess
 import keyboard
 from changeTextColor import changeStringFontColor, changeStringBgColor
-sys.path.insert(0, '/home/obojetnie/scripts/libs')
+
+
+def getOutputLinux(command):
+	result = subprocess.run([command], shell=True, stdout=subprocess.PIPE, text=True)
+	result = result.stdout.strip()
+	return result
+
+pwd = getOutputLinux("pwd")
+libs_path = pwd[:-3] + "libs"
+
+
+sys.path.insert(0, libs_path)
 from keypad import Keypad
 from screenkeyboard import userInputFilename
+
 
 key = ""
 selected = 0
@@ -23,10 +35,7 @@ def show_cursor():
 	sys.stdout.write('\033[?25h')
 	sys.stdout.flush()
 
-def getOutputLinux(command):
-	result = subprocess.run([command], shell=True, stdout=subprocess.PIPE, text=True)
-	result = result.stdout.strip()
-	return result
+
 
 audio_formats = ["wav", "ogg", "mp3"]
 def checkIsAudioFormatIsCompatible(filename):
@@ -262,13 +271,3 @@ def getFilename(o):
 
 test = getFilename("save song")
 print(test)
-"""
-try:
-	hide_cursor()
-	getFilename()
-except Exception as e:
-	print(e)
-finally:
-	show_cursor()
-
-"""

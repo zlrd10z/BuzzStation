@@ -82,17 +82,36 @@ def drawInfoAboutInstrument(screen_matrix, selected_instrument):
 	
 	return screen_matrix
 
-def main(list_of_instruments = ["Drums", "M1CH1"]):
+def drawPatterns(screen_matrix, selected_pattern, playlist, first_number):
+	x = 2
+	for i in range(len(playlist)):
+		for j in range(len(playlist[i])):
+			if j < first_number + 16:
+				if playlist[i][j] is not None:
+					pattern_number_length = len(str(playlist[i][j]))
+					for k in range(pattern_number_length):
+						if j % 2 == 0:
+							screen_matrix[j+1][x+k] = changeStringBgColor("black grey", str(playlist[i][j])[k])
+						else:
+							screen_matrix[j+1][x+k] = str(playlist[i][j])[k]
+		x += 6
+	return screen_matrix
+
+def main(list_of_instruments, bpm_value, swing_value, vol_value, playlist, selected_pattern = None, first_number = 1):
 	screen_matrix = createScreenMatrix()
 	screen_matrix = fillMatrix(screen_matrix)
-	screen_matrix = drawNumbersAndFrames(first_number = 1, screen_matrix = screen_matrix)
+	screen_matrix = drawNumbersAndFrames(first_number, screen_matrix = screen_matrix)
 	screen_matrix = markTrackWithSampleName(screen_matrix = screen_matrix, list_of_samples = list_of_instruments)
 	screen_matrix = drawInformationThatItIsPlalist(screen_matrix)
 	screen_matrix = drawMenu(screen_matrix)
-	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix)
-	screen_matrix = drawInfoAboutInstrument(screen_matrix, list_of_instruments[1])
+	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value)
+	if selected_pattern is not None:
+		screen_matrix = drawInfoAboutInstrument(screen_matrix, list_of_instruments[selected_pattern[0]])
 	screen_matrix = createVerticalGreyLines(screen_matrix)
+	screen_matrix = drawPatterns(screen_matrix, selected_pattern, playlist, first_number)
 	printScreenMatrix(screen_matrix)
 	
 if __name__ == "__main__":
-	main()
+	playlist = [[1, None, 2, None],[4000,400,32,134]]
+	selected_pattern = [1, 2]
+	main(list_of_instruments = ["Drums", "M1CH1"], bpm_value = 200, swing_value = 50, vol_value = 90, playlist = playlist)

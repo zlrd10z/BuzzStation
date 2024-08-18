@@ -4,8 +4,8 @@ import time
 
 class Keypad():
     GPIO.setmode(GPIO.BCM)
-    cols = [21, 19, 6]
-    rows = [26, 13, 5, 20]
+    cols = [13, 26, 5]
+    rows = [19, 21, 0, 6]
 
 
     # Pins setup:
@@ -17,10 +17,10 @@ class Keypad():
        
 
     keys = [
-    ['2', '1', '3'],
-    ['0', '*', '#'],
-    ['8', '7', '9'],
-    ['5', '4', '6']
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9'],
+    ['*', '0', '#']
     ]
 
 
@@ -45,3 +45,11 @@ class Keypad():
             print(e)
             GPIO.cleanup()
 
+
+
+if __name__ == "__main__":
+	while True:
+		keypad = Keypad()
+		key = keypad.check_keys()
+		if key != "":
+			print(key)

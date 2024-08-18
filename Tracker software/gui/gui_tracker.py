@@ -1,6 +1,6 @@
 import os, sys
 import time
-from changeTextColor import changeStringBgColor, changeStringFontColor
+from .changeTextColor import changeStringBgColor, changeStringFontColor
 
 # Lambdas:
 clear = lambda: os.system("clear")
@@ -293,12 +293,12 @@ def printScreenMatrix( screen_matrix):
 
 
 
-def main(list_of_samples, pattern, bpm_value = 110, swing_value = 30, vol_value = 10, selected_button = None, selected_note_element = None, selected_instrument = None):
+def main(list_of_samples, pattern, bpm_value = 110, swing_value = 30, vol_value = 10, selected_button = None, selected_note_element = None, selected_sample = None):
 	#clear()
 	screen_matrix = createScreenMatrix()
 	sceeen_matrix = fillMatrix(screen_matrix)
 	screen_matrix = drawNumbersAndFrames(1, screen_matrix)
-	screen_matrix = markTrackWithSampleName(list_of_samples, screen_matrix, selected = selected_instrument)
+	screen_matrix = markTrackWithSampleName(list_of_samples, screen_matrix, selected = selected_sample)
 	screen_matrix = drawPatternNumber(screen_matrix)
 	screen_matrix = drawNotes(screen_matrix, pattern, selected_note_element)
 	screen_matrix = createVerticalGreyLines(screen_matrix)
@@ -336,7 +336,7 @@ def createExamplePattern():
 
 if __name__ == "__main__":
 	example_pattern = createExamplePattern()
-	main(list_of_samples = ["folder/kick_deep_132.mp3", "a"], pattern = example_pattern, selected_note_element = [3, 3, 3])
+	main(list_of_samples = ["folder/kick_deep_132.mp3", "a"], pattern = example_pattern, selected_note_element = [1, 3, 3])
 
 	
 #

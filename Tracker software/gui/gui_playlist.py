@@ -1,5 +1,5 @@
-from gui_tracker import createScreenMatrix, fillMatrix, drawNumbersAndFrames, markTrackWithSampleName, printScreenMatrix, drawSwingBPMnMasterVolumeValue
-from changeTextColor import changeStringBgColor, changeStringFontColor
+from .gui_tracker import createScreenMatrix, fillMatrix, drawNumbersAndFrames, markTrackWithSampleName, printScreenMatrix, drawSwingBPMnMasterVolumeValue
+from .changeTextColor import changeStringBgColor, changeStringFontColor
 
 formatTextAsSelected = lambda text: changeStringBgColor("grey", changeStringFontColor("black", text))
 
@@ -70,6 +70,11 @@ def drawInfoAboutInstrument(screen_matrix, selected_instrument):
 		text_line_1 = " Drums and"
 		text_line_2 = "  Samples"
 		lines = [text_line_1, text_line_2]
+	elif selected_instrument == "Empty":
+		text_line_1 = "  [insert]"
+		text_line_2 = "to add midi"
+		lines = [text_line_1, text_line_2]
+		
 	else:
 		text_line_1 = "Midi Port: " + selected_instrument[1]
 		text_line_2 = " Channel: " + selected_instrument[-1]
@@ -83,7 +88,10 @@ def drawInfoAboutInstrument(screen_matrix, selected_instrument):
 	
 	return screen_matrix
 
-def drawPatterns(screen_matrix, selected_pattern, playlist, first_number, cursor):
+def drawPatterns(screen_matrix, selected_pattern, playlist, first_number, pattern_cursor):
+	if pattern_cursor is not None:
+		pattern_cursor[1] = pattern_cursor[1] - 1
+	
 	x = 2
 	for i in range(len(playlist)):
 		for j in range(len(playlist[i])):
@@ -91,7 +99,7 @@ def drawPatterns(screen_matrix, selected_pattern, playlist, first_number, cursor
 				if playlist[i][j] is not None:
 					pattern_number_length = len(str(playlist[i][j]))
 					for k in range(pattern_number_length):
-						if cursor is not None and cursor[0] == i and cursor[1] == j:
+						if pattern_cursor is not None and pattern_cursor[0] == i and pattern_cursor[1] == j:
 							screen_matrix[j+1][x+k] = formatTextAsSelected(str(playlist[i][j])[k])
 						elif j % 2 == 0:
 							screen_matrix[j+1][x+k] = changeStringBgColor("black grey", str(playlist[i][j])[k])
@@ -100,21 +108,33 @@ def drawPatterns(screen_matrix, selected_pattern, playlist, first_number, cursor
 		x += 6
 	return screen_matrix
 
-def main(list_of_instruments, bpm_value, swing_value, vol_value, playlist, selected_pattern = None, first_number = 1, cursor = None, selected_instrument = None):
+def main(list_of_instruments, bpm_value, swing_value, vol_value, playlist, menu_selected = None, cursor = None, first_number = 1):
+	if cursor is not None:
+		if cursor[1] == 0:
+			selected_pattern = cursor[0]
+			pattern_cursor = None
+		else:
+			pattern_cursor = cursor
+			selected_pattern = None
+	else:
+		selected_pattern = None
+		pattern_cursor = None
+	
 	screen_matrix = createScreenMatrix()
 	screen_matrix = fillMatrix(screen_matrix)
 	screen_matrix = drawNumbersAndFrames(first_number, screen_matrix = screen_matrix)
-	screen_matrix = markTrackWithSampleName(screen_matrix = screen_matrix, list_of_samples = list_of_instruments, selected = selected_instrument)
+	screen_matrix = markTrackWithSampleName(screen_matrix = screen_matrix, list_of_samples = list_of_instruments, selected = selected_pattern)
 	screen_matrix = drawInformationThatItIsPlalist(screen_matrix)
-	screen_matrix = drawMenu(screen_matrix)
+	screen_matrix = drawMenu(screen_matrix, selected = menu_selected)
 	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value)
 	if selected_pattern is not None:
-		screen_matrix = drawInfoAboutInstrument(screen_matrix, list_of_instruments[selected_pattern[0]])
+		screen_matrix = drawInfoAboutInstrument(screen_matrix, list_of_instruments[selected_pattern])
 	screen_matrix = createVerticalGreyLines(screen_matrix)
-	screen_matrix = drawPatterns(screen_matrix, selected_pattern, playlist, first_number, cursor)
+	screen_matrix = drawPatterns(screen_matrix, selected_pattern, playlist, first_number, pattern_cursor)
 	printScreenMatrix(screen_matrix)
 	
 if __name__ == "__main__":
 	playlist = [[1, None, 2, None],[4000,400,32,134]]
 	selected_pattern = [1, 2]
-	main(list_of_instruments = ["Drums", "M1C1"], bpm_value = 200, swing_value = 50, vol_value = 90, playlist = playlist)
+	main(list_of_instruments = ["Drums", "M1C1"], bpm_value = 200, swing_value = 50, vol_value = 90, playlist = playlist, cursor = [0, 1])
+	#cursor [instrument, quareternote]

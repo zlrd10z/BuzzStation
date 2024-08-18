@@ -2,21 +2,10 @@ import os, sys
 import subprocess
 import keyboard
 from changeTextColor import changeStringFontColor, changeStringBgColor
-
-
-def getOutputLinux(command):
-	result = subprocess.run([command], shell=True, stdout=subprocess.PIPE, text=True)
-	result = result.stdout.strip()
-	return result
-
-pwd = getOutputLinux("pwd")
-libs_path = pwd[:-3] + "libs"
-
-
-sys.path.insert(0, libs_path)
+sys.path.insert(0, '/home/obojetnie/scripts/libs')
 from keypad import Keypad
-from screenkeyboard import userInputFilename
-
+import threading
+import time
 
 key = ""
 selected = 0
@@ -35,6 +24,10 @@ def show_cursor():
 	sys.stdout.write('\033[?25h')
 	sys.stdout.flush()
 
+def getOutputLinux(command):
+	result = subprocess.run([command], shell=True, stdout=subprocess.PIPE, text=True)
+	result = result.stdout.strip()
+	return result
 
 
 audio_formats = ["wav", "ogg", "mp3"]
@@ -46,6 +39,8 @@ def checkIsAudioFormatIsCompatible(filename):
 		compatible = False
 	return compatible
 	
+
+
 class DisplayedFilesList:
 	l = []
 	def __init__(self, file_list):
@@ -54,6 +49,7 @@ class DisplayedFilesList:
 		l = self.l
 		return l
 
+
 def getFileList(pwd):
 	ls = getOutputLinux("ls -p " + pwd)
 	ls = ls.split("\n")
@@ -61,9 +57,6 @@ def getFileList(pwd):
 	list_dir = []
 	list_files = []
 	if "/" in pwd: list_dir.append("…/")
-	if option == "save song":
-		list_dir.append("[Create dir]")
-		list_dir.append("[Save here as new file]")
 	for i in range(len(ls)):
 		if "/" in ls[i]: list_dir.append(ls[i])
 		else: list_files.append(ls[i])
@@ -71,15 +64,13 @@ def getFileList(pwd):
 	return ls
 
 
-def printFileList():
+def printFileList(cursor):
 	# Function to create information to user the top line of the screen:
 	def displayInstructionToUser(option):
 		if option == "sample":
 			information_displayed = " Please choose an audio sample[compatible formats: MP3,WAV,OGG]"
-		elif option == "load song":
+		elif option == "song file":
 			information_displayed = "          Please choose .btp project file to load."
-		elif option == "save song":
-			information_displayed = "          Save song project."
 		elif option == "controls":
 			information_displayed = " Press [*] to abort."
 		number_of_fields_to_fill = 64 - len(information_displayed)
@@ -162,6 +153,12 @@ def printFileList():
 
 	displayInstructionToUser("controls")
 
+def printThread():
+	global screen_changed
+	while main_thread:
+		if screen_changed == True:
+			printFileList(True)
+			screen_changed = False
 class PWD:
 	pwd = getOutputLinux("pwd")
 	def update_pwd(self, pwd):
@@ -181,8 +178,8 @@ def getFilename(o):
 	p = PWD()
 	loadDirectory()
 	k = Keypad()
-	printFileList()
-	
+	printing_thread = threading.Thread(target = printThread)
+	printing_thread.start()
 
 	global key
 	global selected
@@ -190,6 +187,9 @@ def getFilename(o):
 	path_to_selected_file = None
 	while True:
 		pressed_key =  k.check_keys()
+		
+		if pressed_key is not None or pressed_key != "":
+			screen_changed = True
 			
 		# Navigation with keypad:
 		if pressed_key == '8':
@@ -214,37 +214,22 @@ def getFilename(o):
 				new_pwd = new_pwd[:len(new_pwd) - 1]
 				p.update_pwd(new_pwd)
 				loadDirectory()
-				
-			elif q.l[selected] == "[Create dir]":
-				pwd = p.pwd
-				dir_name = userInputFilename(True)
-				dir_path = pwd + "/" + dir_name
-				os.mkdir(dir_path)
-				loadDirectory()
-				clear()
-				
-			elif q.l[selected] == "[Save here as new file]":
-				pwd = p.pwd
-				created_filename = userInputFilename(False)
-				path_to_selected_file = pwd + "/" + created_filename
-				clear()
-				break
-				
-				
+
 			elif "/" in q.l[selected]:
 				dir = q.l[selected]
 				pwd = p.pwd + "/" + dir[:len(dir)-1]
 				p.update_pwd(pwd)
 				loadDirectory()
 				selected = 0
-				
 			else:
 				filename = q.l[selected]
 				if option == "sample":
 					if checkIsAudioFormatIsCompatible(filename) == True:
 						path_to_selected_file = p.pwd +"/"+ filename
+						main_thread = False
 						clear()
 						print(path_to_selected_file)
+						screen_changed = False
 						break
 
 					
@@ -263,11 +248,16 @@ def getFilename(o):
 			main_thread = False
 			clear()
 			break
-				
-		if pressed_key != "":
-			printFileList()
-			
 	return path_to_selected_file
 
-test = getFilename("save song")
-print(test)
+getFilename("song file")
+"""
+try:
+	hide_cursor()
+	getFilename()
+except Exception as e:
+	print(e)
+finally:
+	show_cursor()
+
+"""

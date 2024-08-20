@@ -20,9 +20,9 @@ try:
     while True:
         for note in range(0x1E, 0x5A):
             note_on(0x90, note, 0x45)
-            time.sleep(0.1)  # Czekamy 100 ms
+            time.sleep(0.1)  # Wait 100 ms
             note_on(0x90, note, 0x00)
-            time.sleep(0.1)  # Czekamy 100 ms
+            time.sleep(0.1)  # Wait 100 ms
 
 except KeyboardInterrupt:
     ser.close()

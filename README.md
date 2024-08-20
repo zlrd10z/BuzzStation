@@ -24,3 +24,9 @@ Song projects will be saved in .btp format.
 Song Struckture:
 Loop - for example 16 notes, Each Loop can loop forever, playing 16 notes repetitively.
 Playlist - Matrix with the help of which from loops will be able to arrange into a larger part of a musical piece.In this matrix, you will be able to set as many loops as you want, so that they play simultaneously (for example, one loop plays only kick, the second snare, the third melody sent by one of the MIDI outputs).
+
+## Required Libraries
+
+This project requires the following Python libraries:
+
+- `adafruit-circuitpython-ads1x15`  # Adafruit CircuitPython library for ADS1x15 ADCs

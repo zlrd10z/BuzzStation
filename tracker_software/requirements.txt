@@ -1,1 +1,3 @@
+#To install required external libraries, please use pip install -r requirements.txt
+
 adafruit-circuitpython-ads1x15  # Adafruit CircuitPython library for ADS1x15 ADCs

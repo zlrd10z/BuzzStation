@@ -99,14 +99,15 @@ def drawPatterns(screen_matrix, selected_pattern, playlist, first_number, patter
 		for j in range(len(playlist[i])):
 			if j < first_number + 16:
 				if playlist[i][j] is not None:
-					pattern_number_length = len(str(playlist[i][j]))
+					playlist_element_to_print = " " + str(playlist[i][j])
+					pattern_number_length = len(str(playlist_element_to_print))
 					for k in range(pattern_number_length):
 						if pattern_cursor is not None and pattern_cursor[0] == i and pattern_cursor[1] % 16 == j:
-							screen_matrix[j+1][x+k] = formatTextAsSelected(str(playlist[i][j])[k])
+							screen_matrix[j+1][x+k] = formatTextAsSelected(str(playlist_element_to_print)[k])
 						elif j % 2 == 0:
-							screen_matrix[j+1][x+k] = changeStringBgColor("black grey", str(playlist[i][j])[k])
+							screen_matrix[j+1][x+k] = changeStringBgColor("black grey", str(playlist_element_to_print)[k])
 						else:
-							screen_matrix[j+1][x+k] = str(playlist[i][j])[k]
+							screen_matrix[j+1][x+k] = str(playlist_element_to_print)[k]
 		x += 6
 	return screen_matrix
 

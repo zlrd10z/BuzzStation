@@ -33,15 +33,33 @@ def loadSong():
 def playSong():
 	pass
 
+def createEmptySongPlaylist(data_storage):
+	song_playlist = data_storage.get_data("song_playlist")
+	track_for_instrument = []
+	for i in range(16):
+		track_for_instrument.append(" ")
+	song_playlist.append(track_for_instrument)
+	data_storage.put_data("song_playlist", song_playlist)
+
+#If there is nothing saved after the first 16 fields, delete after 16 fields the rest of the playlist consisting of empty characters to save memory:
+def shortenPlaylistIfPossible(playlist):
+	# Check if playlist can be shorten:
+	for i in range(len(playlist)):
+		can_be_shorten = True
+		
+		for j in range(16):
+			if playlist[i][len(playlist) - 1 - j] != " ":
+				can_be_shorten = False
+		
+		# Cut last 16 empty fields:
+		if can_be_shorten:
+			for i in range(len(playlist)):
+				playlist[i] = playlist[i][:-16]
+				
+		return playlist
 		
 async def playlist_loop(keys, data_storage):
-	def createEmptySongPlaylist(data_storage):
-		song_playlist = data_storage.get_data("song_playlist")
-		track_for_instrument = []
-		for i in range(16):
-			track_for_instrument.append(" ")
-		song_playlist.append(track_for_instrument)
-		data_storage.put_data("song_playlist", song_playlist)
+
 	
 	createEmptySongPlaylist(data_storage)
 	previous_printed_values = [0, 0, 0]
@@ -72,6 +90,7 @@ async def playlist_loop(keys, data_storage):
 			previous_printed_values[1] = swing	
 			previous_printed_values[2] = bvol
 		
+		# Keys 2 and 8 are up and down keys, keys 4 and 6 are left and right keys
 		# Get key from keypad:	
 		key = keys.check_keys()
 		if key != "":
@@ -79,44 +98,25 @@ async def playlist_loop(keys, data_storage):
 				# Move UP in matrix:
 				if playlist_cursor[1] > 0:
 					playlist_cursor[1] -=  1
-					clear_screen()
-					GUIplaylist(gui_cursor = playlist_cursor[:], 
-								playlist = song_playlist,
-								menu_selected = None, 
-								list_of_instruments = playlist_list_of_instruments, 
-								bpm = bpm, 
-								swing = swing, 
-								bvol = bvol)						
+					if playlist_cursor[1] < (len(song_playlist[0]) -1) - 16:
+						song_playlist = shortenPlaylistIfPossible(song_playlist)
 				
 			if key == '8':
 				# Move DOWN im matrix:
-				playlist_cursor[1] += 1
+				if playlist_list_of_instruments[playlist_cursor[0]] != "Empty":
+					playlist_cursor[1] += 1
 				if playlist_cursor[1] > len(song_playlist[0]):
 					for i in range(len(song_playlist)):
 						for j in range(16):
 							song_playlist[i].append(" ")
-					
-				clear_screen()
-				GUIplaylist(gui_cursor = playlist_cursor[:], 
-							playlist = song_playlist, 
-							menu_selected = None, 
-							list_of_instruments = playlist_list_of_instruments, 
-							bpm = bpm, 
-							swing = swing, 
-							bvol = bvol)			
+							
 				
 			if key == '4':
 				# Move left in matrix:
 				if playlist_cursor[0] > 0: 
 					playlist_cursor[0] -= 1
-					clear_screen()
-					GUIplaylist(gui_cursor = playlist_cursor[:], 
-								playlist = song_playlist, 
-								menu_selected = None, 
-								list_of_instruments = playlist_list_of_instruments, 
-								bpm = bpm, 
-								swing = swing, 
-								bvol = bvol)
+					
+
 					
 			if key == '6':
 				# move right in matrix
@@ -127,16 +127,12 @@ async def playlist_loop(keys, data_storage):
 					for i in range(8): playlist_list_of_instruments.append("Empty")
 
 				# Move cursor to next Empty instrument only when instrument on which cursor points to is not empty:
-				if playlist_list_of_instruments[playlist_cursor[0]] != "Empty":
+				if playlist_list_of_instruments[playlist_cursor[0]] != "Empty" and playlist_cursor[1] == 0:
 					playlist_cursor[0] += 1
-					clear_screen()
-					GUIplaylist(gui_cursor = playlist_cursor[:], 
-								playlist = song_playlist, 
-								menu_selected = None, 
-								list_of_instruments = playlist_list_of_instruments, 
-								bpm = bpm, 
-								swing = swing, 
-								bvol = bvol)					
+				
+				# Move cursor on playlist to next intrument, only if it's not Empty:
+				elif playlist_list_of_instruments[playlist_cursor[0] + 1] != "Empty" and playlist_cursor[1] != 0:
+					playlist_cursor[0] += 1
 					
 			if key == '7':
 				# Toggle down midi instrument channel:
@@ -149,14 +145,22 @@ async def playlist_loop(keys, data_storage):
 							channel = int(midi_instrument[3:]) - 1
 						midi_instrument = midi_instrument[:3] + str(channel)
 						playlist_list_of_instruments[playlist_cursor[0]] = midi_instrument
-						clear_screen()
-						GUIplaylist(gui_cursor = playlist_cursor[:], 
-								playlist = song_playlist, 
-								menu_selected = None, 
-								list_of_instruments = playlist_list_of_instruments, 
-								bpm = bpm, 
-								swing = swing, 
-								bvol = bvol)	
+						
+						
+				# Change selected pattern to previous pattern (eg. from pattern 2 to pattern 1):
+				elif playlist_cursor[1] != 0:
+					# Remove pattern from a field:
+					if song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] == '1':
+						song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = ' '
+	
+					# toggle down pattern:	
+					else:
+						if song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] != ' ':
+							patt_number = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
+							patt_number = int(patt_number) - 1
+							song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = patt_number
+							data_storage.put_data("last_added_pattern_numer", patt_number)
+
 						
 						
 			if key == '9':
@@ -170,14 +174,21 @@ async def playlist_loop(keys, data_storage):
 							channel = int(midi_instrument[3:]) + 1
 						midi_instrument = midi_instrument[:3] + str(channel)
 						playlist_list_of_instruments[playlist_cursor[0]] = midi_instrument
-						clear_screen()
-						GUIplaylist(gui_cursor = playlist_cursor[:], 
-							playlist = song_playlist, 
-							menu_selected = None, 
-							list_of_instruments = playlist_list_of_instruments, 
-							bpm = bpm, 
-							swing = swing, 
-							bvol = bvol)
+						
+				# Change selected pattern to previous pattern (eg. from pattern 1 to pattern 2):
+				elif playlist_cursor[1] != 0:
+					# Add pattern to an empty field:
+					if song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] == ' ':
+						song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = '1'
+	
+					# toggle down pattern:	
+					else:
+						if song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] != ' ':
+							patt_number = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
+							patt_number = int(patt_number) + 1
+							song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = patt_number
+							data_storage.put_data("last_added_pattern_numer", patt_number)
+
 			
 			if key == '3':
 				# Enter menu to save or load song:
@@ -222,27 +233,10 @@ async def playlist_loop(keys, data_storage):
 								saveSong()
 							else:
 								loadSong()
-								
-							clear_screen()
-							GUIplaylist(gui_cursor = playlist_cursor[:], 
-								playlist = song_playlist, 
-								menu_selected = None, 
-								list_of_instruments = playlist_list_of_instruments, 
-								bpm = bpm, 
-								swing = swing, 
-								bvol = bvol)
 							break
 								
 						if key == '1':
 							# Exit menu:
-							clear_screen()
-							GUIplaylist(gui_cursor = playlist_cursor[:], 
-								playlist = song_playlist, 
-								menu_selected = None, 
-								list_of_instruments = playlist_list_of_instruments, 
-								bpm = bpm, 
-								swing = swing, 
-								bvol = bvol)
 							break
 						
 
@@ -267,16 +261,26 @@ async def playlist_loop(keys, data_storage):
 							midi_output = 1
 						else:
 							midi_output += 1
-						playlist_list_of_instruments[playlist_cursor[0]] = "M" + str(midi_output) + midi_channel
+						playlist_list_of_instruments[playlist_cursor[0]] = 'M' + str(midi_output) + midi_channel
+					
+				# Add of delete pattern on selected field:
+				elif playlist_cursor[1]  != 0:
+					# Add last picked pattern (pattern picking with buttons [7] and [9]:
+					if song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] == ' ':
+						song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] = data_storage.get_data("last_added_pattern_numer")
 						
-					clear_screen()
-					GUIplaylist(gui_cursor = playlist_cursor[:], 
-								playlist = song_playlist, 
-								menu_selected = None, 
-								list_of_instruments = playlist_list_of_instruments, 
-								bpm = bpm, 
-								swing = swing, 
-								bvol = bvol)		
+					# delete pattern:	
+					else:
+						song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] = ' '
+						
+			clear_screen()
+			GUIplaylist(gui_cursor = playlist_cursor[:], 
+						playlist = song_playlist, 
+						menu_selected = None, 
+						list_of_instruments = playlist_list_of_instruments, 
+						bpm = bpm, 
+						swing = swing, 
+						bvol = bvol)	
 		
 		# Update values in data storage:
 		data_storage.put_data("playlist_cursor", playlist_cursor)

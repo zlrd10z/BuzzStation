@@ -12,10 +12,16 @@ class DataStorage:
 		# Song data:
 		self.__song_playlist = []
 		self.__playlist_list_of_instruments = ["Drums"]
+		self.__last_added_pattern_numer = 1
+		
+		# Pattern data:
+		self.__patterns = []
+		self.__samples = ["Empty"]
 	
-		# Append with instrument list with 7 * string "Empty":
+		# Append instrument list and samples list with 7 * string "Empty":
 		for i in range(7):
 			self.__playlist_list_of_instruments.append("Empty")
+			self.__samples.append("Empty")
 	
 	# Update requested value:
 	def put_data(self, var_name, new_value):

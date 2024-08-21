@@ -1,6 +1,7 @@
 import os, sys
 import time
 from .changeTextColor import changeStringBgColor, changeStringFontColor
+#from changeTextColor import changeStringBgColor, changeStringFontColor
 
 # Lambdas:
 clear = lambda: os.system("clear")
@@ -153,7 +154,7 @@ def createVerticalGreyLines(screen_matrix):
 	
 	return screen_matrix
 
-																			   
+								   
 def drawSongName(screen_matrix, song_name = None):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
@@ -337,6 +338,7 @@ def createExamplePattern():
 if __name__ == "__main__":
 	example_pattern = createExamplePattern()
 	main(list_of_samples = ["folder/kick_deep_132.mp3", "a"], pattern = example_pattern, selected_note_element = [1, 3, 3])
+	print(example_pattern[0])
 
 	
 #

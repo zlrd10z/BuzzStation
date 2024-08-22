@@ -1,23 +1,34 @@
 class DataStorage:
 	def __init__(self):
+		#==================================================
 		# Potentiometers:
 		self.__bpm = 0
 		self.__swing = 0
 		self.__bvol = 0
 		self.__timeBetweenQuarterNotes = 0
 		
+		#==================================================
 		# Curosrs:
 		self.__playlist_cursor = [0, 0]
 		
+		#==================================================
 		# Song data:
 		self.__song_playlist = []
 		self.__playlist_list_of_instruments = ["Drums"]
 		self.__last_added_pattern_numer = 1
 		
+		#==================================================
 		# Pattern data:
 		self.__patterns = []
+
+		#patterns order in pattern list, so if the pattern_order list would looks like [3,2], 
+		#it means that first l is in pattern is pattern 3 and second list is pattern 2
+		self.__patterns_order = [] 
+		
 		self.__samples = ["Empty"]
+		self.__last_added_note = ["C5", "F"]
 	
+		#==================================================
 		# Append instrument list and samples list with 7 * string "Empty":
 		for i in range(7):
 			self.__playlist_list_of_instruments.append("Empty")
@@ -49,3 +60,29 @@ class DataStorage:
 		
 		else:
 			raise AttributeError(f"Attribute '{var_name}' does not exist.")
+
+	
+	def patternOperations(self, operation, pattern_number, new_pattern = None, index = None):
+		result = None
+		index = __patterns_order.index(pattern_number)
+		
+		# Delete pattern from pattern list and pattern order list:
+		if operation == "delete_pattern":
+			__patterns.pop(index)
+			__patterns_order.pop(index)
+			
+		# Get pattern from list of patterns:	
+		elif operation == "get pattern":
+			result = __patterns[index]
+			result = result[:]
+		
+		# Update patterns list with new pattern
+		elif operation == "update pattern":
+			__patterns[index] = new_pattern
+		
+			
+		
+		return result
+			
+			
+			

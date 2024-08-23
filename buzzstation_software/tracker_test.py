@@ -69,10 +69,10 @@ def main(keys, data_storage, pattern_number):
 	potentiometers_previous_values = [None, None, None]
 	
 	# Create new empty pattern:
-	data_storage.put_data("patterns", createNewEmptyPattern())
-	data_storage.put_data("patterns_order", pattern_number)
+	data_storage.put_data("drums_patterns", createNewEmptyPattern())
+	data_storage.put_data("drums_patterns_order", pattern_number)
 	samples = data_storage.get_data("samples")
-	pattern = data_storage.patternOperations("get pattern", pattern_number)
+	pattern = data_storage.drumsPatternOperations("get pattern", pattern_number)
 	
 	while True:
 		bpm = data_storage.get_data("bpm")
@@ -156,11 +156,11 @@ def main(keys, data_storage, pattern_number):
 							volume = volume_string_list[volume_index]
 						pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = volume
 				
-				data_storage.put_data("last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1]-1][0], 
-														pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
-													
+				data_storage.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1]-1][0], 
+								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
+								
 				# update pattern in data storage:
-				pattern = data_storage.patternOperations("update pattern", pattern_number, new_pattern = pattern)
+				pattern = data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)
 				
 				if key == '9':
 					# Add note with volume:
@@ -185,11 +185,11 @@ def main(keys, data_storage, pattern_number):
 								volume = volume_string_list[volume_index]
 							pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = volume
 							
-					data_storage.put_data("last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1] - 1][0], 
-															pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
+					data_storage.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1] - 1][0], 
+								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
 
 					# update pattern in data storage:
-					pattern = data_storage.patternOperations("update pattern", pattern_number, new_pattern = pattern)	
+					pattern = data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)	
 	
 			# Insert key:
 			if key == '5':
@@ -203,7 +203,7 @@ def main(keys, data_storage, pattern_number):
 				elif tracker_cursor[1] > 0:
 					# if note is empty, add last added note:
 					if len(pattern[tracker_cursor[0]][tracker_cursor[1] - 1]) == 0:
-						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = data_storage.get_data("last_added_note")
+						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = data_storage.get_data("drums_last_added_note")
 					# if field for note is not empty, delete note:
 					else:
 						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = []
@@ -214,7 +214,7 @@ def main(keys, data_storage, pattern_number):
 				patternIsEmpty = checkIfPatternIsEmpty()
 				if patternIsEmpty:
 						# Delete pattern from patterns list and pattern orders list:
-						data_storage.patternOperations("delete_pattern", pattern_number)
+						data_storage.drumsPatternOperations("delete_pattern", pattern_number)
 				# exit to playlist:
 				break
 

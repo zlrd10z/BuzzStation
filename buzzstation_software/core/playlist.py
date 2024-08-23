@@ -190,9 +190,10 @@ async def playlist_loop(keys, data_storage):
 							data_storage.put_data("last_added_pattern_numer", patt_number)
 
 			
-			if key == '3':
+			if key == '#':
 				# Enter menu to save or load song:
 				selected = 0
+				menu_cursor = [0, 0]
 				clear_screen()
 				GUIplaylist(gui_cursor = playlist_cursor[:], 
 							playlist = song_playlist, 
@@ -205,34 +206,59 @@ async def playlist_loop(keys, data_storage):
 				while True:
 					key = keys.check_keys()
 					if key != "":
-						if key == '4' or key == '6':
-							new_selected = selected
-							if key == '4':
-								if selected == 1:
-									new_selected = 0
+						previous_selected = selected
+						if key == '4':
+							if menu_cursor[1] == 1:
+								menu_cursor[1] = 0
 
-							if key == '6':
-								if selected == 0:
-									new_selected = 1
+						if key == '6':
+							if menu_cursor[1] == 0:
+								menu_cursor[1] = 1
+
+						if key == '2':
+							if menu_cursor[0] == 1:
+								menu_cursor[0] = 0
+
+						if key == '8':
+							if menu_cursor[0] == 0:
+								menu_cursor[0] = 1
+
+						if menu_cursor[0] == 0:
+							if menu_cursor[1] == 0:
+								selected = 0
+							else:
+								selected = 1
+						else:
+							selected = 2
+								
 							
-							if new_selected != selected:
-								clear_screen()
-								GUIplaylist(gui_cursor = playlist_cursor[:], 
-								playlist = song_playlist, 
-								menu_selected = selected, 
-								list_of_instruments = playlist_list_of_instruments, 
-								bpm = bpm, 
-								swing = swing, 
-								bvol = bvol)
-								selected = new_selected
+						if previous_selected != selected:
+							clear_screen()
+							GUIplaylist(gui_cursor = playlist_cursor[:], 
+							playlist = song_playlist, 
+							menu_selected = selected, 
+							list_of_instruments = playlist_list_of_instruments, 
+							bpm = bpm, 
+							swing = swing, 
+							bvol = bvol)
+							previous_selected = selected 
 	
 						
 						if key == '5':
 							# Accept choice:
 							if selected == 0:
 								saveSong()
-							else:
+							
+							elif selected == 1:
 								loadSong()
+							
+							elif selected == 2:
+								#new song: clear all previous data
+								data_storage = DataStorage()
+								playlist_cursor = data_storage.get_data("playlist_cursor")
+								song_playlist = data_storage.get_data("song_playlist")
+								playlist_list_of_instruments = data_storage.get_data("playlist_list_of_instruments")
+
 							break
 								
 						if key == '1':
@@ -250,6 +276,7 @@ async def playlist_loop(keys, data_storage):
 					if playlist_list_of_instruments[playlist_cursor[0]] == "Empty":
 						playlist_list_of_instruments[playlist_cursor[0]] = "M1c1"
 						createEmptySongPlaylist(data_storage)
+						song_playlist = data_storage.get_data("song_playlist")
 
 					# Change midi output port, if instrument slot is not empty:
 					elif playlist_list_of_instruments[playlist_cursor[0]] != "Empty":

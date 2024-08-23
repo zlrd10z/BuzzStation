@@ -38,7 +38,7 @@ def drawMenu(screen_matrix, selected = None):
 		if i <= len(info_text)-1:
 			screen_matrix[5][x + i] = changeStringBgColor("blue", info_text[i])
 
-	# playlist button:
+	# playlist buttons:
 	button_text = " Save "
 	for i in range(gui_width - x):
 		if i <= len(button_text) - 1:
@@ -47,7 +47,6 @@ def drawMenu(screen_matrix, selected = None):
 			else:
 				screen_matrix[6][x + i] = button_text[i]
 
-	# clone pattern:
 	button_text = " Load "
 	for i in range(gui_width - x):
 		if i <= len(button_text)-1:
@@ -55,7 +54,15 @@ def drawMenu(screen_matrix, selected = None):
 				screen_matrix[6][x + i + 7] = formatTextAsSelected(button_text[i])
 			else: 
 				screen_matrix[6][x + i + 7] = button_text[i]
-
+	
+	button_text = " New "
+	for i in range(gui_width - x):
+		if i <= len(button_text) - 1:
+			if selected == 2:
+				screen_matrix[7][x + i + 4] = formatTextAsSelected(button_text[i])
+			else:
+				screen_matrix[7][x + i + 4] = button_text[i]
+				
 	return screen_matrix
 
 def drawInfoAboutInstrument(screen_matrix, selected_instrument):

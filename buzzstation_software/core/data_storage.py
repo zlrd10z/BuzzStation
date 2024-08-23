@@ -7,6 +7,9 @@ class DataStorage:
 		self.__bvol = 0
 		self.__timeBetweenQuarterNotes = 0
 		
+		# Playing:
+		self.__is_playing = False
+		
 		#==================================================
 		# Curosrs:
 		self.__playlist_cursor = [0, 0]
@@ -23,16 +26,21 @@ class DataStorage:
 
 		#patterns order in pattern list, so if the pattern_order list would looks like [3,2], 
 		#it means that first l is in pattern is pattern 3 and second list is pattern 2
-		self.__drums_pattern_order = [] 
+		self.__drums_patterns_order = [] 
 		
-		self.__samples = ["Empty"]
+		self.__samples = ["Empty", "Empty"]
+		self.__samples_volume = [10, 10]
 		self.__drums_last_added_note = ["C5", "F"]
+
 	
 		#==================================================
 		# Append instrument list and samples list with 7 * string "Empty":
 		for i in range(7):
 			self.__playlist_list_of_instruments.append("Empty")
 			self.__samples.append("Empty")
+			self.__samples.append("Empty")
+			self.__samples_volume.append(10)
+			self.__samples_volume.append(10)
 	
 	# Update requested value:
 	def put_data(self, var_name, new_value):
@@ -62,24 +70,24 @@ class DataStorage:
 			raise AttributeError(f"Attribute '{var_name}' does not exist.")
 
 	
-	def drumsPatternOperations(self, operation, pattern_number, new_pattern = None, index = None):
+	def drumsPatternOperations(self, operation, pattern_number, new_pattern = None):
 		result = None
-		index = __patterns_order.index(pattern_number)
+		
+		index_in_pattern_order = self.__drums_patterns_order.index(pattern_number)
+
 		
 		# Delete pattern from pattern list and pattern order list:
 		if operation == "delete_pattern":
-			__drums_patterns.pop(index)
-			__drums_pattern_order.pop(index)
+			self.__drums_patterns.pop(index_in_pattern_order)
+			self.__drums_patterns_order.pop(index_in_pattern_order)
 			
 		# Get pattern from list of patterns:	
 		elif operation == "get pattern":
-			result = __drums_patterns[index]
+			result = self.__drums_patterns[index_in_pattern_order]
 			result = result[:]
 		
 		# Update patterns list with new pattern
 		elif operation == "update pattern":
-			__drums_patterns[index] = new_pattern
-		
-			
+			self.__drums_patterns[index_in_pattern_order] = new_pattern
 		
 		return result

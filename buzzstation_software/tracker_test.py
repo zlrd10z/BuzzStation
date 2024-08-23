@@ -2,8 +2,19 @@ from gui import gui_tracker
 from libs.keypad import Keypad
 from core.data_storage import DataStorage
 from core.pick_file import getFilename
+import os
 
-
+#lambdas:
+clear_screen = lambda: os.system("clear")
+guitracker = lambda samples_list, this_pattern, pattern_number, selected_button, cursor: gui_tracker.main(list_of_samples = samples_list, 
+																											pattern = this_pattern, 
+																											is_playing = data_storage.get_data("is_playing"), 
+																											bpm_value = data_storage.get_data("bpm"), 
+																											swing_value = data_storage.get_data("swing"), 
+																											vol_value = data_storage.get_data("bvol"), 
+																											pattern_number = pattern_number,
+																											selected_button = selected_button, 
+																											cursor = cursor)
 
 def createNewEmptyPattern():
 	pattern = []
@@ -68,10 +79,23 @@ def main(keys, data_storage, pattern_number):
 	
 	potentiometers_previous_values = [None, None, None]
 	
-	# Create new empty pattern:
-	data_storage.put_data("drums_patterns", createNewEmptyPattern())
-	data_storage.put_data("drums_patterns_order", pattern_number)
+	patterns_order = data_storage.get_data("drums_patterns_order")
+	
+	# If pattern does not exist already, then create new empty pattern:
+	if pattern_number not in patterns_order:
+		patterns = data_storage.get_data("drums_patterns")
+		patterns.append(createNewEmptyPattern())
+		
+		drums_patterns_order = data_storage.get_data("drums_patterns_order")
+		drums_patterns_order.append(pattern_number)
+		
+		data_storage.put_data("drums_patterns", patterns)
+		data_storage.put_data("drums_patterns_order", drums_patterns_order)
+		
+		
+
 	samples = data_storage.get_data("samples")
+	pattern = data_storage.get_data("drums_patterns")
 	pattern = data_storage.drumsPatternOperations("get pattern", pattern_number)
 	
 	while True:
@@ -79,11 +103,12 @@ def main(keys, data_storage, pattern_number):
 		swing = data_storage.get_data("swing")
 		bvol = data_storage.get_data("bvol")
 		
-		if bpm != potentiometers_previous_values[0] or swing == potentiometers_previous_values[1] or bvol != potentiometers_previous_values[2]:
+		if bpm != potentiometers_previous_values[0] or swing != potentiometers_previous_values[1] or bvol != potentiometers_previous_values[2]:
 			potentiometers_previous_values[0] = bpm
 			potentiometers_previous_values[1] = swing
 			potentiometers_previous_values[2] = bvol
-			#update gui here...
+			clear_screen()
+			guitracker(samples_list = samples, this_pattern = pattern, pattern_number = pattern_number, selected_button = None, cursor = tracker_cursor)
 		
 		
 		if tracker_cursor[0] == 0 and tracker_cursor[2] != 0: tracker_cursor[2] = 0
@@ -91,10 +116,16 @@ def main(keys, data_storage, pattern_number):
 		key = keys.check_keys()
 		if key != '':
 						
-			# [Escape] key - back to playlist:
+					
+			# Escape key:
 			if key == '1':
+				patternIsEmpty = checkIfPatternIsEmpty()
+				if patternIsEmpty:
+						# Delete pattern from patterns list and pattern orders list:
+						data_storage.drumsPatternOperations("delete_pattern", pattern_number)
+				# exit to playlist:
 				break
-			
+
 			# Direction key - down:
 			if key == '8':
 				if tracker_cursor[1] + 1 < 17:
@@ -111,17 +142,18 @@ def main(keys, data_storage, pattern_number):
 			
 			# Direction key = right:
 			if key == '6':
-				# If actual selected sample is not empty, user can move to pick next empty sample:
-				if tracker_cursor[1] == 0 and samples[tracker_cursor[0]] != "Empty":
+				# move to next sample
+				if tracker_cursor[1] == 0:
 					tracker_cursor[0] += 1
 				
 				# If cursor is on playlist and next track from the right is choosen, let user to move cursor to next sample playlist:
 				if tracker_cursor[2] == 0:
 					tracker_cursor[2] += 1
 				elif tracker_cursor[2] == 1:
-					if tracker_cursor[1] != 0 and samples[tracker_cursor[0] + 1] != "Empty":
+					if tracker_cursor[1] != 0:
 						tracker_cursor[0] += 1
-			# Direction key = right:
+						
+			# Direction key = left:
 			if key == '4':
 				# Cursor on samples level:
 				if tracker_cursor[1] == 0 and tracker_cursor[0] - 1 >= 0:
@@ -136,68 +168,88 @@ def main(keys, data_storage, pattern_number):
 							tracker_cursor[0] -= 1	
 	
 			if key == '7':
-				# Add note with volume:
-				if len(pattern[tracker_cursor[0]][tracker_cursor[1]-1]) == 0:
-					pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = ["C5", 'F']
-				
-				else:
-					# Change note value down:
-					if tracker_cursor[2] == 0:
-						note_and_octave = pattern[tracker_cursor[0]][tracker_cursor[1]-1][tracker_cursor[2]]
-						new_note = changeNote("semitone down", note_and_octave)
-						pattern[tracker_cursor[0]][tracker_cursor[1]-1][tracker_cursor[2]] = new_note
-					
-					# Change note's volume value:
-					if tracker_cursor[2] == 1:
-						volume = pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]]
-						volume_index = volume_string_list.index(volume)
-						if volume_index > 0:
-							volume_index -= 1
-							volume = volume_string_list[volume_index]
-						pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = volume
-				
-				data_storage.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1]-1][0], 
-								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
-								
-				# update pattern in data storage:
-				pattern = data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)
-				
-				if key == '9':
+				# if field on playlist is highlighted:
+				if tracker_cursor[1] > 0:
 					# Add note with volume:
-					if len(pattern[tracker_cursor[0]][tracker_cursor[1] - 1]) == 0:
+					if len(pattern[tracker_cursor[0]][tracker_cursor[1]-1]) == 0:
 						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = ["C5", 'F']
 
 					else:
-						
-						# semitone up:
+						# Change note value down:
 						if tracker_cursor[2] == 0:
-							note_and_octave = pattern[0][1][2]
-							new_note = changeNote("semitone up", note_and_octave)
-							pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = new_note
-
+							note_and_octave = pattern[tracker_cursor[0]][tracker_cursor[1]-1][tracker_cursor[2]]
+							new_note = changeNote("semitone down", note_and_octave)
+							pattern[tracker_cursor[0]][tracker_cursor[1]-1][tracker_cursor[2]] = new_note
 
 						# Change note's volume value:
 						if tracker_cursor[2] == 1:
-							volume = pattern[0][1][2]
+							volume = pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]]
 							volume_index = volume_string_list.index(volume)
-							if volume_index < len(volume_string_list) - 1:
-								volume_index += 1
+							if volume_index > 0:
+								volume_index -= 1
 								volume = volume_string_list[volume_index]
 							pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = volume
-							
-					data_storage.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1] - 1][0], 
-								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
+
+					data_storage.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1]-1][0], 
+									pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
 
 					# update pattern in data storage:
-					pattern = data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)	
+					pattern = data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)
+				
+				else:
+					# if sample highlighed on the screen, change volume of the sample:
+					volumes = data_storage.get_data("samples_volume")
+					if volumes[tracker_cursor[0]] - 1 >= 0:
+						volumes[tracker_cursor[0]] -= 1
+						data_storage.put_data("samples_volume", volumes)
+				
+				if key == '9':
+					# if field on playlist is highlighted:
+					if tracker_cursor[1] > 0:
+						# Add note with volume:
+						if len(pattern[tracker_cursor[0]][tracker_cursor[1] - 1]) == 0:
+							pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = ["C5", 'F']
+
+						else:
+
+							# semitone up:
+							if tracker_cursor[2] == 0:
+								note_and_octave = pattern[0][1][2]
+								new_note = changeNote("semitone up", note_and_octave)
+								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = new_note
+
+
+							# Change note's volume value:
+							if tracker_cursor[2] == 1:
+								volume = pattern[0][1][2]
+								volume_index = volume_string_list.index(volume)
+								if volume_index < len(volume_string_list) - 1:
+									volume_index += 1
+									volume = volume_string_list[volume_index]
+								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = volume
+
+						data_storage.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1] - 1][0], 
+									pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
+
+						# update pattern in data storage:
+						pattern = data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)	
+					
+					else:
+						# if sample highlighed on the screen, change volume of the sample:
+						volumes = data_storage.get_data("samples_volume")
+						if volumes[tracker_cursor[0]] + 1 <= 10:
+							volumes[tracker_cursor[0]] += 1
+							data_storage.put_data("samples_volume", volumes)
 	
 			# Insert key:
 			if key == '5':
 				# If cursor is on samples level, insert sample / change sample to other one:
 				if tracker_cursor[1] == 0:
 					# Choose sample from disk with getFilename function and get path to choosen sample:
-					samples[tracker_cursor[0]] = getFilename("sample")
-					data_storage.put_data("samples", samples)
+					sample_path = getFilename("sample", keys)
+					if sample_path is not None:
+						samples[tracker_cursor[0]] = sample_path
+						data_storage.put_data("samples", samples)
 					
 				# if cursor is on playlist:
 				elif tracker_cursor[1] > 0:
@@ -207,20 +259,13 @@ def main(keys, data_storage, pattern_number):
 					# if field for note is not empty, delete note:
 					else:
 						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = []
-					
-					
-			# Escape key:
-			if key == '1':
-				patternIsEmpty = checkIfPatternIsEmpty()
-				if patternIsEmpty:
-						# Delete pattern from patterns list and pattern orders list:
-						data_storage.drumsPatternOperations("delete_pattern", pattern_number)
-				# exit to playlist:
-				break
-
-
+			
+			#if key pressed, update displayed gui:
+			clear_screen()
+			guitracker(samples_list = samples, this_pattern = pattern, pattern_number = pattern_number, selected_button = None, cursor = tracker_cursor[:])
+			
 					
 if __name__ == "__main__":
 	keys = Keypad()
 	data_storage = DataStorage()
-	main(keys, data_storage)
+	main(keys, data_storage, 1)

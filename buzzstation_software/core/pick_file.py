@@ -9,7 +9,6 @@ key = ""
 selected = 0
 q = ""
 p = ""
-main_thread = True
 screen_changed = True
 option = ""
 
@@ -74,7 +73,7 @@ def printFileList():
 		elif option == "save song":
 			information_displayed = "          Save song project."
 		elif option == "controls":
-			information_displayed = " Press [*] to abort."
+			information_displayed = " Press [Esc] to abort."
 		number_of_fields_to_fill = 64 - len(information_displayed)
 		information_displayed += " " * number_of_fields_to_fill
 		information_displayed = changeStringBgColor("blue", information_displayed)
@@ -179,7 +178,6 @@ def getFilename(selected_option, keypad):
 
 	global key
 	global selected
-	global main_thread
 	path_to_selected_file = None
 	while True:
 		pressed_key =  k.check_keys()
@@ -245,13 +243,11 @@ def getFilename(selected_option, keypad):
 					file_extension = file_extension[-1]
 					if file_extension == "btp":
 						path_to_selected_file = p.pwd +"/"+ filename
-						main_thread = False
 						clear()
 						screen_changed = False
 						break
 						
-		if pressed_key == "*":
-			main_thread = False
+		if pressed_key == "1":
 			clear()
 			break
 				
@@ -259,5 +255,4 @@ def getFilename(selected_option, keypad):
 			printFileList()
 			
 	return path_to_selected_file
-
 

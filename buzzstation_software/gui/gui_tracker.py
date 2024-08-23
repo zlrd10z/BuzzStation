@@ -294,13 +294,22 @@ def printScreenMatrix( screen_matrix):
 
 
 
-def main(list_of_samples, pattern, bpm_value = 110, swing_value = 30, vol_value = 10, selected_button = None, selected_note_element = None, selected_sample = None):
-	#clear()
+def main(list_of_samples, pattern, is_playing, bpm_value, swing_value, vol_value, pattern_number, selected_button = None, cursor = None):
+	if cursor[1] == 0:
+		selected_sample = cursor[0]
+		selected_note_element = None
+	
+	else:
+		selected_note_element = cursor[:]
+		selected_note_element[1] -= 1
+		selected_sample = None
+	
+	
 	screen_matrix = createScreenMatrix()
 	sceeen_matrix = fillMatrix(screen_matrix)
 	screen_matrix = drawNumbersAndFrames(1, screen_matrix)
 	screen_matrix = markTrackWithSampleName(list_of_samples, screen_matrix, selected = selected_sample)
-	screen_matrix = drawPatternNumber(screen_matrix)
+	screen_matrix = drawPatternNumber(screen_matrix, pattern_number)
 	screen_matrix = drawNotes(screen_matrix, pattern, selected_note_element)
 	screen_matrix = createVerticalGreyLines(screen_matrix)
 	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value)

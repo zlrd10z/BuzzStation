@@ -140,36 +140,44 @@ def main(keys, data_storage, pattern_number):
 
 			# Direction key - down:
 			if key == '8':
-				if tracker_cursor[1] + 1 < 17:
+				if tracker_cursor[1] + 1 <= 16:
 					tracker_cursor[1] += 1
-				else: tracker_cursor[1] == -1
+				else: tracker_cursor[1] = 0
 			
 			# Direction key - up:
 			if key == '2':
-				if tracker_cursor[1] - 1 > -1:
+				if tracker_cursor[1] - 1 >= 0:
 					tracker_cursor[1] -= 1
-					if tracker_cursor == 0:
-						tracker_cursor[2] = 0
-				else: tracker_cursor[1] == 16
+					
+				else: tracker_cursor[1] = 16
 			
 			# Direction key = right:
 			if key == '6':
 				# move to next sample
 				if tracker_cursor[1] == 0:
-					tracker_cursor[0] += 1
+					if tracker_cursor[0] + 1 < 16:
+						tracker_cursor[0] += 1
+					else:
+						tracker_cursor[0] = 0
 				
 				# If cursor is on playlist and next track from the right is choosen, let user to move cursor to next sample playlist:
 				if tracker_cursor[2] == 0:
 					tracker_cursor[2] += 1
 				elif tracker_cursor[2] == 1:
 					if tracker_cursor[1] != 0:
-						tracker_cursor[0] += 1
-						
+						if tracker_cursor[0] + 1 < 16:
+							tracker_cursor[0] += 1
+						else:
+							tracker_cursor[0] = 0
+							
 			# Direction key = left:
 			if key == '4':
 				# Cursor on samples level:
-				if tracker_cursor[1] == 0 and tracker_cursor[0] - 1 >= 0:
-					tracker_cursor[0] -= 1
+				if tracker_cursor[1] == 0:
+					if tracker_cursor[0] - 1 >= 0:
+						tracker_cursor[0] -= 1
+					else:
+						tracker_cursor[0] = 15
 				
 				# Cursor on Playlist level:
 				elif tracker_cursor[1] != 0:
@@ -177,8 +185,11 @@ def main(keys, data_storage, pattern_number):
 						tracker_cursor[2] -= 1
 					elif tracker_cursor[2] == 0 and tracker_cursor[0] - 1 >= 0:
 							tracker_cursor[2] = 1
-							tracker_cursor[0] -= 1	
-	
+							if tracker_cursor[0] - 1 >= 0:	
+								tracker_cursor[0] -= 1	
+							else:
+								tracker_cursor[0] = 15	
+								
 			if key == '7':
 				# if field on playlist is highlighted:
 				if tracker_cursor[1] > 0:
@@ -276,6 +287,71 @@ def main(keys, data_storage, pattern_number):
 					# if field for note is not empty, delete note:
 					else:
 						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = []
+			
+			# Pattern Menu:
+			if key == "#":
+				menu_cursor = [0, 0]
+				selected = 0
+				
+				#clear_screen()
+				guitracker(samples_list = samples, 
+					   this_pattern = pattern, 
+					   pattern_number = pattern_number, 
+					   song_name = song_name, 
+					   selected_button = selected, 
+					   cursor = tracker_cursor)
+				
+				while True:
+					key = keys.check_keys()
+					if key != '':
+						# Menu up
+						if key == "2":
+							if menu_cursor[0] > 0:
+								menu_cursor[0] -= 1
+						
+						#Menu down
+						if key == "8":
+							if menu_cursor[0] < 2:
+								menu_cursor[0] += 1
+						
+						#menu left
+						if key == "6":
+							if menu_cursor[1] == 1:
+								menu_cursor[1] = 0
+						
+						#menu right	
+						if key == "4":
+							if menu_cursor[1] == 0:
+								menu_cursor[1] = 1		
+						
+						#escape button - exit menu, go back to playlist:
+						if key == "1":
+							break
+								
+						if menu_cursor[0] == 0:
+							if menu_cursor[1] == 1:
+								selected = 0
+					
+							else:
+								selected = 1
+							
+
+						elif menu_cursor[0] == 1:
+							selected = 2
+							
+
+						elif menu_cursor[0] == 2:
+							selected =3
+							
+
+						guitracker(samples_list = samples, 
+						   this_pattern = pattern, 
+						   pattern_number = pattern_number, 
+						   song_name = song_name, 
+						   selected_button = selected, 
+						   cursor = tracker_cursor)	
+						
+							
 			
 			#if key pressed, update displayed gui:
 			#clear_screen()

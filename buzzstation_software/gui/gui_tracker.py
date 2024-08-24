@@ -381,23 +381,32 @@ def printScreenMatrix( screen_matrix):
 def main(list_of_samples, pattern, is_playing, bpm_value, swing_value, vol_value, pattern_number, song_name, selected_button = None, cursor = None):
 	list_of_samples_full_paths = list_of_samples[:]
 	
-	if selected_button is None:
-		full_selected_sample_name = list_of_samples_full_paths[cursor[0]]
-		if cursor[0] < 8:
-			page_number = 1
-		else:
-			page_number = 2
-			cursor[0] -= 8
-			pattern = pattern[-8:]
+	
 
-		if cursor[1] == 0:
-			selected_sample = cursor[0]
-			selected_note_element = None
+	full_selected_sample_name = list_of_samples_full_paths[cursor[0]]
+	if cursor[0] < 8:
+		page_number = 1
+	else:
+		page_number = 2
+		cursor[0] -= 8
+		pattern = pattern[-8:]
+		list_of_samples = list_of_samples_full_paths[-8:]
 
-		else:
-			selected_note_element = cursor[:]
-			selected_note_element[1] -= 1
-			selected_sample = None
+	if cursor[1] == 0:
+		selected_sample = cursor[0]
+		selected_note_element = None
+
+
+	else:
+		selected_note_element = cursor[:]
+		selected_note_element[1] -= 1
+		selected_sample = None
+		
+	
+	if selected_button is not None:
+		selected_sample = None
+		selected_note_element = None
+
 	
 	
 	screen_matrix = createScreenMatrix()

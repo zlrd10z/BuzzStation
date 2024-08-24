@@ -16,6 +16,7 @@ class DataStorage:
 		
 		#==================================================
 		# Song data:
+		self.__song_name = "No songname"
 		self.__song_playlist = []
 		self.__playlist_list_of_instruments = ["Drums"]
 		self.__last_added_pattern_numer = 1

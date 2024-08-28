@@ -248,7 +248,7 @@ def drawMenu(screen_matrix, selected = None):
 				screen_matrix[6][x + i + 11] = button_text[i]
 
 	# playlist button:
-	button_text = " Clear "
+	button_text = " Clone "
 	for i in range(gui_width - x):
 		if i <= len(button_text) - 1:
 			if selected == 2:
@@ -257,7 +257,7 @@ def drawMenu(screen_matrix, selected = None):
 				screen_matrix[7][x + i + 3] = button_text[i]
 
 	# clone pattern:
-	button_text = " Clone "
+	button_text = " Clear "
 	for i in range(gui_width - x):
 		if i <= len(button_text)-1:
 			if selected == 3:
@@ -378,7 +378,7 @@ def printScreenMatrix( screen_matrix):
 
 
 
-def main(list_of_samples, pattern, is_playing, bpm_value, swing_value, vol_value, pattern_number, song_name, selected_button = None, cursor = None):
+def main(list_of_samples, pattern, is_playing, bpm_value, swing_value, vol_value, pattern_number, song_name, selected_button = None, cursor = None, print_on_screen = True):
 	list_of_samples_full_paths = list_of_samples[:]
 	
 	
@@ -423,8 +423,10 @@ def main(list_of_samples, pattern, is_playing, bpm_value, swing_value, vol_value
 	screen_matrix = createVerticalGreyLines(screen_matrix)
 	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value)
 	screen_matrix = drawMenu(screen_matrix, selected_button)
-	screen_matrix = drawIsPlaying(screen_matrix)
-	printScreenMatrix(screen_matrix)
+	screen_matrix = drawIsPlaying(screen_matrix, is_playing)
+	if print_on_screen == True:
+		printScreenMatrix(screen_matrix)
+	return screen_matrix
 
 
 def createExamplePattern():

@@ -1,5 +1,5 @@
 from libs.keypad import Keypad
-from gui import gui_playlist
+from gui import gui_playlist, gui_warning_window
 from .potentiometers_operations import potentiometersOperations
 from .data_storage import DataStorage
 import time
@@ -9,7 +9,7 @@ import asyncio
 
 # Lambdas:
 clear_screen = lambda: os.system("clear")
-GUIplaylist = lambda gui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol: gui_playlist.main(
+GUIplaylist = lambda gui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: gui_playlist.main(
 								list_of_instruments = list_of_instruments,
 								bpm_value = bpm,
 								swing_value = swing,
@@ -17,6 +17,19 @@ GUIplaylist = lambda gui_cursor, playlist, menu_selected, list_of_instruments, b
 								playlist = playlist,
 								gui_cursor = gui_cursor,
 								menu_selected = menu_selected,
+								songname = songname
+								)
+
+GUIgetScreenMatrix = lambda  gui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: gui_playlist.main(
+								list_of_instruments = list_of_instruments,
+								bpm_value = bpm,
+								swing_value = swing,
+								vol_value = bvol,
+								playlist = playlist,
+								gui_cursor = gui_cursor,
+								menu_selected = menu_selected,
+								songname = songname,
+								printgui = False
 								)
 
 
@@ -85,7 +98,9 @@ async def playlist_loop(keys, data_storage):
 						list_of_instruments = playlist_list_of_instruments, 
 						bpm = bpm, 
 						swing = swing, 
-						bvol = bvol)
+						bvol = bvol,
+						songname = data_storage.get_data("song_name")
+					   )
 			previous_printed_values[0] = bpm
 			previous_printed_values[1] = swing	
 			previous_printed_values[2] = bvol
@@ -161,7 +176,49 @@ async def playlist_loop(keys, data_storage):
 							song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = patt_number
 							data_storage.put_data("last_added_pattern_numer", patt_number)
 
+			
+			# clear track key:
+			if key == '0':
+				screen_matrix = GUIgetScreenMatrix(gui_cursor = playlist_cursor[:], 
+									playlist = song_playlist, 
+									menu_selected = None, 
+									list_of_instruments = playlist_list_of_instruments, 
+									bpm = bpm, 
+									swing = swing, 
+									bvol = bvol,
+									songname = data_storage.get_data("song_name")
+								   )
+
+
+				ok_selected = False
+				clear_screen()
+				gui_warning_window.main(screen_matrix, ok_selected, "clear song")
+				
+				while True:
+					key = keys.check_keys()
+					if key != "":
+						if key == "4":
+							ok_selected = True
 						
+						if key == "6":
+							ok_selected == False
+						
+						if key == "1": break
+						
+						if key == "5":
+							key = ""
+							if ok_selected:
+								for i in range(len(song_playlist[playlist_cursor[0]])):
+									song_playlist[playlist_cursor[0]][i] = " " 
+								break
+							else:
+								break
+							
+						clear_screen()	
+						gui_warning_window.main(screen_matrix, ok_selected, "clear song")	
+						
+					
+
 						
 			if key == '9':
 				# Toggle up midi instrument channel:
@@ -201,7 +258,9 @@ async def playlist_loop(keys, data_storage):
 							list_of_instruments = playlist_list_of_instruments, 
 							bpm = bpm, 
 							swing = swing, 
-							bvol = bvol)
+							bvol = bvol,
+							songname = data_storage.get_data("song_name")
+						   )
 				
 				while True:
 					key = keys.check_keys()
@@ -216,54 +275,127 @@ async def playlist_loop(keys, data_storage):
 								menu_cursor[1] = 1
 
 						if key == '2':
-							if menu_cursor[0] == 1:
-								menu_cursor[0] = 0
+							if menu_cursor[0] - 1 > -1:
+								menu_cursor[0] -= 1
 
 						if key == '8':
-							if menu_cursor[0] == 0:
-								menu_cursor[0] = 1
+							if menu_cursor[0] + 1 < 4:
+								menu_cursor[0] += 1
+														
+						if key == '1' or key == "#":
+							# Exit menu:
+							break		
 
 						if menu_cursor[0] == 0:
 							if menu_cursor[1] == 0:
 								selected = 0
 							else:
 								selected = 1
-						else:
-							selected = 2
+								
+						if menu_cursor[0] == 1:
+								selected = 2
+								
+						if menu_cursor[0] == 2:
+								selected = 3
 								
 							
 						if previous_selected != selected:
 							clear_screen()
 							GUIplaylist(gui_cursor = playlist_cursor[:], 
-							playlist = song_playlist, 
-							menu_selected = selected, 
-							list_of_instruments = playlist_list_of_instruments, 
-							bpm = bpm, 
-							swing = swing, 
-							bvol = bvol)
+										playlist = song_playlist, 
+										menu_selected = selected, 
+										list_of_instruments = playlist_list_of_instruments, 
+										bpm = bpm, 
+										swing = swing, 
+										bvol = bvol,
+										songname = data_storage.get_data("song_name")
+										)
 							previous_selected = selected 
 	
 						
 						if key == '5':
+							screen_matrix = GUIgetScreenMatrix(gui_cursor = playlist_cursor[:], 
+																playlist = song_playlist, 
+																menu_selected = None, 
+																list_of_instruments = playlist_list_of_instruments, 
+																bpm = bpm, 
+																swing = swing, 
+																bvol = bvol,
+																songname = data_storage.get_data("song_name")
+															   )
+					
 							# Accept choice:
 							if selected == 0:
 								saveSong()
 							
-							elif selected == 1:
-								loadSong()
-							
-							elif selected == 2:
-								#new song: clear all previous data
-								data_storage = DataStorage()
-								playlist_cursor = data_storage.get_data("playlist_cursor")
-								song_playlist = data_storage.get_data("song_playlist")
-								playlist_list_of_instruments = data_storage.get_data("playlist_list_of_instruments")
-
-							break
+							elif selected > 0:
+								if selected == 1:
+									warning_text = "load song"
+								if selected == 2:
+									warning_text = "new song"
+								if selected == 3:
+									warning_text = "clear all tracks"
 								
-						if key == '1':
-							# Exit menu:
+								ok_selected = False
+								clear_screen()
+								gui_warning_window.main(screen_matrix, ok_selected, warning_text)
+								
+								while True:
+									key = keys.check_keys()
+									if key != "":
+										if key == "4":
+											ok_selected = True
+
+										if key == "6":
+											ok_selected == False
+
+										if key == "1": break
+
+										if key == "5":
+											if ok_selected:
+												if selected == 1:
+													loadSong()
+												
+												elif selected == 2:
+													#new song: clear all previous data
+													data_storage = DataStorage()
+													playlist_cursor = [0, 0]
+													createEmptySongPlaylist(data_storage)
+													song_playlist = data_storage.get_data("song_playlist")
+													playlist_list_of_instruments = data_storage.get_data("playlist_list_of_instruments")
+												
+												elif selected == 3:
+													# Clear entire playlist:
+													song_playlist = data_storage.get_data("song_playlist")
+
+													track_for_instrument = []
+													for i in range(16):
+														track_for_instrument.append(" ")
+
+													for i in range(len(song_playlist)):
+														song_playlist[i] = track_for_instrument[:]
+													data_storage.put_data("song_playlist", song_playlist)
+												key = ""
+												clear_screen()
+												GUIplaylist(gui_cursor = playlist_cursor[:], 
+															playlist = song_playlist, 
+															menu_selected = selected, 
+															list_of_instruments = playlist_list_of_instruments, 
+															bpm = bpm, 
+															swing = swing, 
+															bvol = bvol,
+															songname = data_storage.get_data("song_name")
+															)
+												break
+			
+										clear_screen()
+										gui_warning_window.main(screen_matrix, ok_selected, warning_text)	
+					
 							break
+						
+
+	
+
 						
 
 			
@@ -307,7 +439,9 @@ async def playlist_loop(keys, data_storage):
 						list_of_instruments = playlist_list_of_instruments, 
 						bpm = bpm, 
 						swing = swing, 
-						bvol = bvol)	
+						bvol = bvol,
+						songname = data_storage.get_data("song_name")
+					   )	
 		
 		# Update values in data storage:
 		data_storage.put_data("playlist_cursor", playlist_cursor)

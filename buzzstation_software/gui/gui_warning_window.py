@@ -100,8 +100,8 @@ def drawOkNoButtons(screen_matrix, ok_selected):
 
 def drawInfoText(screen_matrix, action_warning):
 
-	if action_warning == "clear song":
-		info_text = "Are you sure you want to clear the entire song? If it's not saved, the entire progress will be lost!"
+	if action_warning == "new song":
+		info_text = "Are you sure you want to start new project? If it's not saved, the entire progress will be lost!"
 	
 	elif action_warning == "clear pattern":
 		info_text = "Are you sure you want to clear this entire pattern? It's not reversible!"
@@ -111,6 +111,9 @@ def drawInfoText(screen_matrix, action_warning):
 	
 	elif action_warning == "clear track":
 		info_text = "Are you sure you want to clear this entire track? It's not reversible!"
+	
+	elif action_warning == "clear all tracks":
+		info_text = "Are you sure you want to clear all of the tracks? It's not reversible!"
 	
 	window_usable_length = window_size_x - 2
 	

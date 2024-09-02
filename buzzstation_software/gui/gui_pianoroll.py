@@ -141,12 +141,20 @@ def drawSwingBPMValueAndMidiChannelNumber(screen_matrix, bpm_value = 100, swing_
 	return screen_matrix
 
 
-def drawIsPlaying(screen_matrix, is_playing = False):
+def drawIsPlaying(screen_matrix, is_playing = False, playing_mode = False):
 	playing_info = "Pause"
-	if is_playing: playing_info = "Playing"
+	x = 0
+	if is_playing: 
+		playing_info = "Playing"
+		x += 3
+		if playing_mode:
+			playing_info += " [S]"
+		else:
+			playing_info += " [P]"
+		
 	axisx_start_printing = int(gui_width / 2 - len(playing_info))
 	for i in range(len(playing_info)):
-		screen_matrix[gui_height-3][axisx_start_printing + 1 + i] = changeStringBgColor("blue", playing_info[i])
+		screen_matrix[gui_height-3][axisx_start_printing + 1 + i + x] = changeStringBgColor("blue", playing_info[i])
 
 	return screen_matrix
 
@@ -257,7 +265,7 @@ def drawMidiOutputAndChannel(screen_matrix, midi_output_and_channel):
 	
 	return screen_matrix
 		
-def main(bpm_value, swing_value, channel_number, pattern_number, playing = False, midi_output_and_channel = 'M1c1', selected_note=None, selecteded_beat=None, pattern=None, selected_menu_button=None):
+def main(bpm_value, swing_value, channel_number, pattern_number, playing_mode, playing = False, midi_output_and_channel = 'M1c16', selected_note=None, selecteded_beat=None, pattern=None, selected_menu_button=None):
 	start_note, octave = getStartingNoteAndOctave(selected_note)
 	
 	screen_matrix = createScreenMatrix()
@@ -267,7 +275,7 @@ def main(bpm_value, swing_value, channel_number, pattern_number, playing = False
 	screen_matrix = drawQuarterTime(screen_matrix)
 	screen_matrix = drawPatternNumber(screen_matrix, pattern_number)
 	screen_matrix = drawSwingBPMValueAndMidiChannelNumber(screen_matrix, bpm_value, swing_value, channel_number)
-	screen_matrix = drawIsPlaying(screen_matrix, playing)
+	screen_matrix = drawIsPlaying(screen_matrix, playing, playing_mode)
 	screen_matrix = drawButtons(screen_matrix, selected_menu_button)
 	if pattern is not None:
 		screen_matrix = drawNotesOnPianoRoll(screen_matrix, pattern = pattern)
@@ -297,5 +305,5 @@ if __name__ == "__main__":
 
 	example_pattern = createExamplePattern()
 	print(example_pattern)
-	main(bpm_value=111, swing_value=31, channel_number=14, pattern_number = 45, pattern = example_pattern, selected_note = "B7", selecteded_beat = 15, selected_menu_button = 3)
+	main(bpm_value=111, swing_value=31, channel_number=14, pattern_number = 45, pattern = example_pattern, selected_note = "B7", selecteded_beat = 15, playing = False, playing_mode = False)
 	#main()

@@ -16,7 +16,8 @@ guitracker = lambda samples_list, this_pattern, pattern_number, song_name, selec
 								pattern_number = pattern_number,
 								song_name = song_name,
 								selected_button = selected_button, 
-								cursor = cursor)
+								cursor = cursor,
+								playing_mode = data_storage.get_data("patternmode_is_song_playing"))
 
 guitrackerNoPrinting = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: gui_tracker.main(list_of_samples = samples_list, 
 								pattern = this_pattern, 
@@ -28,7 +29,8 @@ guitrackerNoPrinting = lambda samples_list, this_pattern, pattern_number, song_n
 								song_name = song_name,
 								selected_button = selected_button, 
 								cursor = cursor,
-								print_on_screen = False)
+								print_on_screen = False,
+								playing_mode = data_storage.get_data("patternmode_is_song_playing"))
 
 def createNewEmptyPattern():
 	pattern = []
@@ -362,6 +364,17 @@ def main(keys, data_storage, pattern_number):
 						gui_warning_window.main(screen_matrix, ok_selected, "clear track")
 						
 						
+			# Change playing mode from looping pattern to playing whole song:
+			if key == "3":
+				is_song_playing = data_storage.get_data("patternmode_is_song_playing")
+				if is_song_playing:
+					is_song_playing = False
+				else:
+					is_song_playing = True
+
+				data_storage.put_data("patternmode_is_song_playing", is_song_playing)	
+				
+				
 			# Pattern Menu:
 			if key == "#":
 				menu_cursor = [0, 0]
@@ -402,7 +415,8 @@ def main(keys, data_storage, pattern_number):
 						#escape button - exit menu, go back to playlist:
 						if key == "1" or key == "#":
 							break
-
+						
+		
 						
 						# [insert] key - accept:
 						if key == "5":

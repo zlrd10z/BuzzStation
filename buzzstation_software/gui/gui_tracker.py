@@ -283,11 +283,16 @@ def drawSamplesPage(screen_matrix, page_number):
 			screen_matrix[15][x + i] = changeStringBgColor("blue", info_text[i])
 	return screen_matrix
 	
-def drawIsPlaying(screen_matrix, is_playing = False):
+def drawIsPlaying(screen_matrix, is_playing = False, playing_mode = False):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
 	info_text = "Pause"
-	if is_playing: info_text = "Playing"
+	if is_playing: 
+		info_text = "Playing"
+		if playing_mode:
+			info_text += " [S]"
+		else:
+			info_text += " [P]"
 	how_many_fills = ((gui_width - x) - len(info_text)) / 2
 	info_text = " " * int(how_many_fills) + info_text
 
@@ -369,7 +374,7 @@ def drawSongName(screen_matrix, song_name):
 	return screen_matrix
 
 # create string from chars matrix (screen_matrix) and print it out
-def printScreenMatrix( screen_matrix):
+def printScreenMatrix(screen_matrix):
 	frame = ""
 	for i in range(len(screen_matrix)):
 		for j in range(len(screen_matrix[0])):
@@ -378,7 +383,7 @@ def printScreenMatrix( screen_matrix):
 
 
 
-def main(list_of_samples, pattern, is_playing, bpm_value, swing_value, vol_value, pattern_number, song_name, selected_button = None, cursor = None, print_on_screen = True):
+def main(list_of_samples, pattern, is_playing, bpm_value, swing_value, playing_mode, vol_value, pattern_number, song_name, selected_button = None, cursor = None, print_on_screen = True):
 	list_of_samples_full_paths = list_of_samples[:]
 	
 	
@@ -423,7 +428,7 @@ def main(list_of_samples, pattern, is_playing, bpm_value, swing_value, vol_value
 	screen_matrix = createVerticalGreyLines(screen_matrix)
 	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value)
 	screen_matrix = drawMenu(screen_matrix, selected_button)
-	screen_matrix = drawIsPlaying(screen_matrix, is_playing)
+	screen_matrix = drawIsPlaying(screen_matrix, is_playing, playing_mode)
 	if print_on_screen == True:
 		printScreenMatrix(screen_matrix)
 	return screen_matrix

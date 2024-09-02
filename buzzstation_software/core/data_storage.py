@@ -9,6 +9,7 @@ class DataStorage:
 		
 		# Playing:
 		self.__is_playing = False
+		self.__patternmode_is_song_playing = False
 		
 		#==================================================
 		# Curosrs:

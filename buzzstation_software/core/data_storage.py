@@ -34,6 +34,11 @@ class DataStorage:
 		self.__samples_volume = [10, 10]
 		self.__drums_last_added_note = ["C5", "F"]
 
+		#==================================================
+		# Pianoroll patterns:
+		self.__pianoroll_patterns_order = []
+		self.__pianoroll_patterns = []
+		self.__pianoroll_last_added_note = ["C5", 1, 8]
 	
 		#==================================================
 		# Append instrument list and samples list with 7 * string "Empty":
@@ -91,5 +96,28 @@ class DataStorage:
 		# Update patterns list with new pattern
 		elif operation == "update pattern":
 			self.__drums_patterns[index_in_pattern_order] = new_pattern
+		
+		return result
+	
+	def pianorollPatternOperations(self, operation, pattern_number = None, new_pattern = None):
+		result = None
+		if operation == "put pattern":
+			index_in_pattern_order = None
+		else:	
+			index_in_pattern_order = self.__pianoroll_patterns_order.index(pattern_number)
+		
+		if operation == "get pattern":
+			result = self.__pianoroll_patterns[index_in_pattern_order]
+			
+		if operation == "update pattern":
+			self.__pianoroll_patterns[index_in_pattern_order] = new_pattern
+		
+		if operation == "delete pattern":
+			self.__pianoroll_patterns_order.pop(index_in_pattern_order)
+			self.__pianoroll_patterns.pop(index_in_pattern_order)
+		
+		if operation == "put pattern":
+			self.__pianoroll_patterns.append(new_pattern)
+		
 		
 		return result

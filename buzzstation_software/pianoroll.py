@@ -29,7 +29,7 @@ def pianoroll(keypad, data_storage, pattern_number):
 		#create new pattern:
 		pianoroll_patterns_order.append(pattern_number)
 		pattern = createEmptyPattern()
-		data_storage.pianorollPatternOperations("put pattern", pattern)
+		data_storage.pianorollPatternOperations("put pattern", pattern_number, pattern)
 		data_storage.put_data("pianoroll_patterns_order", pianoroll_patterns_order)
 	
 	while True:
@@ -86,6 +86,7 @@ def pianoroll(keypad, data_storage, pattern_number):
 			if key == "1":
 				break
 			print(selected_note_and_octave, selected_beat)	
+		
 			
 			# Insert key:
 			if key == "5":
@@ -108,7 +109,13 @@ def pianoroll(keypad, data_storage, pattern_number):
 
 					
 				print(pattern[selected_beat])
+		
+			#clear key:
+			if key == "0":
+				pattern = createEmptyPattern()
+				data_storage.pianorollPatternOperations("update pattern", pattern_number, pattern)
 				
+		
 if __name__ == "__main__":
 	data_storage = DataStorage()
 	keypad = Keypad()

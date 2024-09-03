@@ -46,6 +46,28 @@ def drawVerticalLinesForBetterVisibility(screen_matrix):
 		x += 6
 	return screen_matrix
 
+def drawHorizontalLinesForBetterVisibility(screen_matrix):
+	y_position = 2
+	x_position = 9
+	counter = 0
+	is_light_grey = True 
+	
+	for i in range(6):
+		for j in range(16*3):
+			if counter == 3:
+				if is_light_grey: is_light_grey = False
+				else: is_light_grey = True
+				counter = 0
+			
+			if is_light_grey:
+				char = changeStringBgColor("light grey", " ")
+			else:
+				char = changeStringBgColor("dark grey", " ")
+			
+			screen_matrix[y_position + 2 * i][x_position + j] = char
+			counter += 1
+			
+	return screen_matrix
 
 notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C"]
 notes_displayed = []
@@ -147,20 +169,24 @@ def drawIsPlaying(screen_matrix, is_playing = False, playing_mode = False):
 	if is_playing: 
 		playing_info = "Playing"
 		x += 3
-		if playing_mode:
-			playing_info += " [S]"
-		else:
-			playing_info += " [P]"
+		
+	if playing_mode:
+		playing_sign = "[S]"
+	else:
+		 playing_sign = "[P]"
 		
 	axisx_start_printing = int(gui_width / 2 - len(playing_info))
 	for i in range(len(playing_info)):
 		screen_matrix[gui_height-3][axisx_start_printing + 1 + i + x] = changeStringBgColor("blue", playing_info[i])
 
+	for i in range(3):
+		screen_matrix[0][59 + i] = changeStringBgColor("blue", playing_sign[i])
+		
 	return screen_matrix
 
 def drawButtons(screen_matrix, selected = None):
 	button_playlist = " Playlist "
-	button_new = " Clear "
+	button_new = " Playing mode "
 	button_clone = " Clone "
 	button_previous_pattern = " ⇽ "
 	button_next_pattern = " ⇾ "
@@ -172,9 +198,9 @@ def drawButtons(screen_matrix, selected = None):
 			question_mark_counter += 1
 			
 		elif question_mark_counter == selected:
-			screen_matrix[gui_height-2][19 + i] = changeStringBgColor("grey", toDraw[i])
+			screen_matrix[gui_height-2][16 + i] = changeStringBgColor("grey", toDraw[i])
 		else:
-			screen_matrix[gui_height-2][19 + i] = toDraw[i]
+			screen_matrix[gui_height-2][16 + i] = toDraw[i]
 	return screen_matrix
 
 
@@ -189,8 +215,10 @@ def drawNotesOnPianoRoll(screen_matrix, pattern = None):
 				if pattern[i][j][0] in notes_displayed:
 					y = y_position -  notes_displayed.index(pattern[i][j][0]) 
 					# quarter note displayed as 3 character square:
-					for k in range(pattern[i][j][1] * 3 - 1):
-						screen_matrix[y][x_position + i + k] = changeStringBgColor("white", " ")
+					for k in range(pattern[i][j][1] * 3 - 1):			
+						single_char = chr(0x2580 + pattern[i][j][2])
+						screen_matrix[y][x_position + i + k] = screen_matrix[y][x_position + i + k].replace(" ", single_char)
+
 
 			x_position += 2
 	return screen_matrix
@@ -271,6 +299,7 @@ def main(bpm_value, swing_value, channel_number, pattern_number, playing_mode, p
 	screen_matrix = createScreenMatrix()
 	screen_matrix = drawFrame(screen_matrix)
 	screen_matrix = drawVerticalLinesForBetterVisibility(screen_matrix)
+	screen_matrix = drawHorizontalLinesForBetterVisibility(screen_matrix)
 	screen_matrix = drawPiano(screen_matrix, octave, start_note, selected_note)
 	screen_matrix = drawQuarterTime(screen_matrix)
 	screen_matrix = drawPatternNumber(screen_matrix, pattern_number)
@@ -296,14 +325,25 @@ if __name__ == "__main__":
 			pattern.append(l)
 
 		#                   note, note length
-		pattern[0].append(["C#5", 1])
-		pattern[0].append(["D#5", 1])
-		pattern[0].append(["C#7", 1])
-		pattern[1].append(["C#5", 1])
-		pattern[4].append(["C#1", 3])
+		pattern[0].append(["C5", 1, 8])
+		pattern[0].append(["D#5", 1, 8])
+		pattern[0].append(["F5", 1, 2])
+		pattern[1].append(["C#5", 1, 1])
+		pattern[4].append(["C#5", 3, 4])
+		
+		pattern[0].append(["A#5", 1, 1])
+		pattern[1].append(["A#5", 1, 1])
+		pattern[2].append(["A#5", 1, 2])
+		pattern[3].append(["A#5", 1, 3])
+		pattern[4].append(["A#5", 1, 4])
+		pattern[5].append(["A#5", 1, 5])
+		pattern[6].append(["A#5", 1, 6])
+		pattern[7].append(["A#5", 1, 7])
+		pattern[8].append(["A#5", 1, 8])
+		
 		return pattern
 
 	example_pattern = createExamplePattern()
 	print(example_pattern)
-	main(bpm_value=111, swing_value=31, channel_number=14, pattern_number = 45, pattern = example_pattern, selected_note = "B7", selecteded_beat = 15, playing = False, playing_mode = False)
+	main(bpm_value=111, swing_value=31, channel_number=14, pattern_number = 45, pattern = example_pattern, selected_note = "C5", selecteded_beat = 14, playing = False, playing_mode = False)
 	#main()

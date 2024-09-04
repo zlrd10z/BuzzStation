@@ -31,6 +31,20 @@ getScreenMatrix = lambda pattern_number, midi_and_channel, selected_note, select
 																																		  print_gui = False
 																																		)	
 
+printGuiEditNoteLength = lambda pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button: gui_pianoroll.main(bpm_value = data_storage.get_data("bpm"), 
+																																				  swing_value = data_storage.get_data("swing"), 
+																																				  pattern_number = pattern_number, 
+																																				  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
+																																				  playing = data_storage.get_data("is_playing"), 
+																																				  midi_output_and_channel = midi_and_channel, 
+																																				  selected_note = selected_note, 
+																																				  selecteded_beat = selected_beat, 
+																																				  pattern = pattern, 
+																																				  selected_menu_button=selected_menu_button,
+																																				  print_gui = True,
+																																				  note_length_edit = True
+																																 				)	
+
 
 def createEmptyPattern():
 	pattern = []
@@ -43,7 +57,7 @@ def createEmptyPattern():
 	return pattern
 
 
-def main(keypad, data_storage, pattern_number, midi_and_channel):
+def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 		
 	
 	notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
@@ -53,14 +67,14 @@ def main(keypad, data_storage, pattern_number, midi_and_channel):
 	
 	# Check is this pattern exist or this is new pattern:
 	pianoroll_patterns_order = data_storage.get_data("pianoroll_patterns_order")
-	if pattern_number in pianoroll_patterns_order:
-		pattern = data_storage.pianorollPatternOperations("get pattern", pattern_number)
+	if pattern_number in pianoroll_patterns_order[track]:
+		pattern = data_storage.pianorollPatternOperations("get pattern", track, pattern_number)
 		
 	else:
 		#create new pattern:
-		pianoroll_patterns_order.append(pattern_number)
+		pianoroll_patterns_order[track].append(pattern_number)
 		pattern = createEmptyPattern()
-		data_storage.pianorollPatternOperations("put pattern", pattern_number, pattern)
+		data_storage.pianorollPatternOperations("put pattern", track, pattern_number, pattern)
 		data_storage.put_data("pianoroll_patterns_order", pianoroll_patterns_order)
 	
 	previous_values = [None, None]
@@ -145,9 +159,47 @@ def main(keypad, data_storage, pattern_number, midi_and_channel):
 				elif already_exists:
 					pattern[selected_beat].pop(index)
 
+				data_storage.pianorollPatternOperations("update pattern", pattern_number, track, pattern)
 					
 				print(pattern[selected_beat])
 		
+			# edit length key:
+			if key == "3":
+				if len(pattern[selected_beat]) > 0:
+					for i in range(len(pattern[selected_beat])):
+						if selected_note_and_octave == pattern[selected_beat][i][0]:
+							printGuiEditNoteLength(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = None)
+							while True:
+								key = keypad.check_keys()
+								if key != "":
+									if key == "1" or key == "3" or key == "5": 
+										key = ""
+										break
+									
+									elif key == "7" or key == "4":
+										if pattern[selected_beat][i][1] > 1:
+ 												pattern[selected_beat][i][1]  -= 1
+									
+									elif key == "9" or key == "6": 
+										if 16 - selected_beat > pattern[selected_beat][i][1]:
+											# check if there is no note behind this note:
+											if len(pattern[selected_beat + pattern[selected_beat][i][1]]) > 0:
+												same_note_exists_one_quarter_behind = False
+												for i in range(len(pattern[selected_beat + pattern[selected_beat][i][1]])):
+													if pattern[selected_beat + pattern[selected_beat][i][1]][i][0] == selected_note_and_octave:
+														same_note_exists_one_quarter_behind = True
+														break
+												
+												if same_note_exists_one_quarter_behind == False: pattern[selected_beat][i][1]  += 1
+												
+														
+													
+											else:
+												pattern[selected_beat][i][1] += 1
+										
+									data_storage.pianorollPatternOperations("update pattern", pattern_number, track, pattern)
+									printGuiEditNoteLength(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = None)
+							break
 			# clear key:
 			if key == "0":
 				is_ok_selected = False
@@ -168,7 +220,7 @@ def main(keypad, data_storage, pattern_number, midi_and_channel):
 							key = ''
 							if is_ok_selected:
 								pattern = createEmptyPattern()
-								data_storage.pianorollPatternOperations("update pattern", pattern_number, pattern)
+								data_storage.pianorollPatternOperations("update pattern", pattern_number, track, pattern)
 								break
 							else:
 								break
@@ -185,7 +237,7 @@ def main(keypad, data_storage, pattern_number, midi_and_channel):
 						if pattern[selected_beat][i][0] == selected_note_and_octave:
 							if pattern[selected_beat][i][2] < 8:
 								pattern[selected_beat][i][2] += 1
-			
+								data_storage.pianorollPatternOperations("update pattern", pattern_number, track, pattern)
 			# volume up note:
 			if key == "7":
 				if len(pattern[selected_beat]) > 0:
@@ -193,7 +245,7 @@ def main(keypad, data_storage, pattern_number, midi_and_channel):
 						if pattern[selected_beat][i][0] == selected_note_and_octave:
 							if pattern[selected_beat][i][2] > 1:
 								pattern[selected_beat][i][2] -= 1
-			
+								data_storage.pianorollPatternOperations("update pattern", pattern_number, track, pattern)
 			# Menu key:
 			if key == "#":
 				menu_selected_button = 0
@@ -227,7 +279,7 @@ def main(keypad, data_storage, pattern_number, midi_and_channel):
 								# clone pattern:
 								elif menu_selected_button == 2:
 									cloned_pattern_number = None
-									pianoroll_patterns_order = data_storage.get_data("pianoroll_patterns_order")
+									pianoroll_patterns_order = data_storage.get_data("pianoroll_patterns_order", track)
 									for i in range(999):
 										if i not in pianoroll_patterns_order:
 											cloned_pattern_number = i
@@ -235,7 +287,7 @@ def main(keypad, data_storage, pattern_number, midi_and_channel):
 
 									if cloned_pattern_number is not None:
 										pianoroll_patterns_order.append(cloned_pattern_number)
-										data_storage.pianorollPatternOperations("put pattern", pattern_number, pattern[:])
+										data_storage.pianorollPatternOperations("put pattern", track, pattern_number, pattern[:])
 										data_storage.put_data("pianoroll_patterns_order", pianoroll_patterns_order)
 										pattern_number = cloned_pattern_number
 
@@ -257,4 +309,4 @@ def main(keypad, data_storage, pattern_number, midi_and_channel):
 if __name__ == "__main__":
 	data_storage = DataStorage()
 	keypad = Keypad()
-	main(keypad, data_storage, 1, "M1c1")
+	main(keypad, data_storage, 1, "M1c1", 1)

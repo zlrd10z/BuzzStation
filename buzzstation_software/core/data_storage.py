@@ -38,6 +38,11 @@ class DataStorage:
 		# Pianoroll patterns:
 		self.__pianoroll_patterns_order = []
 		self.__pianoroll_patterns = []
+		
+		for i in range(16):
+			self.__pianoroll_patterns_order.append([])
+			self.__pianoroll_patterns.append([])
+		
 		self.__pianoroll_last_added_note = ["C5", 1, 8]
 	
 		#==================================================
@@ -99,25 +104,25 @@ class DataStorage:
 		
 		return result
 	
-	def pianorollPatternOperations(self, operation, pattern_number = None, new_pattern = None):
+	def pianorollPatternOperations(self, operation, track, pattern_number = None, new_pattern = None):
 		result = None
 		if operation == "put pattern":
 			index_in_pattern_order = None
 		else:	
-			index_in_pattern_order = self.__pianoroll_patterns_order.index(pattern_number)
+			index_in_pattern_order = self.__pianoroll_patterns_order[track].index(pattern_number)
 		
 		if operation == "get pattern":
-			result = self.__pianoroll_patterns[index_in_pattern_order]
+			result = self.__pianoroll_patterns[track][index_in_pattern_order]
 			
 		if operation == "update pattern":
-			self.__pianoroll_patterns[index_in_pattern_order] = new_pattern
+			self.__pianoroll_patterns[track][index_in_pattern_order] = new_pattern
 		
 		if operation == "delete pattern":
-			self.__pianoroll_patterns_order.pop(index_in_pattern_order)
-			self.__pianoroll_patterns.pop(index_in_pattern_order)
+			self.__pianoroll_patterns_order[track].pop(index_in_pattern_order)
+			self.__pianoroll_patterns[track].pop(index_in_pattern_order)
 		
 		if operation == "put pattern":
-			self.__pianoroll_patterns.append(new_pattern)
+			self.__pianoroll_patterns[track].append(new_pattern)
 		
 		
 		return result

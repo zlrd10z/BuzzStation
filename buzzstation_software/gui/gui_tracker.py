@@ -417,7 +417,7 @@ def main(list_of_samples, pattern, is_playing, bpm_value, swing_value, playing_m
 	screen_matrix = createScreenMatrix()
 	sceeen_matrix = fillMatrix(screen_matrix)
 	screen_matrix = drawNumbersAndFrames(1, screen_matrix)
-	screen_matrix = markTrackWithSampleName(list_of_samples, screen_matrix, selected = selected_sample)
+	screen_matrix = markTrackWithSampleName(list_of_samples[:], screen_matrix, selected = selected_sample)
 	screen_matrix = drawPatternNumber(screen_matrix, pattern_number)
 	screen_matrix = drawSamplesPage(screen_matrix, page_number)
 	screen_matrix = drawNotes(screen_matrix, pattern, selected_note_element)

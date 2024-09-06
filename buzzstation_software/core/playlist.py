@@ -6,6 +6,7 @@ import time
 import os
 import copy
 import asyncio
+from . import tracker
 
 # Lambdas:
 clear_screen = lambda: os.system("clear")
@@ -119,7 +120,11 @@ async def playlist_loop(keys, data_storage):
 			if key == '8':
 				# Move DOWN im matrix:
 				if playlist_list_of_instruments[playlist_cursor[0]] != "Empty":
-					playlist_cursor[1] += 1
+					if playlist_cursor[0] < 15:
+						playlist_cursor[1] += 1
+
+				
+				#create list with 
 				if playlist_cursor[1] > len(song_playlist[0]):
 					for i in range(len(song_playlist)):
 						for j in range(16):
@@ -130,9 +135,22 @@ async def playlist_loop(keys, data_storage):
 				# Move left in matrix:
 				if playlist_cursor[0] > 0: 
 					playlist_cursor[0] -= 1
+				elif playlist_cursor[0] == 0:
+					# jump to firs from right added instrument:
+					playlist_cursor[0] = len(song_playlist) - 1
 					
+			# Edit selected pattern:
+			if key == '3':
+				key == ''
+				if playlist_cursor[0] == 0:
+					pattern_number_for_tracker = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
+					while True:
+						if pattern_number_for_tracker is None or pattern_number_for_tracker == ' ':
+							break
+						pattern_number_for_tracker = await tracker.main(keys, data_storage, pattern_number_for_tracker)
 
-					
+			
+			
 			if key == '6':
 				# move right in matrix
 				# Wake up, Neo
@@ -141,8 +159,11 @@ async def playlist_loop(keys, data_storage):
 					# if cursor point to instrument that is not in playlist_list_of_instruments, add more empty to not exceed list length:
 					for i in range(8): playlist_list_of_instruments.append("Empty")
 
+				if playlist_cursor[0] == 15:
+					playlist_cursor[0] = 0
+						
 				# Move cursor to next Empty instrument only when instrument on which cursor points to is not empty:
-				if playlist_list_of_instruments[playlist_cursor[0]] != "Empty" and playlist_cursor[1] == 0:
+				elif playlist_list_of_instruments[playlist_cursor[0]] != "Empty" and playlist_cursor[1] == 0:
 					playlist_cursor[0] += 1
 				
 				# Move cursor on playlist to next intrument, only if it's not Empty:

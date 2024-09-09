@@ -6,8 +6,10 @@ import time
 import os
 import copy
 import asyncio
+import pickle
 from . import tracker
 from . import pianoroll
+from . import pick_file
 
 # Lambdas:
 clear_screen = lambda: os.system("clear")
@@ -74,7 +76,6 @@ def shortenPlaylistIfPossible(playlist):
 		return playlist
 		
 async def playlist_loop(keys, data_storage):
-
 	
 	createEmptySongPlaylist(data_storage)
 	previous_printed_values = [0, 0, 0]
@@ -356,7 +357,56 @@ async def playlist_loop(keys, data_storage):
 					
 							# Accept choice:
 							if selected == 0:
-								saveSong()
+								# Save song:
+								path_to_file = pick_file.getFilename("save song", keys)
+								should_save_song = True
+								
+								# Check if file already exist, then ask user, if he wants to overwrite it:
+								if path_to_file is not None:
+									if os.path.isfile(path_to_file):
+										ok_selected = False
+										screen_matrix = []
+										line = []
+										for i in range(64):
+											line.append(" ")
+										for i in range(17):
+											screen_matrix.append(line[:])
+									
+											
+										for i in range(len(path_to_file)):
+											screen_matrix[0][i] = path_to_file[i]
+											
+										gui_warning_window.main(screen_matrix, ok_selected, "overwrite song")
+									
+										while True:
+											key = keys.check_keys()
+											if key != "":
+												if key == "4": ok_selected = True
+												if key == "6": 	ok_selected = False
+												if key == "5":
+													if not ok_selected: should_save_song = False
+													else:
+														os.remove(path_to_file)
+														break
+												clear_screen()
+												gui_warning_window.main(screen_matrix, ok_selected, "overwrite song")
+										
+								if should_save_song and path_to_file is not None:
+									with open(path_to_file, 'wb') as file_btp:
+										pickle.dump(data_storage, file_btp)
+										
+								key = ""
+								clear_screen()
+								GUIplaylist(gui_cursor = playlist_cursor[:], 
+											playlist = song_playlist, 
+											menu_selected = selected, 
+											list_of_instruments = playlist_list_of_instruments, 
+											bpm = bpm, 
+											swing = swing, 
+											bvol = bvol,
+											songname = data_storage.get_data("song_name")
+											)
+								break
 							
 							elif selected > 0:
 								if selected == 1:
@@ -377,14 +427,20 @@ async def playlist_loop(keys, data_storage):
 											ok_selected = True
 
 										if key == "6":
-											ok_selected == False
+											ok_selected = False
 
 										if key == "1": break
 
 										if key == "5":
 											if ok_selected:
 												if selected == 1:
-													loadSong()
+													# Load Song
+													path_to_file = pick_file.getFilename("load song", keys)
+													if path_to_file is not None:
+														with open(path_to_file, 'rb') as file_btp:
+															data_storage = pickle.load(file_btp)
+															song_playlist = data_storage.get_data("song_playlist")
+															playlist_list_of_instruments = data_storage.get_data("playlist_list_of_instruments")
 												
 												elif selected == 2:
 													#new song: clear all previous data
@@ -422,7 +478,7 @@ async def playlist_loop(keys, data_storage):
 										gui_warning_window.main(screen_matrix, ok_selected, warning_text)	
 					
 							break
-						
+							
 
 	
 

@@ -237,10 +237,10 @@ def getFilename(selected_option, keypad):
 						clear()
 						break
 
-					
-				if option == "song file":
+				if option == "load song" or option == "save song":
 					file_extension = filename.split(".")
 					file_extension = file_extension[-1]
+					print(file_extension)
 					if file_extension == "btp":
 						path_to_selected_file = p.pwd +"/"+ filename
 						clear()
@@ -255,4 +255,3 @@ def getFilename(selected_option, keypad):
 			printFileList()
 			
 	return path_to_selected_file
-

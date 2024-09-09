@@ -115,6 +115,9 @@ def drawInfoText(screen_matrix, action_warning):
 	elif action_warning == "clear all tracks":
 		info_text = "Are you sure you want to clear all of the tracks? It's not reversible!"
 	
+	elif action_warning == "overwrite song":
+		info_text = "Are you sure you want to overwrite this song?"
+	
 	window_usable_length = window_size_x - 2
 	
 	sliced_texts = []

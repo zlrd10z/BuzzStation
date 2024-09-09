@@ -7,6 +7,7 @@ import os
 import copy
 import asyncio
 from . import tracker
+from . import pianoroll
 
 # Lambdas:
 clear_screen = lambda: os.system("clear")
@@ -142,12 +143,20 @@ async def playlist_loop(keys, data_storage):
 			# Edit selected pattern:
 			if key == '3':
 				key == ''
-				if playlist_cursor[0] == 0:
-					pattern_number_for_tracker = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
-					while True:
-						if pattern_number_for_tracker is None or pattern_number_for_tracker == ' ':
-							break
+				pattern_number_for_tracker = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
+				while True:
+					if pattern_number_for_tracker is None or pattern_number_for_tracker == ' ':
+						break
+					
+					if playlist_cursor[0] == 0:
 						pattern_number_for_tracker = await tracker.main(keys, data_storage, pattern_number_for_tracker)
+					elif playlist_cursor[0] > 0 and playlist_list_of_instruments[playlist_cursor[0]] != "Empty":
+						pattern_number_for_tracker = await pianoroll.main(keypad = keys, 
+																		  data_storage = data_storage,
+																		  pattern_number = pattern_number_for_tracker,
+																		  midi_and_channel = playlist_list_of_instruments[playlist_cursor[0]],
+																		  track = playlist_cursor[0] - 1)
+						
 
 			
 			

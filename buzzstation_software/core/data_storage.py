@@ -111,6 +111,8 @@ class DataStorage:
 		else:	
 			index_in_pattern_order = self.__pianoroll_patterns_order[track].index(pattern_number)
 		
+			
+		
 		if operation == "get pattern":
 			result = self.__pianoroll_patterns[track][index_in_pattern_order]
 			

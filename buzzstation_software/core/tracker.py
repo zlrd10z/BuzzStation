@@ -5,6 +5,7 @@ from core.data_storage import DataStorage
 from core.pick_file import getFilename
 import os
 import asyncio
+import copy
 
 #lambdas:
 clear_screen = lambda: os.system("clear")
@@ -448,7 +449,7 @@ async def main(keys, data_storage, pattern_number):
 
 												#clone pattern to list of patterns
 												patterns = data_storage.get_data("drums_patterns")
-												patterns.append(pattern)
+												patterns.append(copy.deepcopy(pattern))
 												data_storage.put_data("drums_patterns", patterns)
 												break		
 								return new_pattern_number

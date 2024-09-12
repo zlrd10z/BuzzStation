@@ -5,7 +5,7 @@ import time
 serialUSB = serial.Serial('/dev/ttyUSB0', 31250) 
 time.sleep(2)  # Czekaj, aż połączenie zostanie nawiązane
 
-stop_byte = bytes([224])
+stop_byte = bytes([221])
 byte_midi_output_2 = bytes([222])
 byte_midi_output_3 = bytes([223])
 

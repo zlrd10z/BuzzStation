@@ -2,86 +2,62 @@
 #include <SoftwareSerial.h>
 #include <stdio.h>
 
-unsigned char buffor [1000];
-volatile byte position;
-volatile boolean process_it;
-
-// Special bytes:
-unsigned char byte_spi_transsmision_stop = 120;
-unsigned char byte_midi_output_2 = 121;
-unsigned char byte_midi_output_3 = 122;
+#define LED_BUILTIN 13 
+unsigned char buffor[1001];
+int buffor_position;
+unsigned char stop_byte = 224;
+unsigned char byte_midi_output_2 = 222;
+unsigned char byte_midi_output_3 = 223;
 
 // Midi output 3:
 SoftwareSerial softSerial(3,2); // Digital ports as 2 (RX) and 3 (TX)
 
-void setup (void)
-{
-    // Midi output 2:
-  Serial.begin(31250);
+void setup() {
+  Serial.begin(31250); // 31250 baudrate - MIDI baudrate
   softSerial.begin(31250);
-
-  // have to send on master in, *slave out*
-  pinMode(MISO, OUTPUT);
-  
-  // turn on SPI in slave mode
-  SPCR |= _BV(SPE);
-  
-  // turn on interrupts
-  SPCR |= _BV(SPIE);
-  
-  position = 0;
-  process_it = false;
-}  // end of setup
-
-
-// SPI interrupt routine:
-ISR (SPI_STC_vect)
-{
-byte c = SPDR;
-  
-  // add to bufforfer if room
-  if (position < sizeof buffor)
-    {
-    buffor[position++] = c;
-    // byte 120 means time to process bufforfer
-    if (c == byte_spi_transsmision_stop)
-      process_it = true;
-      
-    }  // end of room available
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
-// main loop - wait for flag set in interrupt routine
-void loop (void)
-{
-  if (process_it)
-    {
-    buffor[position] = 0;  
+void loop() {
+  if (Serial.available()) {
+    if (Serial.available() > 0) {
+      receiveData();
+      processData();
+    }
+  }
+}
 
-    // send buffor data to Serial and Software Serial:
-    int x = 0;
-    while (true){
-      if (buffor[x] == byte_spi_transsmision_stop){
-        break;
-      }
-      else if (buffor[x] == byte_midi_output_2){
-        playNoteMIDI2(buffor[x + 1], buffor[x + 2], buffor[x + 3]);
-        x += 4;
-      }
+// Receive data:
+void receiveData(){
+  digitalWrite(LED_BUILTIN, HIGH); // Indicate that data is transfered via Serial
+  buffor_position = 0;
 
-      else if (buffor[x] == byte_midi_output_3){
-        playNoteMIDI3(buffor[x + 1], buffor[x + 2], buffor[x + 3]);
-        x += 4;
-      }
-      else {x += 1;
-      }
-      
+  while (Serial.available() > 0 && buffor_position < 1000) {
+    buffor[buffor_position++] = Serial.read();  
+  }
+  buffor[buffor_position] = stop_byte;
+  digitalWrite(LED_BUILTIN, LOW);
+}
+
+// Process data from the buffer, then route the data to MIDI output 2 or output 3
+void processData(){
+  buffor_position = 0;
+
+  while (buffor[buffor_position] != stop_byte){
+    if(buffor[buffor_position] == byte_midi_output_2){
+      playNoteMIDI2(buffor[buffor_position + 1], buffor[buffor_position + 2], buffor[buffor_position + 3]);
+      buffor_position += 4;
+    }
+    else if (buffor[buffor_position] == byte_midi_output_3){
+      playNoteMIDI3(buffor[buffor_position + 1], buffor[buffor_position + 2], buffor[buffor_position + 3]);
+      buffor_position += 4;
     }
 
-    position = 0;
-    process_it = false;
-    }  // end of flag set
-    
-}  // end of loop
+    else{buffor_position++;}
+
+  }
+
+}
 
 void playNoteMIDI2(int channel, int note, int velocity) {
   Serial.write(channel);

@@ -7,7 +7,7 @@ Creating drums and sample loops will be done with music tracker GUI.
 Therer will be able to see 8 sample tracks on the screen at once, but it will be able to scroll the view sideways, making it possible to load and operate on more than 8 samples.
 
 MIDI:
-There would be a connection between Pi Zero and Arduino Nano via SPI (Arduino Nano as SPI Slave) in order to get 3 * UART, to which 3 Midi females will be connected so the BuzzStation. So the BuzzStation will be acting as sequencer for 3 Midi outputs.
+There would be a connection between Pi Zero and Arduino Nano via Serial USB in order to get 3 * UART, to which 3 Midi females will be connected so the BuzzStation. So the BuzzStation will be acting as sequencer for 3 Midi outputs.
 Entering music notes will be done in piano roll.
 
 Inputs:

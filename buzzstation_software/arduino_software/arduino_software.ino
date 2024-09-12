@@ -6,7 +6,7 @@
 
 unsigned char buffor[BUFFER_SIZE];
 int buffor_position = 0;
-unsigned char stop_byte = 224;
+unsigned char stop_byte = 221;
 unsigned char byte_midi_output_2 = 222;
 unsigned char byte_midi_output_3 = 223;
 

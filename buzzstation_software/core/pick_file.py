@@ -1,6 +1,5 @@
 import os, sys
 import subprocess
-import keyboard
 from gui.changeTextColor import changeStringFontColor, changeStringBgColor
 from .screenkeyboard import userInputFilename
 from libs.keypad import Keypad 

@@ -1,5 +1,5 @@
 # BuzzStation
-Phycical Music Tracker project for Pi Zero 2 and Arduino Nano with audio samples support and MIDI outputs.
+Physical Music Tracker project for Pi Zero 2 and Arduino Nano with audio samples support and MIDI outputs.
 
 Drum Machine and samples:
 Tracker will support audio samples.

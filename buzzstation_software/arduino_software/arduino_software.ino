@@ -2,7 +2,8 @@
 #include <SoftwareSerial.h>
 
 #define LED_BUILTIN 13 
-#define BUFFER_SIZE 1000
+/* one note from pi have 3 bytes + 1 one byte for midi output information, so 250 notes can be send, last byte if for stop_byte - processing delimiter */
+#define BUFFER_SIZE 1001 
 
 unsigned char buffer[BUFFER_SIZE];
 int buffer_position = 0;

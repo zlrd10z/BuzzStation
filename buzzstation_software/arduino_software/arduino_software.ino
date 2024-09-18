@@ -4,8 +4,8 @@
 #define LED_BUILTIN 13 
 #define BUFFER_SIZE 1000
 
-unsigned char buffor[BUFFER_SIZE];
-int buffor_position = 0;
+unsigned char buffer[BUFFER_SIZE];
+int buffer_position = 0;
 unsigned char stop_byte = 221;
 unsigned char byte_midi_output_2 = 222;
 unsigned char byte_midi_output_3 = 223;
@@ -28,10 +28,10 @@ void loop() {
 // Receive data
 void receiveData() {
   digitalWrite(LED_BUILTIN, HIGH); // Indicate that data is transferred via Serial
-  buffor_position = 0;
+  buffer_position = 0;
 
-  while (Serial.available() > 0 && buffor_position < BUFFER_SIZE) {
-    buffor[buffor_position++] = Serial.read();
+  while (Serial.available() > 0 && buffer_position < BUFFER_SIZE) {
+    buffer[buffer_position++] = Serial.read();
     delay(1); // Small delay to allow buffer to fill
   }
   digitalWrite(LED_BUILTIN, LOW);
@@ -40,22 +40,22 @@ void receiveData() {
 // Process data from the buffer, then route the data to MIDI output 2 or output 3
 void processData() {
   int index = 0;
-  while (index < buffor_position) {
-    if (buffor[index] == stop_byte) {
+  while (index < buffer_position) {
+    if (buffer[index] == stop_byte) {
       // Stop byte detected, end of message
       break;
     }
-    if (buffor[index] == byte_midi_output_2) {
-      if (index + 3 < buffor_position) {
-        playNoteMIDI2(buffor[index + 1], buffor[index + 2], buffor[index + 3]);
+    if (buffer[index] == byte_midi_output_2) {
+      if (index + 3 < buffer_position) {
+        playNoteMIDI2(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
         index += 4;
       } else {
         // Incomplete message
         break;
       }
-    } else if (buffor[index] == byte_midi_output_3) {
-      if (index + 3 < buffor_position) {
-        playNoteMIDI3(buffor[index + 1], buffor[index + 2], buffor[index + 3]);
+    } else if (buffer[index] == byte_midi_output_3) {
+      if (index + 3 < buffer_position) {
+        playNoteMIDI3(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
         index += 4;
       } else {
         // Incomplete message

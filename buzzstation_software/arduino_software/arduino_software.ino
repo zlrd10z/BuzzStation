@@ -28,7 +28,7 @@ void loop() {
 
 // Receive data
 void receiveData() {
-  digitalWrite(LED_BUILTIN, HIGH); // Indicate that data is transferred via Serial
+  digitalWrite(LED_BUILTIN, HIGH); // Indicate that data is received via Serial
   buffer_position = 0;
 
   while (Serial.available() > 0 && buffer_position < BUFFER_SIZE) {

@@ -10,6 +10,7 @@ class DataStorage:
 		# Playing:
 		self.__is_playing = False
 		self.__patternmode_is_song_playing = False
+		self.__instrument_played = None
 		
 		#==================================================
 		# Curosrs:
@@ -27,6 +28,7 @@ class DataStorage:
 		self.__drums_patterns = {}
 		
 		self.__samples = ["Empty", "Empty"]
+		self.__last_changed_sample = None
 		self.__samples_volume = [10, 10]
 		self.__drums_last_added_note = ["C5", "F"]
 
@@ -99,14 +101,16 @@ class DataStorage:
 		
 		return result
 	
-	def pianoroll_pattern_operations(self, operation, track, pattern_number = None, new_pattern = None):
+	def pianoroll_pattern_operations(self, operation, track = None, pattern_number = None, new_pattern = None):
 		result = None
 		pattern = "pattern" + str(pattern_number)
-		track = "track" + str(track)
 			
 		
-		if operation == "get pattern":
-			result = self.__pianoroll_patterns[pattern][track][index_in_pattern_order]
+		if operation == "get pattern for single track":
+			result = self.__pianoroll_patterns[pattern][track]
+		
+		if operation == "get_whole_pattern":
+			result = self.__pianoroll_patterns[pattern]
 			
 		elif operation == "create or update pattern":
 			if pattern not in self.__pianoroll_patterns:

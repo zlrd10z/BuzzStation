@@ -141,6 +141,8 @@ async def main(keys, data_storage, pattern_number):
 					
 			# Escape key:
 			if key == '1':
+				data_storage.put_data("is_playing", False)
+				data_storage.put_data("instrument_played", None)
 				pattern_is_empty = check_if_pattern_is_empty(pattern)
 				if pattern_is_empty:
 						# Delete pattern from patterns list and pattern orders list:
@@ -152,7 +154,9 @@ async def main(keys, data_storage, pattern_number):
 				is_playing = data_storage.get_data("is_playing")
 				if is_playing:
 					data_storage.put_data("is_playing", False)
+					data_storage.put_data("instrument_played", None)
 				else:
+					data_storage.put_data("instrument_played", 0)
 					data_storage.put_data("is_playing", True)
 					
 			
@@ -285,7 +289,6 @@ async def main(keys, data_storage, pattern_number):
 
 						# Change note's volume value:
 						elif tracker_cursor[2] == 1:
-							print("doopa")
 							volume = pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]]
 							volume_index = volume_string_list.index(volume)
 							if volume_index < len(volume_string_list) - 1:
@@ -316,6 +319,8 @@ async def main(keys, data_storage, pattern_number):
 					if sample_path is not None:
 						samples[tracker_cursor[0]] = sample_path
 						data_storage.put_data("samples", samples)
+						data_storage.put_data("last_changed_sample", (sample_path, tracker_cursor[0]))
+
 					
 				# if cursor is on playlist:
 				elif tracker_cursor[1] > 0:

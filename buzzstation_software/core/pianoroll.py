@@ -68,7 +68,7 @@ async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 	
 	# Check is this pattern exist or this is new pattern:
 	if data_storage.pianoroll_pattern_operations("exists", track, pattern_number):
-		pattern = data_storage.pianoroll_pattern_operations("get pattern", track, pattern_number)
+		pattern = data_storage.pianoroll_pattern_operations("get pattern for single track", track, pattern_number)
 		
 	else:
 		#create new pattern:
@@ -134,8 +134,20 @@ async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 
 			# Escape key:
 			if key == "1":
+				data_storage.put_data("is_playing", False)
+				data_storage.put_data("instrument_played", None)
 				break
 			#print(selected_note_and_octave, selected_beat)	
+			
+			if key == "*":
+				is_playing = data_storage.get_data("is_playing")
+				if is_playing:
+					data_storage.put_data("is_playing", False)
+					data_storage.put_data("instrument_played", None)
+					
+				else:
+					data_storage.put_data("instrument_played", track)
+					data_storage.put_data("is_playing", True)
 		
 			
 			# Insert key:

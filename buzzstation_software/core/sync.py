@@ -4,11 +4,11 @@ import time
 
 GPIO.setmode(GPIO.BCM)
 
-pin = 20
+pin = 23
 GPIO.setup(pin, GPIO.OUT)
 
 
-def syncOut(pinBoolean):
+def sync_out(pinBoolean):
 	try:
 		if pinBoolean:
 			GPIO.output(pin, GPIO.HIGH)
@@ -26,7 +26,7 @@ def syncOut(pinBoolean):
 
 if __name__ == "__main__":
 	while True:
-		syncOut(True)
+		sync_out(True)
 		time.sleep(0.1)
-		syncOut(False)
+		sync_out(False)
 		time.sleep(0.1)

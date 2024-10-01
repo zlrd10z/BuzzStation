@@ -8,7 +8,7 @@ from adafruit_ads1x15.analog_in import AnalogIn
 i2c = busio.I2C(board.SCL, board.SDA)
 
 # ADS1115 init:
-ads = ADS.ADS1115(i2c, address = 0x4a)
+ads = ADS.ADS1115(i2c, address = 0x48)
 
 # Channels init:
 chan0 = AnalogIn(ads, ADS.P0)

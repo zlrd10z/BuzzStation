@@ -9,7 +9,7 @@ async def potentiometersOperations(data_storage):
 		pots_values = potentiometers.returnPotentiometersValues()
 
 		bpm_old_value = data_storage.get_data("bpm")
-		bpm_new_value = int(potentiometer_values_transform.bpmFromPotentiometer0(pots_values[0]))
+		bpm_new_value = int(potentiometer_values_transform.bpmFromPotentiometer0(pots_values[2]))
 		if bpm_new_value - bpm_old_value > 1 or bpm_old_value - bpm_new_value > 1:
 			bpm = bpm_new_value
 			timeBetweenQuarterNotes = potentiometer_values_transform.countTimePerQuarterNote(bpm)
@@ -23,7 +23,7 @@ async def potentiometersOperations(data_storage):
 			data_storage.put_data("swing", swing)
 
 		bvol_old_value = data_storage.get_data("bvol")
-		bvol_new_value = int(potentiometer_values_transform.volumeFromPotentiometer2(pots_values[2]))
+		bvol_new_value = int(potentiometer_values_transform.volumeFromPotentiometer2(pots_values[0]))
 		if bvol_new_value - bvol_old_value > 1 or bvol_old_value - bvol_new_value > 1:
 			bvol = bvol_new_value
 			data_storage.put_data("bvol", bvol)

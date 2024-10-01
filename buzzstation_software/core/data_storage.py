@@ -24,11 +24,7 @@ class DataStorage:
 		
 		#==================================================
 		# Drums and samples pattern data:
-		self.__drums_patterns = []
-
-		#patterns order in pattern list, so if the pattern_order list would looks like [3,2], 
-		#it means that first l is in pattern is pattern 3 and second list is pattern 2
-		self.__drums_patterns_order = [] 
+		self.__drums_patterns = {}
 		
 		self.__samples = ["Empty", "Empty"]
 		self.__samples_volume = [10, 10]
@@ -36,12 +32,8 @@ class DataStorage:
 
 		#==================================================
 		# Pianoroll patterns:
-		self.__pianoroll_patterns_order = []
-		self.__pianoroll_patterns = []
+		self.__pianoroll_patterns = {}
 		
-		for i in range(16):
-			self.__pianoroll_patterns_order.append([])
-			self.__pianoroll_patterns.append([])
 		
 		self.__pianoroll_last_added_note = ["C5", 1, 8]
 	
@@ -82,49 +74,52 @@ class DataStorage:
 			raise AttributeError(f"Attribute '{var_name}' does not exist.")
 
 	
-	def drumsPatternOperations(self, operation, pattern_number, new_pattern = None):
+	def drums_pattern_operations(self, operation, pattern_number, new_pattern = None):
 		result = None
-		
-		index_in_pattern_order = self.__drums_patterns_order.index(pattern_number)
-
+		pattern_number = str(pattern_number)
 		
 		# Delete pattern from pattern list and pattern order list:
 		if operation == "delete_pattern":
-			self.__drums_patterns.pop(index_in_pattern_order)
-			self.__drums_patterns_order.pop(index_in_pattern_order)
+			self.__drums_patterns.pop(pattern_number)
 			
 		# Get pattern from list of patterns:	
 		elif operation == "get pattern":
-			result = self.__drums_patterns[index_in_pattern_order]
+			result = self.__drums_patterns[pattern_number]
 			result = result[:]
 		
 		# Update patterns list with new pattern
-		elif operation == "update pattern":
-			self.__drums_patterns[index_in_pattern_order] = new_pattern
+		elif operation == "create or update pattern":
+			self.__drums_patterns[pattern_number] = new_pattern
+		
+		elif operation == "exists":
+			if pattern_number in self.__drums_patterns:
+				result = True
+			else:
+				result = False
 		
 		return result
 	
-	def pianorollPatternOperations(self, operation, track, pattern_number = None, new_pattern = None):
+	def pianoroll_pattern_operations(self, operation, track, pattern_number = None, new_pattern = None):
 		result = None
-		if operation == "put pattern":
-			index_in_pattern_order = None
-		else:	
-			index_in_pattern_order = self.__pianoroll_patterns_order[track].index(pattern_number)
-		
+		pattern = "pattern" + str(pattern_number)
+		track = "track" + str(track)
 			
 		
 		if operation == "get pattern":
-			result = self.__pianoroll_patterns[track][index_in_pattern_order]
+			result = self.__pianoroll_patterns[pattern][track][index_in_pattern_order]
 			
-		if operation == "update pattern":
-			self.__pianoroll_patterns[track][index_in_pattern_order] = new_pattern
+		elif operation == "create or update pattern":
+			if pattern not in self.__pianoroll_patterns:
+				self.__pianoroll_patterns[pattern] = {}
+			self.__pianoroll_patterns[pattern][track] = new_pattern
 		
-		if operation == "delete pattern":
-			self.__pianoroll_patterns_order[track].pop(index_in_pattern_order)
-			self.__pianoroll_patterns[track].pop(index_in_pattern_order)
+		elif operation == "delete pattern":
+			self.__pianoroll_patterns[pattern].pop(track)
 		
-		if operation == "put pattern":
-			self.__pianoroll_patterns[track].append(new_pattern)
-		
+		elif operation == "exists":
+			if pattern_number in self.__pianoroll_patterns:
+				result = True
+			else:
+				result = False
 		
 		return result

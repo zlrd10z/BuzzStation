@@ -11,7 +11,7 @@ import copy
 clear_screen = lambda: os.system("clear")
 
 
-def createNewEmptyPattern():
+def create_new_empty_pattern():
 	pattern = []
 	for i in range(16):
 		#Max 16 samples:
@@ -23,7 +23,7 @@ def createNewEmptyPattern():
 	return pattern
 
 
-def checkIfPatternIsEmpty(pattern):
+def check_if_pattern_is_empty(pattern):
 	isEmpty = True
 	for i in range(len(pattern)):
 		for j in range(len(pattern[i])):
@@ -33,7 +33,7 @@ def checkIfPatternIsEmpty(pattern):
 
 	
 
-def changeNote(operation, note_and_octave, tracker_cursor):
+def change_note(operation, note_and_octave, tracker_cursor):
 	notes_string_list = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 	note_and_octave = note_and_octave.replace(" ", '')
 	
@@ -85,7 +85,7 @@ async def main(keys, data_storage, pattern_number):
 								cursor = cursor,
 								playing_mode = data_storage.get_data("patternmode_is_song_playing"))
 
-	guitrackerNoPrinting = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: gui_tracker.main(list_of_samples = samples_list, 
+	guitracker_noprinting = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: gui_tracker.main(list_of_samples = samples_list, 
 									pattern = this_pattern, 
 									is_playing = data_storage.get_data("is_playing"), 
 									bpm_value = data_storage.get_data("bpm"), 
@@ -106,22 +106,14 @@ async def main(keys, data_storage, pattern_number):
 	potentiometers_previous_values = [None, None, None]
 	
 
-	drums_patterns_order = data_storage.get_data("drums_patterns_order")
-	# If pattern does not exist already, then create new empty pattern:
-	if pattern_number not in drums_patterns_order:
-		patterns = data_storage.get_data("drums_patterns")
-		patterns.append(createNewEmptyPattern())
-		
-		drums_patterns_order = data_storage.get_data("drums_patterns_order")
-		drums_patterns_order.append(pattern_number)
-		
-		data_storage.put_data("drums_patterns", patterns)
-		data_storage.put_data("drums_patterns_order", drums_patterns_order)
-		
-		
 	
+	# If pattern does not exist already, then create new empty pattern:
+	if not data_storage.drums_pattern_operations("exists", pattern_number):
+		data_storage.drums_pattern_operations("create or update pattern", pattern_number, create_new_empty_pattern())
+	
+	# Load samples and pattern:
 	samples = data_storage.get_data("samples")
-	pattern = data_storage.drumsPatternOperations("get pattern", pattern_number)
+	pattern = data_storage.drums_pattern_operations("get pattern", pattern_number)
 
 	
 	while True:
@@ -142,18 +134,17 @@ async def main(keys, data_storage, pattern_number):
 					   cursor = tracker_cursor)
 		
 		
-		#if tracker_cursor[0] == 0 and tracker_cursor[2] != 0 and len(pattern[tracker_cursor[0]][tracker_cursor[1]-1]) == 0: tracker_cursor[2] = 0
-		
+		#if tracker_cursor[0] == 0 and tracker_cursor[2] != 0 and len(pattern[tracker_cursor[0]][tracker_cursor[1]-1]) == 0: tracker_cursor[2] = 0		
 		key = keys.check_keys()
 		if key != '':
 				
 					
 			# Escape key:
 			if key == '1':
-				patternIsEmpty = checkIfPatternIsEmpty(pattern)
-				if patternIsEmpty:
+				pattern_is_empty = check_if_pattern_is_empty(pattern)
+				if pattern_is_empty:
 						# Delete pattern from patterns list and pattern orders list:
-						data_storage.drumsPatternOperations("delete_pattern", pattern_number)
+						data_storage.drums_pattern_operations("delete_pattern", pattern_number)
 				# exit to playlist:
 				break
 
@@ -247,7 +238,7 @@ async def main(keys, data_storage, pattern_number):
 						# Change note value down:
 						if tracker_cursor[2] == 0:
 							note_and_octave = pattern[tracker_cursor[0]][tracker_cursor[1]-1][tracker_cursor[2]]
-							new_note = changeNote("semitone down", note_and_octave, tracker_cursor[:])
+							new_note = change_note("semitone down", note_and_octave, tracker_cursor[:])
 							pattern[tracker_cursor[0]][tracker_cursor[1]-1][tracker_cursor[2]] = new_note
 
 						# Change note's volume value:
@@ -263,7 +254,7 @@ async def main(keys, data_storage, pattern_number):
 								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
 
 					# update pattern in data storage:
-					data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)
+					data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
 				
 				else:
 					# if sample highlighed on the screen, change volume of the sample:
@@ -288,7 +279,7 @@ async def main(keys, data_storage, pattern_number):
 						# semitone up:
 						if tracker_cursor[2] == 0:
 							note_and_octave = pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]]
-							new_note = changeNote("semitone up", note_and_octave, tracker_cursor[:])
+							new_note = change_note("semitone up", note_and_octave, tracker_cursor[:])
 							pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = new_note
 
 
@@ -306,7 +297,7 @@ async def main(keys, data_storage, pattern_number):
 								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
 
 					# update pattern in data storage:
-					data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)	
+					data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)	
 
 				else:
 					# if sample highlighed on the screen, change volume of the sample:
@@ -335,7 +326,7 @@ async def main(keys, data_storage, pattern_number):
 					else:
 						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = []
 					# update pattern in data storage:
-					data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)
+					data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
 	
 			#clear single track:
 			if key == "0":
@@ -433,7 +424,7 @@ async def main(keys, data_storage, pattern_number):
 								
 								if pattern_number - 1 > 0 or pattern_number + 1 < 999:
 									# update pattern in data storage:
-									data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)
+									data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
 									if selected == 0:
 										new_pattern_number = pattern_number - 1
 									elif selected == 1:
@@ -458,7 +449,7 @@ async def main(keys, data_storage, pattern_number):
 							elif selected == 3:
 								warning_windows_selected_ok = False
 								clear_screen()
-								screen_matrix = guitrackerNoPrinting(samples_list = samples, 
+								screen_matrix = guitracker_noprinting(samples_list = samples, 
 														   this_pattern = pattern, 
 														   pattern_number = pattern_number, 
 														   song_name = song_name, 
@@ -476,8 +467,8 @@ async def main(keys, data_storage, pattern_number):
 
 										if key == "5":
 											if warning_windows_selected_ok:
-												pattern = createNewEmptyPattern()
-												data_storage.drumsPatternOperations("update pattern", pattern_number, new_pattern = pattern)
+												pattern = create_new_empty_pattern()
+												data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
 												break
 											else:
 												break

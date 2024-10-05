@@ -4,7 +4,6 @@ from libs.keypad import Keypad
 from core.data_storage import DataStorage
 from core.pick_file import getFilename
 import os
-import asyncio
 import copy
 
 #lambdas:
@@ -71,7 +70,7 @@ def change_note(operation, note_and_octave, tracker_cursor):
 		
 	return new_note
 
-async def main(keys, data_storage, pattern_number):
+def main(keys, data_storage, pattern_number):
 	
 	guitracker = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: gui_tracker.main(list_of_samples = samples_list, 
 								pattern = this_pattern, 
@@ -514,7 +513,7 @@ async def main(keys, data_storage, pattern_number):
 					   song_name = song_name, 
 					   selected_button = None, 
 					   cursor = tracker_cursor[:])
-		await asyncio.sleep(0.1)
+
 			#print(tracker_cursor)
 			#print(pattern[tracker_cursor[0]][tracker_cursor[1]-1])
 					

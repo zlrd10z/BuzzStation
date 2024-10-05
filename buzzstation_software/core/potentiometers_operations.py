@@ -4,7 +4,7 @@ from . import potentiometer_values_transform
 from .data_storage import DataStorage
 import asyncio
 
-async def potentiometersOperations(data_storage):
+def potentiometersOperations(data_storage):
 	while True:
 		pots_values = potentiometers.returnPotentiometersValues()
 
@@ -27,4 +27,3 @@ async def potentiometersOperations(data_storage):
 		if bvol_new_value - bvol_old_value > 1 or bvol_old_value - bvol_new_value > 1:
 			bvol = bvol_new_value
 			data_storage.put_data("bvol", bvol)
-		await asyncio.sleep(0.3)

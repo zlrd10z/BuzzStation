@@ -2,7 +2,6 @@ from gui import gui_warning_window
 from gui import gui_pianoroll
 from libs.keypad import Keypad
 from .data_storage import DataStorage
-import asyncio
 import copy
 
 
@@ -23,48 +22,48 @@ def delete_from_pattern(pattern, beat, note):
 				pattern[beat].pop(i)
 
 
-async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
+def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 	#=========================================================================================
 	# Lambdas:
 	print_gui = lambda pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button: gui_pianoroll.main(bpm_value = data_storage.get_data("bpm"), 
-																																		  swing_value = data_storage.get_data("swing"), 
-																																		  pattern_number = pattern_number, 
-																																		  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
-																																		  playing = data_storage.get_data("is_playing"), 
-																																		  midi_output_and_channel = midi_and_channel, 
-																																		  selected_note = selected_note, 
-																																		  selecteded_beat = selected_beat, 
-																																		  pattern = pattern, 
-																																		  selected_menu_button=selected_menu_button,
-																																		  print_gui = True
-																																		)	
+																			  swing_value = data_storage.get_data("swing"), 
+																			  pattern_number = pattern_number, 
+																			  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
+																			  playing = data_storage.get_data("is_playing"), 
+																			  midi_output_and_channel = midi_and_channel, 
+																			  selected_note = selected_note, 
+																			  selecteded_beat = selected_beat, 
+																			  pattern = pattern, 
+																			  selected_menu_button=selected_menu_button,
+																			  print_gui = True
+																			)
 
 	get_screen_matrix = lambda pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button: gui_pianoroll.main(bpm_value = data_storage.get_data("bpm"), 
-																																			  swing_value = data_storage.get_data("swing"), 
-																																			  pattern_number = pattern_number, 
-																																			  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
-																																			  playing = data_storage.get_data("is_playing"), 
-																																			  midi_output_and_channel = midi_and_channel, 
-																																			  selected_note = selected_note, 
-																																			  selecteded_beat = selected_beat, 
-																																			  pattern = pattern, 
-																																			  selected_menu_button=selected_menu_button,
-																																			  print_gui = False
-																																			)	
+																			  swing_value = data_storage.get_data("swing"), 
+																			  pattern_number = pattern_number, 
+																			  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
+																			  playing = data_storage.get_data("is_playing"), 
+																			  midi_output_and_channel = midi_and_channel, 
+																			  selected_note = selected_note, 
+																			  selecteded_beat = selected_beat, 
+																			  pattern = pattern, 
+																			  selected_menu_button=selected_menu_button,
+																			  print_gui = False
+																			)
 
 	print_gui_edit_note_length = lambda pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button: gui_pianoroll.main(bpm_value = data_storage.get_data("bpm"), 
-																																					  swing_value = data_storage.get_data("swing"), 
-																																					  pattern_number = pattern_number, 
-																																					  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
-																																					  playing = data_storage.get_data("is_playing"), 
-																																					  midi_output_and_channel = midi_and_channel, 
-																																					  selected_note = selected_note, 
-																																					  selecteded_beat = selected_beat, 
-																																					  pattern = pattern, 
-																																					  selected_menu_button=selected_menu_button,
-																																					  print_gui = True,
-																																					  note_length_edit = True
-																																					)	
+																			  swing_value = data_storage.get_data("swing"), 
+																			  pattern_number = pattern_number, 
+																			  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
+																			  playing = data_storage.get_data("is_playing"), 
+																			  midi_output_and_channel = midi_and_channel, 
+																			  selected_note = selected_note, 
+																			  selecteded_beat = selected_beat, 
+																			  pattern = pattern, 
+																			  selected_menu_button=selected_menu_button,
+																			  print_gui = True,
+																			  note_length_edit = True
+																			)
 
 	#=========================================================================================	
 	notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
@@ -389,8 +388,7 @@ async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 						print_gui(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = menu_selected_button)
 
 			print_gui(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = None)
-		await asyncio.sleep(0.1)
-			
+
 if __name__ == "__main__":
 	data_storage = DataStorage()
 	keypad = Keypad()

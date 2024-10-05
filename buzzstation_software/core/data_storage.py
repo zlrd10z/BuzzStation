@@ -136,7 +136,7 @@ class DataStorage:
 		
 		elif operation == "exists":
 			if track in patterns_collection:
-				if pattern_number in patterns_collection[track]:
+				if pattern in patterns_collection[track]:
 					result = True
 			else:
 				result = False

@@ -5,7 +5,6 @@ from .data_storage import DataStorage
 import time
 import os
 import copy
-import asyncio
 import pickle
 from . import tracker
 from . import pianoroll
@@ -75,7 +74,7 @@ def shortenPlaylistIfPossible(playlist):
 				
 		return playlist
 		
-async def playlist_loop(keys, data_storage):
+def playlist_loop(keys, data_storage):
 	
 	createEmptySongPlaylist(data_storage)
 	previous_printed_values = [0, 0, 0]
@@ -150,9 +149,9 @@ async def playlist_loop(keys, data_storage):
 						break
 					
 					if playlist_cursor[0] == 0:
-						pattern_number_for_tracker = await tracker.main(keys, data_storage, pattern_number_for_tracker)
+						pattern_number_for_tracker = tracker.main(keys, data_storage, pattern_number_for_tracker)
 					elif playlist_cursor[0] > 0 and playlist_list_of_instruments[playlist_cursor[0]] != "Empty":
-						pattern_number_for_tracker = await pianoroll.main(keypad = keys, 
+						pattern_number_for_tracker = pianoroll.main(keypad = keys, 
 																		  data_storage = data_storage,
 																		  pattern_number = pattern_number_for_tracker,
 																		  midi_and_channel = playlist_list_of_instruments[playlist_cursor[0]],
@@ -533,7 +532,7 @@ async def playlist_loop(keys, data_storage):
 		data_storage.put_data("playlist_cursor", playlist_cursor)
 		data_storage.put_data("song_playlist", song_playlist)
 		data_storage.put_data("playlist_list_of_instruments", playlist_list_of_instruments)
-		await asyncio.sleep(0.1)
+
 
 if __name__ == "__main__":
 	playlist_loop()

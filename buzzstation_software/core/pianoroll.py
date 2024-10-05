@@ -16,6 +16,12 @@ def create_empty_pattern():
 
 	return pattern
 
+def delete_from_pattern(pattern, beat, note):
+	if len(pattern[beat]) > 0:
+		for i in range(len(pattern_beat)):
+			if pattern[beat][i] == note:
+				pattern[beat].pop(i)
+
 
 async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 	#=========================================================================================
@@ -67,13 +73,35 @@ async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 	
 	
 	# Check is this pattern exist or this is new pattern:
-	if data_storage.pianoroll_pattern_operations("exists", track, pattern_number):
-		pattern = data_storage.pianoroll_pattern_operations("get pattern for single track", track, pattern_number)
+	if data_storage.pianoroll_pattern_operations(operation = "exists", track = track, pattern_number = pattern_number):
+		pattern = data_storage.pianoroll_pattern_operations(operation = "get pattern for single track", 
+															track = track, 
+															pattern_number = pattern_number
+														   )
+		
+		pattern_notes_to_turn_off = data_storage.pianoroll_pattern_operations(operation = "get pattern for single track", 
+																			  track = track,
+																			  pattern_number = pattern_number,
+																			  target_notes_to_turn_off = True
+																			 )
 		
 	else:
 		#create new pattern:
 		pattern = create_empty_pattern()
-		data_storage.pianoroll_pattern_operations("create or update pattern", track, pattern_number, pattern[:])
+		pattern_notes_to_turn_off = create_empty_pattern()
+		data_storage.pianoroll_pattern_operations(operation = "create or update pattern", 
+												  track = track, 
+												  pattern_number = pattern_number, 
+												  new_pattern = pattern[:]
+												 )
+		
+		data_storage.pianoroll_pattern_operations(operation = "create or update pattern", 
+												  track = track, 
+												  pattern_number = pattern_number, 
+												  new_pattern = pattern_notes_to_turn_off[:], 
+												  target_notes_to_turn_off = True
+												 )
+		
 	
 	previous_values = [None, None]
 			
@@ -165,11 +193,29 @@ async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 				
 				if not already_exists:
 					pattern[selected_beat].append([selected_note_and_octave, 1, 8])
+					pattern_notes_to_turn_off[selected_beat].append(selected_note_and_octave)
 				
 				elif already_exists:
 					pattern[selected_beat].pop(index)
+					# search for end of the note and delete it:
+					for i in range(len(pattern_notes_to_turn_off[selected_beat])):
+						if pattern_notes_to_turn_off[selected_beat][i] == selected_note_and_octave:
+							pattern_notes_to_turn_off[selected_beat].pop(i)
+							break
+				
+				# Update pattern with start of notes and with end of notes in data storage:
+				data_storage.pianoroll_pattern_operations(operation = "update pattern", 
+														  track = track, 
+														  pattern_number = pattern_number, 
+														  new_pattern = pattern
+														 )
 
-				data_storage.pianoroll_pattern_operations("update pattern", track, pattern_number, pattern)
+				data_storage.pianoroll_pattern_operations(operation = "update pattern", 
+														  track = track, 
+														  pattern_number = pattern_number, 
+														  new_pattern = pattern_notes_to_turn_off, 
+														  target_notes_to_turn_off = True
+														 )
 					
 		
 			# edit length key:
@@ -187,7 +233,9 @@ async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 									
 									elif key == "7" or key == "4":
 										if pattern[selected_beat][i][1] > 1:
- 												pattern[selected_beat][i][1]  -= 1
+											delete_from_pattern(pattern_notes_to_turn_off, pattern[selected_beat][i][1] - 1, pattern[selected_beat][i][0])
+											pattern[selected_beat][i][1] -= 1
+											pattern_notes_to_turn_off[pattern[selected_beat][i][1] - 1].append(pattern[selected_beat][i][0])
 									
 									elif key == "9" or key == "6": 
 										if 16 - selected_beat > pattern[selected_beat][i][1]:
@@ -199,14 +247,28 @@ async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 														same_note_exists_one_quarter_behind = True
 														break
 												
-												if same_note_exists_one_quarter_behind == False: pattern[selected_beat][i][1]  += 1
-												
+												if same_note_exists_one_quarter_behind == False:
+													delete_from_pattern(pattern_notes_to_turn_off, pattern[selected_beat][i][1] - 1, pattern[selected_beat][i][0])
+													pattern[selected_beat][i][1] += 1
+													pattern_notes_to_turn_off[pattern[selected_beat][i][1] - 1].append(pattern[selected_beat][i][0])
 														
 													
 											else:
 												pattern[selected_beat][i][1] += 1
 										
-									data_storage.pianoroll_pattern_operations("update pattern", track, pattern_number, pattern)
+									# Update pattern with start of notes and with end of notes in data storage:
+									data_storage.pianoroll_pattern_operations(operation = "update pattern", 
+																			  track = track, 
+																			  pattern_number = pattern_number, 
+																			  new_pattern = pattern
+																			 )
+
+									data_storage.pianoroll_pattern_operations(operation = "update pattern", 
+																			  track = track, 
+																			  pattern_number = pattern_number, 
+																			  new_pattern = pattern_notes_to_turn_off, 
+																			  target_notes_to_turn_off = True
+																			 )
 									print_gui_edit_note_length(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = None)
 							break
 			# clear key:
@@ -228,8 +290,22 @@ async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 						if key == "5":
 							key = ''
 							if is_ok_selected:
+								# Clear pattern:
 								pattern = create_empty_pattern()
-								data_storage.pianoroll_pattern_operations("update pattern", pattern_number, track, pattern[:])
+								pattern_notes_to_turn_off = create_empty_pattern()
+								# Update pattern with start of notes and with end of notes in data storage:
+								data_storage.pianoroll_pattern_operations(operation = "update pattern", 
+																		  track = track, 
+																		  pattern_number = pattern_number, 
+																		  new_pattern = pattern
+																		 )
+
+								data_storage.pianoroll_pattern_operations(operation = "update pattern", 
+																		  track = track, 
+																		  pattern_number = pattern_number, 
+																		  new_pattern = pattern_notes_to_turn_off, 
+																		  target_notes_to_turn_off = True
+																		 )
 								break
 							else:
 								break
@@ -297,7 +373,6 @@ async def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 									if cloned_pattern_number is not None:
 										pianoroll_patterns_order[track].append(cloned_pattern_number)
 										data_storage.pianoroll_pattern_operations("put pattern", track, cloned_pattern_number, copy.deepcopy(pattern))
-										data_storage.put_data("pianoroll_patterns_order", copy.deepcopy(pianoroll_patterns_order))
 										pattern_number = cloned_pattern_number
 
 								return pattern_number

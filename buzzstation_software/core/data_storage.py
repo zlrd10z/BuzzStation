@@ -28,6 +28,7 @@ class DataStorage:
 		self.__drums_patterns = {}
 		
 		self.__samples = ["Empty", "Empty"]
+		self.__samples_temp = []
 		self.__last_changed_sample = None
 		self.__samples_volume = [10, 10]
 		self.__drums_last_added_note = ["C5", "F"]
@@ -35,7 +36,7 @@ class DataStorage:
 		#==================================================
 		# Pianoroll patterns:
 		self.__pianoroll_patterns = {}
-		
+		self.__pianoroll_patterns_notes_to_turn_off = {}
 		
 		self.__pianoroll_last_added_note = ["C5", 1, 8]
 	
@@ -45,6 +46,8 @@ class DataStorage:
 			self.__playlist_list_of_instruments.append("Empty")
 			self.__samples.append("Empty")
 			self.__samples.append("Empty")
+			self.__samples_temp.append("Empty")
+			self.__samples_temp.append("Empty")
 			self.__samples_volume.append(10)
 			self.__samples_volume.append(10)
 	
@@ -101,28 +104,40 @@ class DataStorage:
 		
 		return result
 	
-	def pianoroll_pattern_operations(self, operation, track = None, pattern_number = None, new_pattern = None):
+	def pianoroll_pattern_operations(self, operation, track = None, pattern_number = None, new_pattern = None, quarter = None, target_notes_to_turn_off = False):
 		result = None
 		pattern = "pattern" + str(pattern_number)
+		
+		patterns_collection = self.__pianoroll_patterns
+		if target_notes_to_turn_off:
+			patterns_collection = self.__pianoroll_patterns_notes_to_turn_off
 			
 		
 		if operation == "get pattern for single track":
-			result = self.__pianoroll_patterns[pattern][track]
+			result = patterns_collection[track][pattern]
 		
-		if operation == "get_whole_pattern":
-			result = self.__pianoroll_patterns[pattern]
+		elif operation == "get notes":
+			if track in patterns_collection:
+				if pattern in patterns_collection[track]:
+					result = patterns_collection[track][pattern][quarter]
+			else:
+				result = None
+		
+		elif operation == "get number of tracks":
+			result = len(patterns_collection)
 			
 		elif operation == "create or update pattern":
-			if pattern not in self.__pianoroll_patterns:
-				self.__pianoroll_patterns[pattern] = {}
-			self.__pianoroll_patterns[pattern][track] = new_pattern
+			if track not in patterns_collection:
+				patterns_collection[track] = {}
+			patterns_collection[track][pattern] = new_pattern
 		
 		elif operation == "delete pattern":
-			self.__pianoroll_patterns[pattern].pop(track)
+			patterns_collection[track].pop(pattern)
 		
 		elif operation == "exists":
-			if pattern_number in self.__pianoroll_patterns:
-				result = True
+			if track in patterns_collection:
+				if pattern_number in patterns_collection[track]:
+					result = True
 			else:
 				result = False
 		

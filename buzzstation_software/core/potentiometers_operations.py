@@ -27,4 +27,4 @@ async def potentiometersOperations(data_storage):
 		if bvol_new_value - bvol_old_value > 1 or bvol_old_value - bvol_new_value > 1:
 			bvol = bvol_new_value
 			data_storage.put_data("bvol", bvol)
-		await asyncio.sleep(0.1)
+		await asyncio.sleep(0.3)

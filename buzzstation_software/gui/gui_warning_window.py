@@ -1,12 +1,12 @@
-from .gui_tracker import createScreenMatrix, printScreenMatrix, fillMatrix
-from .changeTextColor import changeStringBgColor, changeStringFontColor
+from .gui_tracker import create_screen_matrix, print_screen_matrix, fill_matrix
+from .txtcolor import text_bg_color, text_font_color
 
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
 # Lambdas:
 bold_text = lambda text: f"{BOLD}{text}{RESET}"
-formatTextAsSelected = lambda text: changeStringBgColor("grey", changeStringFontColor("black", text))
+formatTextAsSelected = lambda text: text_bg_color("grey", text_font_color("black", text))
 
 # Screen size (in characters):
 screen_x = 64
@@ -18,13 +18,12 @@ window_size_x = window_size_y * 5
 
 # start printing poistion, so the window will be centred:
 start_x = ((screen_x - window_size_x) / 2) -1
-start_y = ((screen_y - window_size_y) / 2 ) -1
+start_y = ((screen_y - window_size_y) / 2) -1
 
 start_x = int(start_x)
 start_y = int(start_y)
 
-def drawWindow(screen_matrix):
-	
+def draw_window(screen_matrix):
 	for y in range(window_size_y):
 		for x in range(window_size_x):
 			if x == 0 and y == 0:
@@ -57,24 +56,26 @@ def drawWindow(screen_matrix):
 			else:
 				single_char = " "
 			
-			screen_matrix[start_y + y][start_x + x] = changeStringBgColor(color = "blue", text = single_char)
+			screen_matrix[start_y + y][start_x + x] = text_bg_color(color = "blue", text = single_char)
 			
 				
 	
 	return screen_matrix
 
-def drawWarningString(screen_matrix):
+# Put text 'Warning!' in window:
+def draw_warning_txt(screen_matrix):
 	warning_string = "Warning!"
 	x_start_print_text = start_x + int( (window_size_x - len(warning_string)) / 2 )
 
 	for i in range(len(warning_string)):
 		single_char = warning_string[i]
 		single_char = bold_text(single_char)
-		screen_matrix[start_y + 1][x_start_print_text + i] = changeStringBgColor("blue", single_char)
+		screen_matrix[start_y + 1][x_start_print_text + i] = text_bg_color("blue", single_char)
 	
 	return screen_matrix
 
-def drawOkNoButtons(screen_matrix, ok_selected):
+# Draw ok/no buttons:
+def draw_buttons(screen_matrix, ok_selected):
 	ok_string = "yes"
 	no_string = "no"
 	
@@ -87,19 +88,19 @@ def drawOkNoButtons(screen_matrix, ok_selected):
 		single_char = bold_text(single_char)
 		if ok_selected == True: 
 			single_char = formatTextAsSelected(single_char)
-		screen_matrix[start_y + window_size_y - 2][x_ok_string_print_start + i] = changeStringBgColor("blue", single_char)
+		screen_matrix[start_y + window_size_y - 2][x_ok_string_print_start + i] = text_bg_color("blue", single_char)
 	
 	for i in range(len(no_string)):
 		single_char = no_string[i]
 		single_char = bold_text(single_char)
 		if ok_selected == False: 
 			single_char = formatTextAsSelected(single_char)
-		screen_matrix[start_y + window_size_y - 2][x_no_string_print_start + i] = changeStringBgColor("blue", single_char)
+		screen_matrix[start_y + window_size_y - 2][x_no_string_print_start + i] = text_bg_color("blue", single_char)
 	
 	return screen_matrix
 
-def drawInfoText(screen_matrix, action_warning):
-
+# Put info text in window:
+def draw_info_txt(screen_matrix, action_warning):
 	if action_warning == "new song":
 		info_text = "Are you sure you want to start new project? If it's not saved, the entire progress will be lost!"
 	
@@ -123,7 +124,7 @@ def drawInfoText(screen_matrix, action_warning):
 	sliced_texts = []
 	x_start_print_text = []
 	
-
+	# Fit text to window:
 	while len(info_text) > 0:
 		x = 0
 		while True:
@@ -154,14 +155,14 @@ def drawInfoText(screen_matrix, action_warning):
 	for y in range(len(sliced_texts)):
 		for x in range(len(sliced_texts[y])):
 			#print(x_start_print_text[y] + x)
-			screen_matrix[2 + y + start_y][x_start_print_text[y] + x + 2] = changeStringBgColor("blue", sliced_texts[y][x])
+			screen_matrix[2 + y + start_y][x_start_print_text[y] + x + 2] = text_bg_color("blue", sliced_texts[y][x])
 	
 	
 	return screen_matrix
 
 def main(screen_matrix, ok_selected, action):
-	screen_matrix = drawWindow(screen_matrix)
-	screen_matrix = drawWarningString(screen_matrix)
-	screen_matrix = drawOkNoButtons(screen_matrix, ok_selected)
-	screen_matrix = drawInfoText(screen_matrix, action)
-	printScreenMatrix(screen_matrix)
+	screen_matrix = draw_window(screen_matrix)
+	screen_matrix = draw_warning_txt(screen_matrix)
+	screen_matrix = draw_buttons(screen_matrix, ok_selected)
+	screen_matrix = draw_info_txt(screen_matrix, action)
+	print_screen_matrix(screen_matrix)

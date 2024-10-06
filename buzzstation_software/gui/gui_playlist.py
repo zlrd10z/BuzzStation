@@ -1,9 +1,10 @@
-from .gui_tracker import createScreenMatrix, fillMatrix, drawNumbersAndFrames, markTrackWithSampleName, printScreenMatrix, drawSwingBPMnMasterVolumeValue
-from .changeTextColor import changeStringBgColor, changeStringFontColor
+from .gui_tracker import create_screen_matrix, fill_matrix, draw_frames_and_numbers, name_tracks, print_screen_matrix, draw_bpm_vol_swing_values
+from .txtcolor import text_bg_color, text_font_color
 
-formatTextAsSelected = lambda text: changeStringBgColor("grey", changeStringFontColor("black", text))
+formatTextAsSelected = lambda text: text_bg_color("grey", text_font_color("black", text))
 
-def createVerticalGreyLines(screen_matrix):
+#Create vertical lines for better visibility:
+def draw_vertical_lines(screen_matrix):
 	# screen's hight of 17 characters:
 	for y in range(17):
 		track_position = 2
@@ -13,22 +14,24 @@ def createVerticalGreyLines(screen_matrix):
 			for j in range(5):
 				# each second i
 				if y % 2 == 1:
-					screen_matrix[y][track_position + j] = changeStringBgColor("black grey", screen_matrix[y][track_position + j])
+					screen_matrix[y][track_position + j] = text_bg_color("black grey", screen_matrix[y][track_position + j])
 			track_position += 6
 	
 	return screen_matrix
 
-def drawInformationThatItIsPlalist(screen_matrix):
+# Draw information that it is plalist:
+def draw_info_mode(screen_matrix):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
 	info_text = " [Playlist]" 
 	# Draw "Song Name:" text
 	for i in range(64 - x):
 		if i <= len(info_text)-1:
-			screen_matrix[0][x + i] = changeStringBgColor("blue", info_text[i])
+			screen_matrix[0][x + i] = text_bg_color("blue", info_text[i])
 	return screen_matrix
 
-def drawMenu(screen_matrix, selected = None):
+# Draw menu texts and buttons:
+def draw_menu(screen_matrix, selected = None):
 	gui_width = 64
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
@@ -36,7 +39,7 @@ def drawMenu(screen_matrix, selected = None):
 	# Draw "Song Name:" text
 	for i in range(gui_width - x):
 		if i <= len(info_text)-1:
-			screen_matrix[5][x + i] = changeStringBgColor("blue", info_text[i])
+			screen_matrix[5][x + i] = text_bg_color("blue", info_text[i])
 
 	# playlist buttons:
 	button_text = " Save "
@@ -73,12 +76,13 @@ def drawMenu(screen_matrix, selected = None):
 				
 	return screen_matrix
 
-def drawInfoAboutInstrument(screen_matrix, selected_instrument):
+# Draw info about selected instrument:
+def draw_info_instrument(screen_matrix, selected_instrument):
 	gui_width = 64
 	x = 2 + 6*8
 	text_line_1 = "Inst. info:"
 	for i in range(len(text_line_1)):
-		screen_matrix[10][x + i + 1] = changeStringBgColor("blue", text_line_1[i])
+		screen_matrix[10][x + i + 1] = text_bg_color("blue", text_line_1[i])
 	
 	lines = []
 	if selected_instrument == "Drums":
@@ -100,12 +104,12 @@ def drawInfoAboutInstrument(screen_matrix, selected_instrument):
 
 	for i in range(len(lines)):
 		for j in range(len(lines[i])):
-			screen_matrix[11 + i][x + j + 1] = changeStringBgColor("blue", lines[i][j])
+			screen_matrix[11 + i][x + j + 1] = text_bg_color("blue", lines[i][j])
 
 	
 	return screen_matrix
 
-def drawPatterns(screen_matrix, selected_pattern, playlist, first_number, pattern_cursor):
+def draw_patterns(screen_matrix, selected_pattern, playlist, first_number, pattern_cursor):
 	if pattern_cursor is not None:
 		pattern_cursor[1] = pattern_cursor[1] - 1
 	
@@ -120,20 +124,21 @@ def drawPatterns(screen_matrix, selected_pattern, playlist, first_number, patter
 						if pattern_cursor is not None and pattern_cursor[0] == i and pattern_cursor[1] % 16 == j:
 							screen_matrix[j+1][x+k] = formatTextAsSelected(str(playlist_element_to_print)[k])
 						elif j % 2 == 0:
-							screen_matrix[j+1][x+k] = changeStringBgColor("black grey", str(playlist_element_to_print)[k])
+							screen_matrix[j+1][x+k] = text_bg_color("black grey", str(playlist_element_to_print)[k])
 						else:
 							screen_matrix[j+1][x+k] = str(playlist_element_to_print)[k]
 		x += 6
 	return screen_matrix
 
-def drawPageAndPlaying(screen_matrix, page_number, is_playing):
+# Draw page of the instrument (as max 8 can be displayed on the screen, and there can be many more instrumnets applied), draw info about playing/pause
+def draw_page_and_playing(screen_matrix, page_number, is_playing):
 
 	x = 2 + 6*8
 	
 	text_to_print = "Page: " + str(page_number)
 	
 	for i in range(len(text_to_print)):
-		screen_matrix[15][x + i + 3] = changeStringBgColor("blue", text_to_print[i])
+		screen_matrix[15][x + i + 3] = text_bg_color("blue", text_to_print[i])
 	
 	if is_playing:
 		text_to_print = "Playing"
@@ -143,11 +148,11 @@ def drawPageAndPlaying(screen_matrix, page_number, is_playing):
 		z = 4
 	
 	for i in range(len(text_to_print)):
-		screen_matrix[16][x + i + z] = changeStringBgColor("blue", text_to_print[i])
+		screen_matrix[16][x + i + z] = text_bg_color("blue", text_to_print[i])
 	
 	return screen_matrix
 
-def drawSongname(screen_matrix, songname):
+def draw_songname(screen_matrix, songname):
 	if songname == "No songname":
 		songname = "  [Song not saved!]"
 	
@@ -155,7 +160,7 @@ def drawSongname(screen_matrix, songname):
 	x = 2 + 6*8
 	text_line_1 = "Song name:"
 	for i in range(len(text_line_1)):
-		screen_matrix[10][x + i + 2] = changeStringBgColor("blue", text_line_1[i])
+		screen_matrix[10][x + i + 2] = text_bg_color("blue", text_line_1[i])
 	
 	lines = []
 	if len(songname) > 24:
@@ -174,10 +179,14 @@ def drawSongname(screen_matrix, songname):
 		line_len = len(lines[i])
 		centered = int((13 - line_len) / 2)
 		for j in range(len(lines[i])):
-			screen_matrix[11 + i][x + j + centered] = changeStringBgColor("blue", lines[i][j])
+			screen_matrix[11 + i][x + j + centered] = text_bg_color("blue", lines[i][j])
 	return screen_matrix
 
-def main(list_of_instruments, bpm_value, swing_value, vol_value, playlist, menu_selected = None, gui_cursor = None, is_playing = False, songname = "DNB24421.btp", printgui = True):
+def main(list_of_instruments, bpm_value, swing_value, vol_value, 
+	 playlist, menu_selected=None, gui_cursor=None, is_playing=False, 
+	 songname="DNB24421.btp", printgui=True
+):
+		
 	page_number = int(gui_cursor[0]/8) + 1
 	first_instrument_to_display = int(gui_cursor[0] / 8) * 8
 	list_of_instruments_to_display = list_of_instruments[first_instrument_to_display: first_instrument_to_display+8]
@@ -211,22 +220,22 @@ def main(list_of_instruments, bpm_value, swing_value, vol_value, playlist, menu_
 
 	
 	
-	screen_matrix = createScreenMatrix()
-	screen_matrix = fillMatrix(screen_matrix)
-	screen_matrix = drawNumbersAndFrames(first_number, screen_matrix = screen_matrix)
-	screen_matrix = markTrackWithSampleName(screen_matrix = screen_matrix, list_of_samples = list_of_instruments_to_display, selected = selected_pattern)
-	screen_matrix = drawInformationThatItIsPlalist(screen_matrix)
-	screen_matrix = drawMenu(screen_matrix, selected = menu_selected)
-	screen_matrix = drawSwingBPMnMasterVolumeValue(screen_matrix, bpm_value, swing_value, vol_value)
+	screen_matrix = create_screen_matrix()
+	screen_matrix = fill_matrix(screen_matrix)
+	screen_matrix = draw_frames_and_numbers(first_number, screen_matrix = screen_matrix)
+	screen_matrix = name_tracks(screen_matrix = screen_matrix, list_of_samples = list_of_instruments_to_display, selected = selected_pattern)
+	screen_matrix = draw_info_mode(screen_matrix)
+	screen_matrix = draw_menu(screen_matrix, selected = menu_selected)
+	screen_matrix = draw_bpm_vol_swing_values(screen_matrix, bpm_value, swing_value, vol_value)
 	if selected_pattern is not None:
-		screen_matrix = drawInfoAboutInstrument(screen_matrix, list_of_instruments_to_display[selected_pattern])
+		screen_matrix = draw_info_instrument(screen_matrix, list_of_instruments_to_display[selected_pattern])
 	else:
-		screen_matrix = drawSongname(screen_matrix, songname)
-	screen_matrix = createVerticalGreyLines(screen_matrix)
-	screen_matrix = drawPatterns(screen_matrix, selected_pattern, playlist_to_display, first_number, pattern_cursor)
-	screen_matrix = drawPageAndPlaying(screen_matrix, page_number, is_playing)
+		screen_matrix = draw_songname(screen_matrix, songname)
+	screen_matrix = draw_vertical_lines(screen_matrix)
+	screen_matrix = draw_patterns(screen_matrix, selected_pattern, playlist_to_display, first_number, pattern_cursor)
+	screen_matrix = draw_page_and_playing(screen_matrix, page_number, is_playing)
 	if printgui:
-		printScreenMatrix(screen_matrix)
+		print_screen_matrix(screen_matrix)
 	else:
 		return screen_matrix
 	

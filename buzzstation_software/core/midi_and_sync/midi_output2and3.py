@@ -15,7 +15,7 @@ volume0 = bytes([0])
 
 
 
-def sendDataToArduino(data):
+def send_data_to_arduino(data):
 	try:
 		data.append(stop_byte)
 		data = bytes(data)		
@@ -29,7 +29,7 @@ def sendDataToArduino(data):
 
 		
 
-def turnOffAllNotesOnArduino():
+def arduino_turnoff_all_notes():
 	data = []
 	for i in range(2):
 		for j in range(len(16)):
@@ -42,7 +42,7 @@ def turnOffAllNotesOnArduino():
 			data.append(123) #all notes off 
 			data.append(0) #has to be 0
 	
-	sendDataToArduino(data)
+	send_data_to_arduino(data)
 	
 	
 # For hardware/software testing purpose:
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 	note_off_midi_output_3 = [223, 144, 72, 50]
 
 	while True:
-		sendDataToArduino(note_on_midi_output_2 + note_on_midi_output_3)
+		send_data_to_arduino(note_on_midi_output_2 + note_on_midi_output_3)
 		time.sleep(0.1)
-		sendDataToArduino(note_off_midi_output_2 + note_off_midi_output_3)
+		send_data_to_arduino(note_off_midi_output_2 + note_off_midi_output_3)
 		time.sleep(0.1)

@@ -1,4 +1,4 @@
-from gui.changeTextColor import changeStringFontColor, changeStringBgColor
+from gui.txtcolor import text_font_color, text_bg_color
 import sys
 import os
 
@@ -11,7 +11,7 @@ save_x = 0
 keyboard_matrix = []
 
 
-def appendKeyboardRows():
+def append_keyboard_matrix():
     keyboard_row1 = []
     keyboard_row2 = []
     keyboard_row3 = []
@@ -41,10 +41,10 @@ def appendKeyboardRows():
     keyboard_matrix.append(keyboard_row5)
 
 
-appendKeyboardRows()
+append_keyboard_matrix()
 
 
-def changeCursorPosition(direction):
+def change_cursor_position(direction):
 	global x
 	global y
 	global save_x
@@ -96,16 +96,16 @@ def changeCursorPosition(direction):
 			x += 1
 
 
-fill = changeStringFontColor("purple", "█")
+fill = text_font_color("purple", "█")
 
-def printKeyboard(filename, is_dir):
-	def printColoredLine(text):
+def print_keyboard(filename, is_dir):
+	def print_colored_line(text):
 		number_of_fields_to_fill = 64 - len(text)
 		text += " " * number_of_fields_to_fill
-		text = changeStringBgColor("blue", text)
+		text = text_bg_color("blue", text)
 		print(text)
 	clear()
-	printColoredLine("  Please enter the name of song project")
+	print_colored_line("  Please enter the name of song project")
 	# starting index to print keyboard on center of the screen, between each key there would be two spaces
 	# screen width 64 signs - 2 chars for bottom and top blue line, divided by two to get ceneter
 	keyboard_print_index_start_width = int((64 - 2 - (len(keyboard_matrix[0]*3)) - 3) / 2)
@@ -118,7 +118,7 @@ def printKeyboard(filename, is_dir):
 
 				for k in range(len(keyboard_matrix[j])):
 					if y == j and x == k:
-						text += (changeStringBgColor("grey", keyboard_matrix[j][k]))
+						text += (text_bg_color("grey", keyboard_matrix[j][k]))
 					else:
 						text += keyboard_matrix[j][k]
 					text += fill * 2
@@ -134,9 +134,9 @@ def printKeyboard(filename, is_dir):
 				if j == 4:
 					text += fill *19
 
-				text += fill * keyboard_print_index_start_width + (changeStringBgColor("blue", " "))
+				text += fill * keyboard_print_index_start_width + (text_bg_color("blue", " "))
 				print(text)
-				print((changeStringBgColor("blue", " ")) + fill * 62 + (changeStringBgColor("blue", " ")))
+				print((text_bg_color("blue", " ")) + fill * 62 + (text_bg_color("blue", " ")))
 		elif i == keyboard_print_index_start_height - 8:
 			center_text_index = int((64 - 2 - len("filename:")) / 2)
 			if is_dir: 
@@ -156,23 +156,23 @@ def printKeyboard(filename, is_dir):
 			print(text)
 		
 		else:
-			text = (changeStringBgColor("blue", " ")) + fill * 62 + (changeStringBgColor("blue", " "))
+			text = (text_bg_color("blue", " ")) + fill * 62 + (text_bg_color("blue", " "))
 			print(text)
 
-	printColoredLine(" Press [*] to abort.")
+	print_colored_line(" Press [*] to abort.")
 	
-def userInputFilename(is_dir, keypad):
+def user_input_filename(is_dir, keypad):
 	filename = ""			
 	k = keypad
-	printKeyboard("", is_dir)
+	print_keyboard("", is_dir)
 	while True:
 		pressed_key = k.check_keys()
 		#print(pressed_key)
 			
-		if pressed_key == "2": changeCursorPosition("up")
-		elif pressed_key == "8": changeCursorPosition("down")
-		elif pressed_key == "4": changeCursorPosition("left")
-		elif pressed_key == "6": changeCursorPosition("right")
+		if pressed_key == "2": change_cursor_position("up")
+		elif pressed_key == "8": change_cursor_position("down")
+		elif pressed_key == "4": change_cursor_position("left")
+		elif pressed_key == "6": change_cursor_position("right")
 		elif pressed_key == "*":
 			filename = ""
 			break
@@ -188,6 +188,6 @@ def userInputFilename(is_dir, keypad):
 			else:
 				filename += keyboard_matrix[row][column]	
 		if pressed_key != "":
-			printKeyboard(filename, is_dir)
-			#printKeyboard(str(y) + str(x))
+			print_keyboard(filename, is_dir)
+			#print_keyboard(str(y) + str(x))
 	return filename

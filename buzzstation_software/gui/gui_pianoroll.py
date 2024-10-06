@@ -1,4 +1,4 @@
-from .changeTextColor import changeStringFontColor, changeStringBgColor
+from .txtcolor import text_font_color, text_bg_color
 
 # Lambdas:
 clear = lambda: os.system("clear")
@@ -9,7 +9,7 @@ gui_height = 17 #terminal command line is taking one line
 gui_width = 64
 
 # Create matrix 16 x 64 chars
-def createScreenMatrix():
+def create_screen_matrix():
 	screen_matrix = []
 		
 	for i in range(gui_height):
@@ -21,32 +21,34 @@ def createScreenMatrix():
 	return screen_matrix
 
 
-def drawFrame(screen_matrix):
+def draw_frame(screen_matrix):
 	for i in range(len(screen_matrix)):
 		for j in range(len(screen_matrix[i])):
 			if i < 1 or i > len(screen_matrix) - 4:
-				screen_matrix[i][j] = changeStringBgColor("blue", " ")
+				screen_matrix[i][j] = text_bg_color("blue", " ")
 				
 			elif j < 2 or j > len(screen_matrix[i]) - 8:
-				screen_matrix[i][j] = changeStringBgColor("blue", " ")
-				screen_matrix[i][j] = changeStringBgColor("blue", " ")
+				screen_matrix[i][j] = text_bg_color("blue", " ")
+				screen_matrix[i][j] = text_bg_color("blue", " ")
 
 			else:
 				screen_matrix[i][j] = " "
 	return screen_matrix
-			
-def drawVerticalLinesForBetterVisibility(screen_matrix):
+
+# Draw vertical lines in different color tone then already used for better visibility:
+def draw_vertical_lines(screen_matrix):
 	x_position = 9
 	x = 0
 	
 	for i in range(8):
 		for j in range(13):
 			for k in range(3):
-				screen_matrix[13-j][x_position + x + k] = changeStringBgColor("black grey", " ")
+				screen_matrix[13-j][x_position + x + k] = text_bg_color("black grey", " ")
 		x += 6
 	return screen_matrix
 
-def drawHorizontalLinesForBetterVisibility(screen_matrix):
+# Draw horizontal lines in different color tone  then already used for better visibility:
+def draw_horizontal_lines(screen_matrix):
 	y_position = 2
 	x_position = 9
 	counter = 0
@@ -60,9 +62,9 @@ def drawHorizontalLinesForBetterVisibility(screen_matrix):
 				counter = 0
 			
 			if is_light_grey:
-				char = changeStringBgColor("light grey", " ")
+				char = text_bg_color("light grey", " ")
 			else:
-				char = changeStringBgColor("dark grey", " ")
+				char = text_bg_color("dark grey", " ")
 			
 			screen_matrix[y_position + 2 * i][x_position + j] = char
 			counter += 1
@@ -73,7 +75,9 @@ notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 notes_displayed = []
 
 
-def drawPartOfPiano(screen_matrix, y_position, x_poistion, octave, selected_note, start_note = 0, counter = 0, note_already_selected = False):
+def draw_part_of_piano(screen_matrix, y_position, x_poistion, octave, 
+					   selected_note, start_note=0, counter=0, note_already_selected=False):
+	
 	for i in range(12):
 		note = " "
 		note_index = start_note + i
@@ -95,7 +99,7 @@ def drawPartOfPiano(screen_matrix, y_position, x_poistion, octave, selected_note
 			if len(notes[note_index]) > 1:
 				pass # drawing back keys
 			else:
-				screen_matrix[y_position - i][j+x_poistion] = changeStringBgColor("grey", " ")
+				screen_matrix[y_position - i][j+x_poistion] = text_bg_color("grey", " ")
 				# drawing part of white keys:
 				
 			if j == 0:
@@ -103,8 +107,8 @@ def drawPartOfPiano(screen_matrix, y_position, x_poistion, octave, selected_note
 			else:
 				# draw last 3 chars which makes piano key:
 				# drawing key and note on key:
-				note_part = changeStringFontColor("black", note[j-1])
-				note_part = changeStringBgColor("grey", note_part)
+				note_part = text_font_color("black", note[j-1])
+				note_part = text_bg_color("grey", note_part)
 				if not note_already_selected and  selected_note in note:
 					if note[j-1] != " ":
 						note_part = underlined_text(note_part)
@@ -114,8 +118,8 @@ def drawPartOfPiano(screen_matrix, y_position, x_poistion, octave, selected_note
 				screen_matrix[y_position - i][j+x_poistion+3] = note_part
 	return counter, screen_matrix, note_already_selected
 
-def drawPiano(screen_matrix, octave, start_note, selected_note):
-	x = drawPartOfPiano(screen_matrix = screen_matrix, 
+def draw_piano(screen_matrix, octave, start_note, selected_note):
+	x = draw_part_of_piano(screen_matrix = screen_matrix, 
 							y_position = 13, 
 							x_poistion = 2, 
 							octave = octave, 
@@ -126,7 +130,7 @@ def drawPiano(screen_matrix, octave, start_note, selected_note):
 	screen_matrix = x[1]
 	was_note_underlined = x[2]
 	
-	screen_matrix = drawPartOfPiano(screen_matrix = screen_matrix, 
+	screen_matrix = draw_part_of_piano(screen_matrix = screen_matrix, 
 									y_position = 13 - counter, 
 									x_poistion = 2, 
 									octave = octave + 1, 
@@ -136,36 +140,37 @@ def drawPiano(screen_matrix, octave, start_note, selected_note):
 	return screen_matrix
 
 
-def drawQuarterTime(screen_matrix):
+def draw_quarter_time(screen_matrix):
 	x_position = 9
 	x = 0
 	for i in range(16):
 		char_number = chr(0x2488 + i)
 		if i % 4 == 0:
-			screen_matrix[0][x_position + x] = changeStringFontColor("black", changeStringBgColor("blue", char_number))
+			screen_matrix[0][x_position + x] = text_font_color("black", text_bg_color("blue", char_number))
 		else:
-			screen_matrix[0][x_position + x] = changeStringBgColor("blue", char_number)
+			screen_matrix[0][x_position + x] = text_bg_color("blue", char_number)
 		x += 3
 	return screen_matrix
 
-def drawPatternNumber(screen_matrix, pattern_number = 1):
+def draw_pattern_number(screen_matrix, pattern_number=1):
 	text_to_print = "Pattern: " + str(pattern_number)
 	axisx_start_printing = (gui_width - len(text_to_print)) - 2
 	for i in range(len(text_to_print)):
-		screen_matrix[gui_height-1][axisx_start_printing + i] = changeStringBgColor("blue", text_to_print[i])
+		screen_matrix[gui_height-1][axisx_start_printing + i] = text_bg_color("blue", text_to_print[i])
 
 	return screen_matrix
 
-def drawSwingBPMValueAndMidiChannelNumber(screen_matrix, bpm_value = 100, swing_value = 40, channel_number = 1):
+#draw Swing value, BPM value and MIDI output and channel number
+def draw_swing_bpm_midi(screen_matrix, bpm_value=100, swing_value=40, channel_number=1):
 	
 	text_to_print = "BPM: " + str(bpm_value) + 8 * " " + "Swing: " + str(swing_value) + 8 * " " + "Channel: " + str(channel_number)
 	for i in range(len(text_to_print)):
-		screen_matrix[gui_height-1][i+2] = changeStringBgColor("blue", text_to_print[i])
+		screen_matrix[gui_height-1][i+2] = text_bg_color("blue", text_to_print[i])
 
 	return screen_matrix
 
 
-def drawIsPlaying(screen_matrix, is_playing = False, playing_mode = False):
+def draw_play_pause(screen_matrix, is_playing=False, playing_mode=False):
 	playing_info = "Pause"
 	x = 0
 	if is_playing: 
@@ -179,14 +184,14 @@ def drawIsPlaying(screen_matrix, is_playing = False, playing_mode = False):
 		
 	axisx_start_printing = int(gui_width / 2 - len(playing_info))
 	for i in range(len(playing_info)):
-		screen_matrix[gui_height-3][axisx_start_printing + 1 + i + x] = changeStringBgColor("blue", playing_info[i])
+		screen_matrix[gui_height-3][axisx_start_printing + 1 + i + x] = text_bg_color("blue", playing_info[i])
 
 	for i in range(3):
-		screen_matrix[0][59 + i] = changeStringBgColor("blue", playing_sign[i])
+		screen_matrix[0][59 + i] = text_bg_color("blue", playing_sign[i])
 		
 	return screen_matrix
 
-def drawButtons(screen_matrix, selected = None):
+def draw_buttons(screen_matrix, selected=None):
 	button_playlist = " Playlist "
 	button_playing_mode = " Playing mode "
 	button_clone = " Clone "
@@ -200,13 +205,13 @@ def drawButtons(screen_matrix, selected = None):
 			question_mark_counter += 1
 			
 		elif question_mark_counter == selected:
-			screen_matrix[gui_height-2][16 + i] = changeStringBgColor("grey", toDraw[i])
+			screen_matrix[gui_height-2][16 + i] = text_bg_color("grey", toDraw[i])
 		else:
 			screen_matrix[gui_height-2][16 + i] = toDraw[i]
 	return screen_matrix
 
 
-def drawNotesOnPianoRoll(screen_matrix, pattern = None):	
+def draw_notes_on_piano(screen_matrix, pattern=None):	
 	x_position = 9
 	y_position = 13
 	if pattern is not None:
@@ -225,7 +230,7 @@ def drawNotesOnPianoRoll(screen_matrix, pattern = None):
 			x_position += 2
 	return screen_matrix
 
-def drawCursor(screen_matrix, cursor, position, note_length_edit):
+def draw_cursor(screen_matrix, cursor, position, note_length_edit):
 	x_position = 9
 	y_position = 13
 	
@@ -256,7 +261,7 @@ def drawCursor(screen_matrix, cursor, position, note_length_edit):
 	return screen_matrix
 	
 		
-def printGUI(screen_matrix):
+def print_gui(screen_matrix):
 	toprint = ""
 	for i in range(len(screen_matrix)):
 		for j in range(len(screen_matrix[i])):
@@ -264,7 +269,7 @@ def printGUI(screen_matrix):
 	print(toprint)
 
 	
-def getStartingNoteAndOctave(selected_note):
+def get_starting_note_and_octave(selected_note):
 	global notes_displayed
 	octave = int(selected_note[-1:])
 	note = selected_note
@@ -293,7 +298,8 @@ def getStartingNoteAndOctave(selected_note):
 		
 	return start_note, octave
 
-def drawIndicatorsThatThereAreNotesBesideTheScreen(screen_matrix, pattern):
+# draw indicators that there are more notes beside the displayed octave(s):
+def draw_indicators(screen_matrix, pattern):
 	above = False
 	below = False
 	
@@ -306,67 +312,71 @@ def drawIndicatorsThatThereAreNotesBesideTheScreen(screen_matrix, pattern):
 					below = True
 					
 	if above:
-		screen_matrix[1][57] = changeStringBgColor("blue", "⇡")
+		screen_matrix[1][57] = text_bg_color("blue", "⇡")
 	
 	if below:
-		screen_matrix[13][57] = changeStringBgColor("blue", "⇣")
+		screen_matrix[13][57] = text_bg_color("blue", "⇣")
 	
 	return screen_matrix
 
-def drawMidiOutputAndChannel(screen_matrix, midi_output_and_channel):
+def draw_midi_info(screen_matrix, midi_output_and_channel):
 	midi_output = midi_output_and_channel[1]
 	midi_channel = midi_output_and_channel[3:]
 	
 	for i in range(5):
-		screen_matrix[5][58 + i] = changeStringBgColor("blue", ("MIDI" + midi_output)[i])
+		screen_matrix[5][58 + i] = text_bg_color("blue", ("MIDI" + midi_output)[i])
 
 	channel_string = "Ch: "
 	if len(midi_channel) == 2:
 		channel_string = "Ch:"
 		
 	for i in range(len(channel_string + midi_channel)):
-		screen_matrix[6][58 + i] = changeStringBgColor("blue", (channel_string + midi_channel)[i])
+		screen_matrix[6][58 + i] = text_bg_color("blue", (channel_string + midi_channel)[i])
 	#		 
 	
 	return screen_matrix
 		
-def main(bpm_value, swing_value, pattern_number, playing_mode, playing = False, midi_output_and_channel = 'M1c16', selected_note=None, selecteded_beat=None, pattern=None, selected_menu_button=None, print_gui = True, note_length_edit = False):
-	start_note, octave = getStartingNoteAndOctave(selected_note)
+def main(bpm_value, swing_value, pattern_number, playing_mode, 
+	 playing=False, midi_output_and_channel='M1c16', selected_note=None, 
+	 selecteded_beat=None, pattern=None, selected_menu_button=None, 
+	 print_gui=True, note_length_edit=False
+):
+		
+	start_note, octave = get_starting_note_and_octave(selected_note)
 
-	
 	channel_number = midi_output_and_channel[3:]
 	
-	screen_matrix = createScreenMatrix()
-	screen_matrix = drawFrame(screen_matrix)
-	screen_matrix = drawVerticalLinesForBetterVisibility(screen_matrix)
-	screen_matrix = drawHorizontalLinesForBetterVisibility(screen_matrix)
-	screen_matrix = drawPiano(screen_matrix, octave, start_note, selected_note)
-	screen_matrix = drawQuarterTime(screen_matrix)
-	screen_matrix = drawPatternNumber(screen_matrix, pattern_number)
-	screen_matrix = drawSwingBPMValueAndMidiChannelNumber(screen_matrix, bpm_value, swing_value, channel_number)
-	screen_matrix = drawIsPlaying(screen_matrix, playing, playing_mode)
-	screen_matrix = drawButtons(screen_matrix, selected_menu_button)
+	screen_matrix = create_screen_matrix()
+	screen_matrix = draw_frame(screen_matrix)
+	screen_matrix = draw_vertical_lines(screen_matrix)
+	screen_matrix = draw_horizontal_lines(screen_matrix)
+	screen_matrix = draw_piano(screen_matrix, octave, start_note, selected_note)
+	screen_matrix = draw_quarter_time(screen_matrix)
+	screen_matrix = draw_pattern_number(screen_matrix, pattern_number)
+	screen_matrix = draw_swing_bpm_midi(screen_matrix, bpm_value, swing_value, channel_number)
+	screen_matrix = draw_play_pause(screen_matrix, playing, playing_mode)
+	screen_matrix = draw_buttons(screen_matrix, selected_menu_button)
 	if pattern is not None:
-		screen_matrix = drawNotesOnPianoRoll(screen_matrix, pattern = pattern)
+		screen_matrix = draw_notes_on_piano(screen_matrix, pattern = pattern)
 	if selected_menu_button is None:
-		screen_matrix = drawCursor(screen_matrix, selected_note, selecteded_beat, note_length_edit)
-	screen_matrix = drawMidiOutputAndChannel(screen_matrix, midi_output_and_channel)
-	screen_matrix = drawIndicatorsThatThereAreNotesBesideTheScreen(screen_matrix, pattern)
+		screen_matrix = draw_cursor(screen_matrix, selected_note, selecteded_beat, note_length_edit)
+	screen_matrix = draw_midi_info(screen_matrix, midi_output_and_channel)
+	screen_matrix = draw_indicators(screen_matrix, pattern)
 	if print_gui:
-		printGUI(screen_matrix)
+		print_gui(screen_matrix)
 	else:
 		return screen_matrix
 
 
 	
 if __name__ == "__main__":
-	def createExamplePattern():
+	def create_example_pattern():
 		pattern = []
 		for i in range(16):
 			l = []
 			pattern.append(l)
 
-		#                   note, note length
+		#                   note, note length, volume
 		pattern[0].append(["C5", 1, 8])
 		pattern[0].append(["D#5", 1, 8])
 		pattern[0].append(["F5", 1, 2])
@@ -385,6 +395,6 @@ if __name__ == "__main__":
 		
 		return pattern
 
-	example_pattern = createExamplePattern()
+	example_pattern = create_example_pattern()
 	print(example_pattern)
 	main(bpm_value=111, swing_value=31, pattern_number = 45, pattern = example_pattern, selected_note = "A4", selecteded_beat = 14, playing = False, playing_mode = False)

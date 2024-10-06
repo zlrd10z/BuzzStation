@@ -1,7 +1,7 @@
 import os, sys
 import subprocess
-from gui.changeTextColor import changeStringFontColor, changeStringBgColor
-from .screenkeyboard import userInputFilename
+from gui.txtcolor import text_font_color, text_bg_color
+from .screen_keyboard import user_input_filename
 from libs.keypad import Keypad 
 
 key = ""
@@ -23,7 +23,7 @@ def show_cursor():
 
 
 audio_formats = ["wav", "ogg", "mp3"]
-def checkIsAudioFormatIsCompatible(filename):
+def check_audio_format_compatibility(filename):
 	filename = filename.split(".")
 	file_format = filename[-1]
 	compatible = True
@@ -31,7 +31,7 @@ def checkIsAudioFormatIsCompatible(filename):
 		compatible = False
 	return compatible
 	
-class DisplayedFilesList:
+class displayed_filelist:
 	l = []
 	def __init__(self, file_list):
 		self.l = file_list
@@ -39,14 +39,14 @@ class DisplayedFilesList:
 		l = self.l
 		return l
 	
-def getOutputLinux(command):
+def get_linux_output(command):
 	result = subprocess.run([command], shell=True, stdout=subprocess.PIPE, text=True)
 	result = result.stdout.strip()
 	return result
 
 
-def getFileList(pwd):
-	ls = getOutputLinux("ls -p " + pwd)
+def get_filelist(pwd):
+	ls = get_linux_output("ls -p " + pwd)
 	ls = ls.split("\n")
 	# Segregate ls output for files and directories
 	list_dir = []
@@ -62,7 +62,7 @@ def getFileList(pwd):
 	return ls
 
 
-def printFileList():
+def print_filelist():
 	# Function to create information to user the top line of the screen:
 	def displayInstructionToUser(option):
 		if option == "sample":
@@ -75,24 +75,24 @@ def printFileList():
 			information_displayed = " Press [Esc] to abort."
 		number_of_fields_to_fill = 64 - len(information_displayed)
 		information_displayed += " " * number_of_fields_to_fill
-		information_displayed = changeStringBgColor("blue", information_displayed)
+		information_displayed = text_bg_color("blue", information_displayed)
 		print(information_displayed)
 
 		
-	def changeTextPrintingFormat(text, mode):
-		def adjustTextLength(text):
+	def chg_txt_print_format(text, mode):
+		def adjust_txt_length(text):
 			if len(text) > 62:
 				text = text[61] + "…"
 			return text
-		text = adjustTextLength(text)
+		text = adjust_txt_length(text)
 		text_len = len(text)
-		blue_fill = changeStringBgColor("blue", " ")
+		blue_fill = text_bg_color("blue", " ")
 		
 		# Change text color
 		if mode == 1:
-			text = changeStringBgColor("grey", text)
+			text = text_bg_color("grey", text)
 		elif mode == 2:
-			text = changeStringFontColor("blue", text)
+			text = text_font_color("blue", text)
 		
 		text = blue_fill + text + " " * (62 - text_len) + blue_fill
 		return text
@@ -107,22 +107,22 @@ def printFileList():
 		for i in range(len(ls)):
 			toprint = str(ls[i])
 			if toprint == str(ls[selected]):
-				toprint = changeTextPrintingFormat(toprint, 1)
+				toprint = chg_txt_print_format(toprint, 1)
 			elif "/" in toprint:
-				toprint = changeTextPrintingFormat(toprint, 2)
-			else: toprint = changeTextPrintingFormat(toprint, 3)
+				toprint = chg_txt_print_format(toprint, 2)
+			else: toprint = chg_txt_print_format(toprint, 3)
 			print(toprint)
 		free_space = how_many_lines_visible - len(ls)
-		for i in range(free_space): print(changeTextPrintingFormat(" ", 3))
+		for i in range(free_space): print(chg_txt_print_format(" ", 3))
 	# when there is more than 15 elemntis in the list, but cursor is on first 15 elements:
 	elif selected  < how_many_lines_visible:
 		for i in range(how_many_lines_visible):
 			toprint = str(ls[i])
 			if toprint == str(ls[selected]):
-				toprint = changeTextPrintingFormat(toprint, 1)
+				toprint = chg_txt_print_format(toprint, 1)
 			elif "/" in toprint:
-				toprint = changeTextPrintingFormat(toprint, 2)
-			else: toprint = changeTextPrintingFormat(toprint, 3)
+				toprint = chg_txt_print_format(toprint, 2)
+			else: toprint = chg_txt_print_format(toprint, 3)
 			print(toprint)
 	# when there is more than 15 elemntis in the list, but cursor is on first 15 elements:	
 	elif selected == len(ls)-1:
@@ -131,10 +131,10 @@ def printFileList():
 			#print(len(ls), lastStartingindex+i)
 			toprint = str(ls[lastStartingindex+i])
 			if toprint == str(ls[selected]):
-				toprint = changeTextPrintingFormat(toprint, 1)
+				toprint = chg_txt_print_format(toprint, 1)
 			elif "/" in toprint:
-				toprint = changeTextPrintingFormat(toprint, 2)
-			else: toprint = changeTextPrintingFormat(toprint, 3)
+				toprint = chg_txt_print_format(toprint, 2)
+			else: toprint = chg_txt_print_format(toprint, 3)
 			print(toprint)
 	# when there is more than 15 elemntis in the list, and the cursor is in the middle of the list:
 	elif selected >= how_many_lines_visible:
@@ -142,10 +142,10 @@ def printFileList():
 		for i in range(how_many_lines_visible):
 			toprint = str(ls[selected-i])
 			if toprint == str(ls[selected]):
-				toprint = changeTextPrintingFormat(toprint, 1)
+				toprint = chg_txt_print_format(toprint, 1)
 			elif "/" in toprint:
-				toprint = changeTextPrintingFormat(toprint, 2)
-			else: toprint = changeTextPrintingFormat(toprint, 3)
+				toprint = chg_txt_print_format(toprint, 2)
+			else: toprint = chg_txt_print_format(toprint, 3)
 			temp_l.append(toprint)
 		templ_l = temp_l.reverse()
 		for i in range(len(temp_l)):
@@ -154,15 +154,15 @@ def printFileList():
 	displayInstructionToUser("controls")
 
 class PWD:
-	pwd = getOutputLinux("pwd")
+	pwd = get_linux_output("pwd")
 	def update_pwd(self, pwd):
 		self.pwd = pwd
 
-def loadDirectory():
+def load_directory():
 	pwd = p.pwd
-	ls = getFileList(pwd)
+	ls = get_filelist(pwd)
 	global q
-	q = DisplayedFilesList(ls)
+	q = displayed_filelist(ls)
 
 def getFilename(selected_option, keypad):	
 	global p
@@ -170,9 +170,9 @@ def getFilename(selected_option, keypad):
 	global option
 	option = selected_option
 	p = PWD()
-	loadDirectory()
+	load_directory()
 	k = keypad
-	printFileList()
+	print_filelist()
 	
 
 	global key
@@ -203,19 +203,19 @@ def getFilename(selected_option, keypad):
 					new_pwd += pwd[i] + "/"
 				new_pwd = new_pwd[:len(new_pwd) - 1]
 				p.update_pwd(new_pwd)
-				loadDirectory()
+				load_directory()
 				
 			elif q.l[selected] == "[Create dir]":
 				pwd = p.pwd
-				dir_name = userInputFilename(True, k)
+				dir_name = user_input_filename(True, k)
 				dir_path = pwd + "/" + dir_name
 				os.mkdir(dir_path)
-				loadDirectory()
+				load_directory()
 				clear()
 				
 			elif q.l[selected] == "[Save here as new file]":
 				pwd = p.pwd
-				created_filename = userInputFilename(False, k)
+				created_filename = user_input_filename(False, k)
 				path_to_selected_file = pwd + "/" + created_filename
 				clear()
 				break
@@ -225,13 +225,13 @@ def getFilename(selected_option, keypad):
 				dir = q.l[selected]
 				pwd = p.pwd + "/" + dir[:len(dir)-1]
 				p.update_pwd(pwd)
-				loadDirectory()
+				load_directory()
 				selected = 0
 				
 			else:
 				filename = q.l[selected]
 				if option == "sample":
-					if checkIsAudioFormatIsCompatible(filename) == True:
+					if check_audio_format_compatibility(filename) == True:
 						path_to_selected_file = p.pwd +"/"+ filename
 						clear()
 						break
@@ -251,6 +251,6 @@ def getFilename(selected_option, keypad):
 			break
 				
 		if pressed_key != "":
-			printFileList()
+			print_filelist()
 			
 	return path_to_selected_file

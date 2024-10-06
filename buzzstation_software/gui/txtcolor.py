@@ -16,7 +16,7 @@ FONT_GREEN = "\033[38;5;10m"
 
 
 # Change char's background color:
-def changeStringBgColor(color, text):
+def text_bg_color(color, text):
 	colored_string = ""
 	if color == "green":
 		colored_string = (f"{BG_GREEN}{FONT_BLACK}{text}{RESET}")
@@ -36,7 +36,7 @@ def changeStringBgColor(color, text):
 	else: pass
 	return colored_string
 
-def changeStringFontColor(color, text):
+def text_font_color(color, text):
 	colored_string = ""
 	if color == "blue":
 		colored_string = (f"{FONT_BLUE}{text}{RESET}")

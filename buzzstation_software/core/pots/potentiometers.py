@@ -15,6 +15,6 @@ chan0 = AnalogIn(ads, ADS.P0)
 chan1 = AnalogIn(ads, ADS.P1)
 chan2 = AnalogIn(ads, ADS.P2)
 
-def returnPotentiometersValues():
+def return_potentiometers_values():
 	return chan0.voltage, chan1.voltage, chan2.voltage
 

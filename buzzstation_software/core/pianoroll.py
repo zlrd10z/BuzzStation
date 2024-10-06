@@ -21,49 +21,138 @@ def delete_from_pattern(pattern, beat, note):
 			if pattern[beat][i] == note:
 				pattern[beat].pop(i)
 
+def gui(data_storage, pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button):
+	gui_pianoroll.main(
+					  bpm_value = data_storage.get_data("bpm"), 
+					  swing_value = data_storage.get_data("swing"), 
+					  pattern_number = pattern_number, 
+					  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
+					  playing = data_storage.get_data("is_playing"), 
+					  midi_output_and_channel = midi_and_channel, 
+					  selected_note = selected_note, 
+					  selecteded_beat = selected_beat, 
+					  pattern = pattern, 
+					  selected_menu_button=selected_menu_button,
+					  print_it = True
+	)			
+	
+def get_screen_matrix(data_storage, pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button):
+	gui_pianoroll.main(
+					  bpm_value = data_storage.get_data("bpm"), 
+					  swing_value = data_storage.get_data("swing"), 
+					  pattern_number = pattern_number, 
+					  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
+					  playing = data_storage.get_data("is_playing"), 
+					  midi_output_and_channel = midi_and_channel, 
+					  selected_note = selected_note, 
+					  selecteded_beat = selected_beat, 
+					  pattern = pattern, 
+					  selected_menu_button=selected_menu_button,
+					  print_it = False
+	)
+
+def gui_edit_note_length(data_storage, pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button):
+	gui_pianoroll.main(
+					  bpm_value = data_storage.get_data("bpm"), 
+					  swing_value = data_storage.get_data("swing"), 
+					  pattern_number = pattern_number, 
+					  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
+					  playing = data_storage.get_data("is_playing"), 
+					  midi_output_and_channel = midi_and_channel, 
+					  selected_note = selected_note, 
+					  selecteded_beat = selected_beat, 
+					  pattern = pattern, 
+					  selected_menu_button=selected_menu_button,
+					  print_it = True,
+					  note_length_edit = True
+					)
+	
+	
+def menu(keypad, data_storage, pattern_number, midi_and_channel, 
+		selected_note_and_octave, selected_beat, pattern,  pattern_notes_to_turn_off,
+		track
+		):
+	
+	menu_selected_button = 0
+	gui(data_storage, pattern_number, midi_and_channel, 
+		selected_note_and_octave, selected_beat, pattern[:], 
+		selected_menu_button = menu_selected_button
+	   )
+
+	while True:
+		key = keypad.check_keys()
+		if key != "":
+			if key == '1' or key == "#":
+				break
+
+			# direction key - rigth:
+			if key == '6':
+				if menu_selected_button < 3:
+					menu_selected_button += 1
+
+			# direction key - left:
+			if key == '4':
+				if menu_selected_button > 0:
+					menu_selected_button -= 1
+
+			# accept key:
+			if key == '5':
+				if menu_selected_button != 1:
+					# previous pattern:
+					if menu_selected_button == 0:
+						pattern_number -= 1
+					# next pattern:
+					elif menu_selected_button == 3:
+						pattern_number += 1
+					# clone pattern:
+					elif menu_selected_button == 2:
+						cloned_pattern_number = None
+						for i in range(1, 1000):
+							
+							if not data_storage.pianoroll_pattern_operations(operation = "exists", track = track, pattern_number = i):
+								cloned_pattern_number = i
+								break								
+								
+						if cloned_pattern_number is not None:
+							data_storage.pianoroll_pattern_operations(operation = "create or update pattern", 
+										  track = track, 
+										  pattern_number = cloned_pattern_number, 
+										  new_pattern = copy.deepcopy(pattern)
+										 )
+
+							data_storage.pianoroll_pattern_operations(operation = "create or update pattern", 
+																	  track = track, 
+																	  pattern_number = cloned_pattern_number, 
+																	  new_pattern =  copy.deepcopy(pattern_notes_to_turn_off),
+																	  target_notes_to_turn_off = True
+																	 )
+							pattern_number = cloned_pattern_number
+							print(pattern_number)
+
+					return pattern_number
+
+				if menu_selected_button == 1:
+					is_song_playing = data_storage.get_data("patternmode_is_song_playing")
+
+					if is_song_playing: is_song_playing = False
+					else: is_song_playing = True
+
+					data_storage.put_data("patternmode_is_song_playing", is_song_playing)
+					gui(data_storage, pattern_number, midi_and_channel, 
+						selected_note_and_octave, selected_beat, pattern[:], 
+						selected_menu_button = menu_selected_button
+					   )
+
+			gui(data_storage, pattern_number, midi_and_channel, 
+				selected_note_and_octave, selected_beat, pattern[:], 
+				selected_menu_button = menu_selected_button)
+			
+				
 
 def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 	#=========================================================================================
 	# Lambdas:
-	print_gui = lambda pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button: gui_pianoroll.main(bpm_value = data_storage.get_data("bpm"), 
-																			  swing_value = data_storage.get_data("swing"), 
-																			  pattern_number = pattern_number, 
-																			  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
-																			  playing = data_storage.get_data("is_playing"), 
-																			  midi_output_and_channel = midi_and_channel, 
-																			  selected_note = selected_note, 
-																			  selecteded_beat = selected_beat, 
-																			  pattern = pattern, 
-																			  selected_menu_button=selected_menu_button,
-																			  print_gui = True
-																			)
 
-	get_screen_matrix = lambda pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button: gui_pianoroll.main(bpm_value = data_storage.get_data("bpm"), 
-																			  swing_value = data_storage.get_data("swing"), 
-																			  pattern_number = pattern_number, 
-																			  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
-																			  playing = data_storage.get_data("is_playing"), 
-																			  midi_output_and_channel = midi_and_channel, 
-																			  selected_note = selected_note, 
-																			  selecteded_beat = selected_beat, 
-																			  pattern = pattern, 
-																			  selected_menu_button=selected_menu_button,
-																			  print_gui = False
-																			)
-
-	print_gui_edit_note_length = lambda pattern_number, midi_and_channel, selected_note, selected_beat, pattern, selected_menu_button: gui_pianoroll.main(bpm_value = data_storage.get_data("bpm"), 
-																			  swing_value = data_storage.get_data("swing"), 
-																			  pattern_number = pattern_number, 
-																			  playing_mode = data_storage.get_data("patternmode_is_song_playing"), 
-																			  playing = data_storage.get_data("is_playing"), 
-																			  midi_output_and_channel = midi_and_channel, 
-																			  selected_note = selected_note, 
-																			  selecteded_beat = selected_beat, 
-																			  pattern = pattern, 
-																			  selected_menu_button=selected_menu_button,
-																			  print_gui = True,
-																			  note_length_edit = True
-																			)
 
 	#=========================================================================================	
 	notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
@@ -108,7 +197,10 @@ def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 		if data_storage.get_data("bpm") != previous_values[0] or data_storage.get_data("swing") != previous_values[1]:
 			previous_values[0] = data_storage.get_data("bpm") 
 			previous_values[1] = data_storage.get_data("swing") 
-			print_gui(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = None)
+			gui(data_storage, pattern_number, midi_and_channel, 
+				selected_note_and_octave, selected_beat, pattern[:], 
+				selected_menu_button = None
+			   )
 		
 		key = keypad.check_keys()
 		if key != "":
@@ -222,7 +314,10 @@ def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 				if len(pattern[selected_beat]) > 0:
 					for i in range(len(pattern[selected_beat])):
 						if selected_note_and_octave == pattern[selected_beat][i][0]:
-							print_gui_edit_note_length(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = None)
+							gui_edit_note_length(data_storage, pattern_number, midi_and_channel, 
+												 selected_note_and_octave, selected_beat, pattern[:], 
+												 selected_menu_button = None
+												)
 							while True:
 								key = keypad.check_keys()
 								if key != "":
@@ -268,12 +363,19 @@ def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 																			  new_pattern = pattern_notes_to_turn_off, 
 																			  target_notes_to_turn_off = True
 																			 )
-									print_gui_edit_note_length(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = None)
+									gui_edit_note_length(data_storage, pattern_number, midi_and_channel, 
+														 selected_note_and_octave, selected_beat, pattern[:], 
+														 selected_menu_button = None
+														)
 							break
 			# clear key:
 			if key == "0":
 				is_ok_selected = False
-				screen_matrix = get_screen_matrix(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = 15)
+				screen_matrix = get_screen_matrix(data_storage, pattern_number, midi_and_channel, 
+												  selected_note_and_octave, selected_beat, pattern[:], 
+												  selected_menu_button = 15
+												 )
+				
 				gui_warning_window.main(screen_matrix, is_ok_selected, "clear pattern")
 				
 				while True:
@@ -332,62 +434,21 @@ def main(keypad, data_storage, pattern_number, midi_and_channel, track):
 								data_storage.pianoroll_pattern_operations("update pattern", track, pattern_number, pattern[:])
 			# Menu key:
 			if key == "#":
-				menu_selected_button = 0
-				print_gui(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = menu_selected_button)
+				# if in menu there is new pattern selected or pattern is cloned, then close this pattern, return new pattern number to playlist
+				# then playlist will open selected pattern:
+				new_pattern_number = menu(keypad, data_storage, pattern_number, midi_and_channel, 
+										selected_note_and_octave, selected_beat, pattern, pattern_notes_to_turn_off,
+										track
+										)
 				
-				while True:
-					key = keypad.check_keys()
-					if key != "":
-						if key == '1' or key == "#":
-							break
+				if new_pattern_number is not None:
+					return new_pattern_number
+				
 
-						# direction key - rigth:
-						if key == '6':
-							if menu_selected_button < 3:
-								menu_selected_button += 1
-
-						# direction key - left:
-						if key == '4':
-							if menu_selected_button > 0:
-								menu_selected_button -= 1
-
-						# accept key:
-						if key == '5':
-							if menu_selected_button != 1:
-								# previous pattern:
-								if menu_selected_button == 0:
-									pattern_number -= 1
-								# next pattern:
-								elif menu_selected_button == 3:
-									pattern_number += 1
-								# clone pattern:
-								elif menu_selected_button == 2:
-									cloned_pattern_number = None
-									pianoroll_patterns_order = data_storage.get_data("pianoroll_patterns_order")
-									for i in range(998):
-										if i + 1 not in pianoroll_patterns_order[track]:
-											cloned_pattern_number = i + 1
-											break
-
-									if cloned_pattern_number is not None:
-										pianoroll_patterns_order[track].append(cloned_pattern_number)
-										data_storage.pianoroll_pattern_operations("put pattern", track, cloned_pattern_number, copy.deepcopy(pattern))
-										pattern_number = cloned_pattern_number
-
-								return pattern_number
-
-							if menu_selected_button == 1:
-								is_song_playing = data_storage.get_data("patternmode_is_song_playing")
-
-								if is_song_playing: is_song_playing = False
-								else: is_song_playing = True
-
-								data_storage.put_data("patternmode_is_song_playing", is_song_playing)
-								print_gui(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = menu_selected_button)
-								
-						print_gui(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = menu_selected_button)
-
-			print_gui(pattern_number, midi_and_channel, selected_note_and_octave, selected_beat, pattern[:], selected_menu_button = None)
+			gui(data_storage, pattern_number, midi_and_channel,
+				selected_note_and_octave, selected_beat,
+				pattern[:], selected_menu_button = None
+			   )
 
 if __name__ == "__main__":
 	data_storage = DataStorage()

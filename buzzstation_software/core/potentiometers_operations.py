@@ -4,9 +4,9 @@ from .pots import potentiometer_values_transform
 from .data_storage import DataStorage
 import asyncio
 
-def potentiometers_operations(data_storage):
+def pots_operations(data_storage):
 	while True:
-		pots_values = potentiometers.returnPotentiometersValues()
+		pots_values = potentiometers.return_potentiometers_values()
 
 		bpm_old_value = data_storage.get_data("bpm")
 		bpm_new_value = int(potentiometer_values_transform.bpm_from_potentiometer2(pots_values[2]))

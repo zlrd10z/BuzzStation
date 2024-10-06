@@ -339,7 +339,7 @@ def draw_midi_info(screen_matrix, midi_output_and_channel):
 def main(bpm_value, swing_value, pattern_number, playing_mode, 
 	 playing=False, midi_output_and_channel='M1c16', selected_note=None, 
 	 selecteded_beat=None, pattern=None, selected_menu_button=None, 
-	 print_gui=True, note_length_edit=False
+	 print_it=True, note_length_edit=False
 ):
 		
 	start_note, octave = get_starting_note_and_octave(selected_note)
@@ -362,7 +362,7 @@ def main(bpm_value, swing_value, pattern_number, playing_mode,
 		screen_matrix = draw_cursor(screen_matrix, selected_note, selecteded_beat, note_length_edit)
 	screen_matrix = draw_midi_info(screen_matrix, midi_output_and_channel)
 	screen_matrix = draw_indicators(screen_matrix, pattern)
-	if print_gui:
+	if print_it:
 		print_gui(screen_matrix)
 	else:
 		return screen_matrix

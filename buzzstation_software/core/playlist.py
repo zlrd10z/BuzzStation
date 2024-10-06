@@ -1,6 +1,5 @@
 from libs.keypad import Keypad
 from gui import gui_playlist, gui_warning_window
-from .potentiometers_operations import potentiometersOperations
 from .data_storage import DataStorage
 import time
 import os

@@ -434,19 +434,13 @@ def main(keys, data_storage, pattern_number):
 									elif selected == 1:
 										new_pattern_number = pattern_number + 1
 									elif selected == 2:
-										drums_patterns_order = data_storage.get_data("drums_patterns_order")
-										for i in range(998):
-											if i + 1 not in drums_patterns_order:
+										for i in range(1, 998):
+											if not data_storage.drums_pattern_operations("exists", i):
 												# Update pattern order list:
-												new_pattern_number = i + 1
-												drums_patterns_order.append(new_pattern_number)
-												data_storage.put_data("drums_patterns_order", drums_patterns_order)
+												new_pattern_number = i
+												data_storage.drums_pattern_operations("create or update pattern", new_pattern_number, copy.deepcopy(pattern))
+												break
 
-												#clone pattern to list of patterns
-												patterns = data_storage.get_data("drums_patterns")
-												patterns.append(copy.deepcopy(pattern))
-												data_storage.put_data("drums_patterns", patterns)
-												break		
 								return new_pattern_number
 							
 							#clear pattern:

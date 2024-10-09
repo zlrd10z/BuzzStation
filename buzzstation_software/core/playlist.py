@@ -8,6 +8,7 @@ import pickle
 from . import tracker
 from . import pianoroll
 from . import pick_file
+from . import pick_midi_instrument
 
 # Lambdas:
 clear_screen = lambda: os.system("clear")
@@ -142,10 +143,27 @@ def playlist_loop(keys, data_storage):
 			# Edit selected pattern:
 			if key == '3':
 				key == ''
-				pattern_number_for_tracker = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
+				if playlist_cursor[1]-1 < 0:
+					pattern_number_for_tracker = None
+				else:
+					pattern_number_for_tracker = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
+				
 				while True:
+					# Select new midi instrument for midi output:
+					if playlist_cursor[0] != 0 and playlist_cursor[1] == 0:
+						midi_output = data_storage.get_data("playlist_list_of_instruments")[playlist_cursor[0]]
+						if midi_output != "Empty":
+							midi_instruments = data_storage.get_data("playlist_list_of_midi_assigned")
+							midi_instrument = midi_instruments[midi_output][0]
+							choosen_instrument = pick_midi_instrument.main(keys, midi_output, midi_instrument)
+
+							if choosen_instrument is not None:
+								midi_instruments[midi_output] = choosen_instrument
+								data_storage.put_data("playlist_list_of_midi_assigned", midi_instruments)
+							break
+							
 					if pattern_number_for_tracker is None or pattern_number_for_tracker == ' ':
-						break
+							break
 					
 					if playlist_cursor[0] == 0:
 						pattern_number_for_tracker = tracker.main(keys, data_storage, pattern_number_for_tracker)

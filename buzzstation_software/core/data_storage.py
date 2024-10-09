@@ -21,6 +21,7 @@ class DataStorage:
 		self.__song_name = "No songname"
 		self.__song_playlist = []
 		self.__playlist_list_of_instruments = ["Drums"]
+		self.__playlist_list_of_midi_assigned = {}
 		self.__last_added_pattern_numer = 1
 		
 		#==================================================
@@ -50,6 +51,12 @@ class DataStorage:
 			self.__samples_temp.append("Empty")
 			self.__samples_volume.append(10)
 			self.__samples_volume.append(10)
+		
+		for midi in range(1, 4):
+			for channel in range(1, 17):
+				output_and_channel = "M" + str(midi) + "c" + str(channel)
+				self.__playlist_list_of_midi_assigned[output_and_channel] = ("Acoustic Grand Piano", 1)
+				
 	
 	# Update requested value:
 	def put_data(self, var_name, new_value):

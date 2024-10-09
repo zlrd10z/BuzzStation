@@ -1,13 +1,22 @@
 from threading import Thread
 from libs.keypad import Keypad
-from gui import gui_playlist
 from core.data_storage import DataStorage
 from core.playlist import playlist_loop
 from core.potentiometers_operations import pots_operations
 import time
+import os
 
+# Remove all temporary audio files from .temp directory:
+def clear_temp():
+	cwd = os.getcwd()
+	command = "rm " + cwd + "/.temp/* -f"
+	os.system(command)
 
+	
 def main():
+	# Clear temp dir:
+	clear_temp()
+	
 	# Create objects:
 	keys = Keypad()
 	data_storage = DataStorage()
@@ -17,11 +26,8 @@ def main():
 	thread_pots.start()
 	
 	#main loop:
-	print("123")
 	playlist_loop(keys, data_storage)
 
-	#thread_playlist = Thread(target=playlist_loop, args=[keys,data_storage])
-	#thread_playlist.run()
 
 if __name__ == "__main__":
 	main()

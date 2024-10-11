@@ -1,7 +1,7 @@
 from gui import gui_tracker
 from gui import gui_warning_window
 from libs.keypad import Keypad
-from core.data_storage import DataStorage
+from core.song_data import SongData
 from core.pick_file import getFilename
 import os
 import copy
@@ -70,34 +70,34 @@ def change_note(operation, note_and_octave, tracker_cursor):
 		
 	return new_note
 
-def main(keys, data_storage, pattern_number):
+def main(keys, song_data, pattern_number):
 	
 	guitracker = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: gui_tracker.main(list_of_samples = samples_list, 
 								pattern = this_pattern, 
-								is_playing = data_storage.get_data("is_playing"), 
-								bpm_value = data_storage.get_data("bpm"), 
-								swing_value = data_storage.get_data("swing"), 
-								vol_value = data_storage.get_data("bvol"), 
+								is_playing = song_data.get_data("is_playing"), 
+								bpm_value = song_data.get_data("bpm"), 
+								swing_value = song_data.get_data("swing"), 
+								vol_value = song_data.get_data("bvol"), 
 								pattern_number = pattern_number,
 								song_name = song_name,
 								selected_button = selected_button, 
 								cursor = cursor,
-								playing_mode = data_storage.get_data("patternmode_is_song_playing"))
+								playing_mode = song_data.get_data("patternmode_is_song_playing"))
 
 	guitracker_noprinting = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: gui_tracker.main(list_of_samples = samples_list, 
 									pattern = this_pattern, 
-									is_playing = data_storage.get_data("is_playing"), 
-									bpm_value = data_storage.get_data("bpm"), 
-									swing_value = data_storage.get_data("swing"), 
-									vol_value = data_storage.get_data("bvol"), 
+									is_playing = song_data.get_data("is_playing"), 
+									bpm_value = song_data.get_data("bpm"), 
+									swing_value = song_data.get_data("swing"), 
+									vol_value = song_data.get_data("bvol"), 
 									pattern_number = pattern_number,
 									song_name = song_name,
 									selected_button = selected_button, 
 									cursor = cursor,
 									print_on_screen = False,
-									playing_mode = data_storage.get_data("patternmode_is_song_playing"))
+									playing_mode = song_data.get_data("patternmode_is_song_playing"))
 	
-	song_name = data_storage.get_data("song_name")
+	song_name = song_data.get_data("song_name")
 
 	volume_string_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"]
 	tracker_cursor = [0, 0, 0]
@@ -107,18 +107,18 @@ def main(keys, data_storage, pattern_number):
 
 	
 	# If pattern does not exist already, then create new empty pattern:
-	if not data_storage.drums_pattern_operations("exists", pattern_number):
-		data_storage.drums_pattern_operations("create or update pattern", pattern_number, create_new_empty_pattern())
+	if not song_data.drums_pattern_operations("exists", pattern_number):
+		song_data.drums_pattern_operations("create or update pattern", pattern_number, create_new_empty_pattern())
 	
 	# Load samples and pattern:
-	samples = data_storage.get_data("samples")
-	pattern = data_storage.drums_pattern_operations("get pattern", pattern_number)
+	samples = song_data.get_data("samples")
+	pattern = song_data.drums_pattern_operations("get pattern", pattern_number)
 
 	
 	while True:
-		bpm = data_storage.get_data("bpm")
-		swing = data_storage.get_data("swing")
-		bvol = data_storage.get_data("bvol")
+		bpm = song_data.get_data("bpm")
+		swing = song_data.get_data("swing")
+		bvol = song_data.get_data("bvol")
 		
 		if bpm != potentiometers_previous_values[0] or swing != potentiometers_previous_values[1] or bvol != potentiometers_previous_values[2]:
 			potentiometers_previous_values[0] = bpm
@@ -140,23 +140,23 @@ def main(keys, data_storage, pattern_number):
 					
 			# Escape key:
 			if key == '1':
-				data_storage.put_data("is_playing", False)
-				data_storage.put_data("instrument_played", None)
+				song_data.put_data("is_playing", False)
+				song_data.put_data("instrument_played", None)
 				pattern_is_empty = check_if_pattern_is_empty(pattern)
 				if pattern_is_empty:
 						# Delete pattern from patterns list and pattern orders list:
-						data_storage.drums_pattern_operations("delete_pattern", pattern_number)
+						song_data.drums_pattern_operations("delete_pattern", pattern_number)
 				# exit to playlist:
 				break
 
 			if key == "*":
-				is_playing = data_storage.get_data("is_playing")
+				is_playing = song_data.get_data("is_playing")
 				if is_playing:
-					data_storage.put_data("is_playing", False)
-					data_storage.put_data("instrument_played", None)
+					song_data.put_data("is_playing", False)
+					song_data.put_data("instrument_played", None)
 				else:
-					data_storage.put_data("instrument_played", 0)
-					data_storage.put_data("is_playing", True)
+					song_data.put_data("instrument_played", 0)
+					song_data.put_data("is_playing", True)
 					
 			
 			# Direction key - down:
@@ -253,18 +253,18 @@ def main(keys, data_storage, pattern_number):
 								volume = volume_string_list[volume_index]
 							pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = volume
 
-					data_storage.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1]-1][0], 
+					song_data.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1]-1][0], 
 								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
 
 					# update pattern in data storage:
-					data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
+					song_data.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
 				
 				else:
 					# if sample highlighed on the screen, change volume of the sample:
-					volumes = data_storage.get_data("samples_volume")
+					volumes = song_data.get_data("samples_volume")
 					if volumes[tracker_cursor[0]] - 1 >= 0:
 						volumes[tracker_cursor[0]] -= 1
-						data_storage.put_data("samples_volume", volumes)
+						song_data.put_data("samples_volume", volumes)
 				
 				
 			if key == '9':
@@ -295,18 +295,18 @@ def main(keys, data_storage, pattern_number):
 								volume = volume_string_list[volume_index]
 							pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = volume
 
-					data_storage.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1] - 1][0], 
+					song_data.put_data("drums_last_added_note", [pattern[tracker_cursor[0]][tracker_cursor[1] - 1][0], 
 								pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
 
 					# update pattern in data storage:
-					data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)	
+					song_data.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)	
 
 				else:
 					# if sample highlighed on the screen, change volume of the sample:
-					volumes = data_storage.get_data("samples_volume")
+					volumes = song_data.get_data("samples_volume")
 					if volumes[tracker_cursor[0]] + 1 <= 10:
 						volumes[tracker_cursor[0]] += 1
-						data_storage.put_data("samples_volume", volumes)
+						song_data.put_data("samples_volume", volumes)
 	
 							
 			# Insert key:
@@ -317,20 +317,20 @@ def main(keys, data_storage, pattern_number):
 					sample_path = getFilename("sample", keys)
 					if sample_path is not None:
 						samples[tracker_cursor[0]] = sample_path
-						data_storage.put_data("samples", samples)
-						data_storage.put_data("last_changed_sample", (sample_path, tracker_cursor[0]))
+						song_data.put_data("samples", samples)
+						song_data.put_data("last_changed_sample", (sample_path, tracker_cursor[0]))
 
 					
 				# if cursor is on playlist:
 				elif tracker_cursor[1] > 0:
 					# if note is empty, add last added note:
 					if len(pattern[tracker_cursor[0]][tracker_cursor[1] - 1]) == 0:
-						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = data_storage.get_data("drums_last_added_note")
+						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = song_data.get_data("drums_last_added_note")
 					# if field for note is not empty, delete note:
 					else:
 						pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = []
 					# update pattern in data storage:
-					data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
+					song_data.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
 	
 			#clear single track:
 			if key == "0":
@@ -367,13 +367,13 @@ def main(keys, data_storage, pattern_number):
 						
 			# Change playing mode from looping pattern to playing whole song:
 			if key == "3":
-				is_song_playing = data_storage.get_data("patternmode_is_song_playing")
+				is_song_playing = song_data.get_data("patternmode_is_song_playing")
 				if is_song_playing:
 					is_song_playing = False
 				else:
 					is_song_playing = True
 
-				data_storage.put_data("patternmode_is_song_playing", is_song_playing)	
+				song_data.put_data("patternmode_is_song_playing", is_song_playing)	
 				
 				
 			# Pattern Menu:
@@ -428,17 +428,17 @@ def main(keys, data_storage, pattern_number):
 								
 								if pattern_number - 1 > 0 or pattern_number + 1 < 999:
 									# update pattern in data storage:
-									data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
+									song_data.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
 									if selected == 0:
 										new_pattern_number = pattern_number - 1
 									elif selected == 1:
 										new_pattern_number = pattern_number + 1
 									elif selected == 2:
 										for i in range(1, 998):
-											if not data_storage.drums_pattern_operations("exists", i):
+											if not song_data.drums_pattern_operations("exists", i):
 												# Update pattern order list:
 												new_pattern_number = i
-												data_storage.drums_pattern_operations("create or update pattern", new_pattern_number, copy.deepcopy(pattern))
+												song_data.drums_pattern_operations("create or update pattern", new_pattern_number, copy.deepcopy(pattern))
 												break
 
 								return new_pattern_number
@@ -466,7 +466,7 @@ def main(keys, data_storage, pattern_number):
 										if key == "5":
 											if warning_windows_selected_ok:
 												pattern = create_new_empty_pattern()
-												data_storage.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
+												song_data.drums_pattern_operations("create or update pattern", pattern_number, new_pattern = pattern)
 												break
 											else:
 												break
@@ -513,5 +513,5 @@ def main(keys, data_storage, pattern_number):
 					
 if __name__ == "__main__":
 	keys = Keypad()
-	data_storage = DataStorage()
-	main(keys, data_storage, 1)
+	song_data = SongData()
+	main(keys, song_data, 1)

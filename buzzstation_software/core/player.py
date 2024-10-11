@@ -84,27 +84,27 @@ def player_audiofiles(child_conn):
 				channels[sample_number].set_volume(vol)
 				channels[sample_number].play(samples[sample_number])
 				
-def player_pattern(track_number, pattern_number, data_storage, nmc, parent_conn):
+def player_pattern(track_number, pattern_number, song_data, nmc, parent_conn):
 	
 	# If sample changed, send new sample to player in another process:
-	if data_storage.get_data("last_changed_sample") is not None:
+	if song_data.get_data("last_changed_sample") is not None:
 		parent_conn = "samples"
-		parent_conn = data_storage.get_data("last_changed_sample")[1]
-		parent_conn = data_storage.get_data("last_changed_sample")[0]
-		data_storage.put_data("last_changed_sample", None)
+		parent_conn = song_data.get_data("last_changed_sample")[1]
+		parent_conn = song_data.get_data("last_changed_sample")[0]
+		song_data.put_data("last_changed_sample", None)
 	
-	drum_pattern = data_storage.drums_pattern_operations(operation = "get pattern", 
+	drum_pattern = song_data.drums_pattern_operations(operation = "get pattern", 
 															 pattern_number = pattern_number
 															)
 
-	if data_storage.pianoroll_pattern_operations("exists", pattern_number):
-		midi_patterns = data_storage.pianoroll_pattern_operations(operation = "get_whole_pattern",
+	if song_data.pianoroll_pattern_operations("exists", pattern_number):
+		midi_patterns = song_data.pianoroll_pattern_operations(operation = "get_whole_pattern",
 																  pattern_number = pattern_number
 																 )
 	else:
 		midi_patterns = None
 	
-	midi_outputs_and_channels = data_storage.get_data("playlist_list_of_instruments")
+	midi_outputs_and_channels = song_data.get_data("playlist_list_of_instruments")
 	
 	while True:
 		#for each quarter note in pattern:
@@ -152,48 +152,48 @@ def player_pattern(track_number, pattern_number, data_storage, nmc, parent_conn)
 			
 		
 			# end of playing:
-			if not data_storage.get_data("patternmode_is_song_playing") and not data_storage.get_data("is_playing"):
+			if not song_data.get_data("patternmode_is_song_playing") and not song_data.get_data("is_playing"):
 				midi_output2and3.turnOffAllNotesOnArduino()
 				break
 			
-			time.sleep(int(data_storage.get_data("timeBetweenQuarterNotes") / 2))
+			time.sleep(int(song_data.get_data("timeBetweenQuarterNotes") / 2))
 			sync.sync_out(False)
-			time.sleep(int(data_storage.get_data("timeBetweenQuarterNotes") / 2))
+			time.sleep(int(song_data.get_data("timeBetweenQuarterNotes") / 2))
 		
 		# Playing in playlist mode (playling whole song without looping single pattern):
-		if data_storage.get_data("patternmode_is_song_playing") and not data_storage.get_data("is_playing"):
+		if song_data.get_data("patternmode_is_song_playing") and not song_data.get_data("is_playing"):
 			break
 		# end of playing pattern in loop:
-		elif not data_storage.get_data("patternmode_is_song_playing") and not data_storage.get_data("is_playing"):
+		elif not song_data.get_data("patternmode_is_song_playing") and not song_data.get_data("is_playing"):
 			midi_output2and3.turnOffAllNotesOnArduino()
 			parent_conn = "stop"
 			break	
 			
 		
 											
-def song_player(data_storage, nmc, parent_conn):
-	playlist = data_storage.get_data(song_playlist)
+def song_player(song_data, nmc, parent_conn):
+	playlist = song_data.get_data(song_playlist)
 	
 	for quarter in range(len(playlist[0])):
 		for instrument in range(len(playlist)):
 			if playlist[instrument][quarter] != " ":
-				t = Thread(target=player_pattern, args=[instrument, playlist[instrument][quarter], data_storage, nmc, parent_conn])
+				t = Thread(target=player_pattern, args=[instrument, playlist[instrument][quarter], song_data, nmc, parent_conn])
 				t.run()
 		t.join() #wait for pattern to stop playing
 	
 
-def main(data_storage):
+def main(song_data):
 	nmc = NoteMidiConverter()
 	parent_conn, child_conn = multiprocessing.Pipe()
 	multiprocessing.Process(target=player_audiofiles, args=(child_conn,))
 	
 	while True:
-		if data_storage.get_data("patternmode_is_song_playing"):
-			song_player(data_storage, nmc, parent_conn)
+		if song_data.get_data("patternmode_is_song_playing"):
+			song_player(song_data, nmc, parent_conn)
 		
-		if data_storage.get_data("is_playing"):
-			instrument = data_storage.get_data("instrument_played")
-			player_pattern(instrument, pattern_number, data_storage, nmc, parent_conn)
+		if song_data.get_data("is_playing"):
+			instrument = song_data.get_data("instrument_played")
+			player_pattern(instrument, pattern_number, song_data, nmc, parent_conn)
 		
 		else:
 			time.sleep(0.1)

@@ -1,6 +1,6 @@
 from libs.keypad import Keypad
 from gui import gui_playlist, gui_warning_window
-from .data_storage import DataStorage
+from .song_data import SongData
 import time
 import os
 import copy
@@ -49,13 +49,13 @@ def loadSong():
 def playSong():
 	pass
 
-def createEmptySongPlaylist(data_storage):
-	song_playlist = data_storage.get_data("song_playlist")
+def createEmptySongPlaylist(song_data):
+	song_playlist = song_data.get_data("song_playlist")
 	track_for_instrument = []
 	for i in range(16):
 		track_for_instrument.append(" ")
 	song_playlist.append(track_for_instrument)
-	data_storage.put_data("song_playlist", song_playlist)
+	song_data.put_data("song_playlist", song_playlist)
 
 #If there is nothing saved after the first 16 fields, delete after 16 fields the rest of the playlist consisting of empty characters to save memory:
 def shortenPlaylistIfPossible(playlist):
@@ -74,22 +74,22 @@ def shortenPlaylistIfPossible(playlist):
 				
 		return playlist
 		
-def playlist_loop(keys, data_storage):
+def playlist_loop(keys, song_data):
 	
-	createEmptySongPlaylist(data_storage)
+	createEmptySongPlaylist(song_data)
 	previous_printed_values = [0, 0, 0]
 	
 	# Playlist loop:
 	while True:
 		# Get lists from data storage:
-		playlist_cursor = data_storage.get_data("playlist_cursor")
-		song_playlist = data_storage.get_data("song_playlist")
-		playlist_list_of_instruments = data_storage.get_data("playlist_list_of_instruments")
+		playlist_cursor = song_data.get_data("playlist_cursor")
+		song_playlist = song_data.get_data("song_playlist")
+		playlist_list_of_instruments = song_data.get_data("playlist_list_of_instruments")
 		
 		# Get potentiometers transformed data from data storage object:
-		bpm = data_storage.get_data("bpm")
-		swing = data_storage.get_data("swing")
-		bvol = data_storage.get_data("bvol")
+		bpm = song_data.get_data("bpm")
+		swing = song_data.get_data("swing")
+		bvol = song_data.get_data("bvol")
 	
 		# Update screen, if any value from potentiometers has changed:
 		if previous_printed_values[0] != bpm or previous_printed_values[1] != swing or previous_printed_values[2] != bvol:
@@ -101,7 +101,7 @@ def playlist_loop(keys, data_storage):
 						bpm = bpm, 
 						swing = swing, 
 						bvol = bvol,
-						songname = data_storage.get_data("song_name")
+						songname = song_data.get_data("song_name")
 					   )
 			previous_printed_values[0] = bpm
 			previous_printed_values[1] = swing	
@@ -151,25 +151,25 @@ def playlist_loop(keys, data_storage):
 				while True:
 					# Select new midi instrument for midi output:
 					if playlist_cursor[0] != 0 and playlist_cursor[1] == 0:
-						midi_output = data_storage.get_data("playlist_list_of_instruments")[playlist_cursor[0]]
+						midi_output = song_data.get_data("playlist_list_of_instruments")[playlist_cursor[0]]
 						if midi_output != "Empty":
-							midi_instruments = data_storage.get_data("playlist_list_of_midi_assigned")
+							midi_instruments = song_data.get_data("playlist_list_of_midi_assigned")
 							midi_instrument = midi_instruments[midi_output][0]
 							choosen_instrument = pick_midi_instrument.main(keys, midi_output, midi_instrument)
 
 							if choosen_instrument is not None:
 								midi_instruments[midi_output] = choosen_instrument
-								data_storage.put_data("playlist_list_of_midi_assigned", midi_instruments)
+								song_data.put_data("playlist_list_of_midi_assigned", midi_instruments)
 							break
 							
 					if pattern_number_for_tracker is None or pattern_number_for_tracker == ' ':
 							break
 					
 					if playlist_cursor[0] == 0:
-						pattern_number_for_tracker = tracker.main(keys, data_storage, pattern_number_for_tracker)
+						pattern_number_for_tracker = tracker.main(keys, song_data, pattern_number_for_tracker)
 					elif playlist_cursor[0] > 0 and playlist_list_of_instruments[playlist_cursor[0]] != "Empty":
 						pattern_number_for_tracker = pianoroll.main(keypad = keys, 
-																		  data_storage = data_storage,
+																		  song_data = song_data,
 																		  pattern_number = pattern_number_for_tracker,
 																		  midi_and_channel = playlist_list_of_instruments[playlist_cursor[0]],
 																		  track = playlist_cursor[0] - 1)
@@ -221,7 +221,7 @@ def playlist_loop(keys, data_storage):
 							patt_number = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
 							patt_number = int(patt_number) - 1
 							song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = patt_number
-							data_storage.put_data("last_added_pattern_numer", patt_number)
+							song_data.put_data("last_added_pattern_numer", patt_number)
 
 			
 			# clear track key:
@@ -233,7 +233,7 @@ def playlist_loop(keys, data_storage):
 									bpm = bpm, 
 									swing = swing, 
 									bvol = bvol,
-									songname = data_storage.get_data("song_name")
+									songname = song_data.get_data("song_name")
 								   )
 
 
@@ -291,7 +291,7 @@ def playlist_loop(keys, data_storage):
 							patt_number = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
 							patt_number = int(patt_number) + 1
 							song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = patt_number
-							data_storage.put_data("last_added_pattern_numer", patt_number)
+							song_data.put_data("last_added_pattern_numer", patt_number)
 
 			
 			if key == '#':
@@ -306,7 +306,7 @@ def playlist_loop(keys, data_storage):
 							bpm = bpm, 
 							swing = swing, 
 							bvol = bvol,
-							songname = data_storage.get_data("song_name")
+							songname = song_data.get_data("song_name")
 						   )
 				
 				while True:
@@ -355,7 +355,7 @@ def playlist_loop(keys, data_storage):
 										bpm = bpm, 
 										swing = swing, 
 										bvol = bvol,
-										songname = data_storage.get_data("song_name")
+										songname = song_data.get_data("song_name")
 										)
 							previous_selected = selected 
 	
@@ -368,7 +368,7 @@ def playlist_loop(keys, data_storage):
 																bpm = bpm, 
 																swing = swing, 
 																bvol = bvol,
-																songname = data_storage.get_data("song_name")
+																songname = song_data.get_data("song_name")
 															   )
 					
 							# Accept choice:
@@ -409,7 +409,7 @@ def playlist_loop(keys, data_storage):
 										
 								if should_save_song and path_to_file is not None:
 									with open(path_to_file, 'wb') as file_btp:
-										pickle.dump(data_storage, file_btp)
+										pickle.dump(song_data, file_btp)
 										
 								key = ""
 								clear_screen()
@@ -420,7 +420,7 @@ def playlist_loop(keys, data_storage):
 											bpm = bpm, 
 											swing = swing, 
 											bvol = bvol,
-											songname = data_storage.get_data("song_name")
+											songname = song_data.get_data("song_name")
 											)
 								break
 							
@@ -454,21 +454,21 @@ def playlist_loop(keys, data_storage):
 													path_to_file = pick_file.getFilename("load song", keys)
 													if path_to_file is not None:
 														with open(path_to_file, 'rb') as file_btp:
-															data_storage = pickle.load(file_btp)
-															song_playlist = data_storage.get_data("song_playlist")
-															playlist_list_of_instruments = data_storage.get_data("playlist_list_of_instruments")
+															song_data = pickle.load(file_btp)
+															song_playlist = song_data.get_data("song_playlist")
+															playlist_list_of_instruments = song_data.get_data("playlist_list_of_instruments")
 												
 												elif selected == 2:
 													#new song: clear all previous data
-													data_storage = DataStorage()
+													song_data = SongData()
 													playlist_cursor = [0, 0]
-													createEmptySongPlaylist(data_storage)
-													song_playlist = data_storage.get_data("song_playlist")
-													playlist_list_of_instruments = data_storage.get_data("playlist_list_of_instruments")
+													createEmptySongPlaylist(song_data)
+													song_playlist = song_data.get_data("song_playlist")
+													playlist_list_of_instruments = song_data.get_data("playlist_list_of_instruments")
 												
 												elif selected == 3:
 													# Clear entire playlist:
-													song_playlist = data_storage.get_data("song_playlist")
+													song_playlist = song_data.get_data("song_playlist")
 
 													track_for_instrument = []
 													for i in range(16):
@@ -476,7 +476,7 @@ def playlist_loop(keys, data_storage):
 
 													for i in range(len(song_playlist)):
 														song_playlist[i] = track_for_instrument[:]
-													data_storage.put_data("song_playlist", song_playlist)
+													song_data.put_data("song_playlist", song_playlist)
 												key = ""
 												clear_screen()
 												GUIplaylist(gui_cursor = playlist_cursor[:], 
@@ -486,7 +486,7 @@ def playlist_loop(keys, data_storage):
 															bpm = bpm, 
 															swing = swing, 
 															bvol = bvol,
-															songname = data_storage.get_data("song_name")
+															songname = song_data.get_data("song_name")
 															)
 												break
 			
@@ -509,8 +509,8 @@ def playlist_loop(keys, data_storage):
 					# Assign new midi output port to an empty instrument slot:
 					if playlist_list_of_instruments[playlist_cursor[0]] == "Empty":
 						playlist_list_of_instruments[playlist_cursor[0]] = "M1c1"
-						createEmptySongPlaylist(data_storage)
-						song_playlist = data_storage.get_data("song_playlist")
+						createEmptySongPlaylist(song_data)
+						song_playlist = song_data.get_data("song_playlist")
 
 					# Change midi output port, if instrument slot is not empty:
 					elif playlist_list_of_instruments[playlist_cursor[0]] != "Empty":
@@ -528,7 +528,7 @@ def playlist_loop(keys, data_storage):
 				elif playlist_cursor[1]  != 0:
 					# Add last picked pattern (pattern picking with buttons [7] and [9]:
 					if song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] == ' ':
-						song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] = data_storage.get_data("last_added_pattern_numer")
+						song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] = song_data.get_data("last_added_pattern_numer")
 						
 					# delete pattern:	
 					else:
@@ -542,13 +542,13 @@ def playlist_loop(keys, data_storage):
 						bpm = bpm, 
 						swing = swing, 
 						bvol = bvol,
-						songname = data_storage.get_data("song_name")
+						songname = song_data.get_data("song_name")
 					   )	
 		
 		# Update values in data storage:
-		data_storage.put_data("playlist_cursor", playlist_cursor)
-		data_storage.put_data("song_playlist", song_playlist)
-		data_storage.put_data("playlist_list_of_instruments", playlist_list_of_instruments)
+		song_data.put_data("playlist_cursor", playlist_cursor)
+		song_data.put_data("song_playlist", song_playlist)
+		song_data.put_data("playlist_list_of_instruments", playlist_list_of_instruments)
 
 
 if __name__ == "__main__":

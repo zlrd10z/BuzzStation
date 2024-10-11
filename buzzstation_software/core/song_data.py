@@ -1,4 +1,4 @@
-class DataStorage:
+class SongData:
 	def __init__(self):
 		#==================================================
 		# Potentiometers:

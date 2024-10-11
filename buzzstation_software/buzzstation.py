@@ -1,6 +1,6 @@
 from threading import Thread
 from libs.keypad import Keypad
-from core.data_storage import DataStorage
+from core.song_data import SongData
 from core.playlist import playlist_loop
 from core.potentiometers_operations import pots_operations
 import time
@@ -19,14 +19,14 @@ def main():
 	
 	# Create objects:
 	keys = Keypad()
-	data_storage = DataStorage()
+	song_data = SongData()
 
 	#Create thread for potentiometers:
-	thread_pots = Thread(target=pots_operations, args=[data_storage])
+	thread_pots = Thread(target=pots_operations, args=[song_data])
 	thread_pots.start()
 	
 	#main loop:
-	playlist_loop(keys, data_storage)
+	playlist_loop(keys, song_data)
 
 
 if __name__ == "__main__":

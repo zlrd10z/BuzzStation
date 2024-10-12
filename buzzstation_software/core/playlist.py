@@ -92,6 +92,9 @@ def load_song(song_data, keys):
 		for sample in samples:
 			if sample != "Empty":
 				convert_audio_to_temp.convert_to_pygame_format(sample)
+		
+		# Set song loaded flag for True, this flag is used for update samples list in player in another process
+		song_data.put_data("song_loaded", True)
 		return song_data
 
 def createEmptySongPlaylist(song_data):

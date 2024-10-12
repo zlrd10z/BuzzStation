@@ -21,13 +21,13 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
-    receiveData();
-    processData();
+    receive_data();
+    process_data();
   }
 }
 
 // Receive data
-void receiveData() {
+void receive_data() {
   digitalWrite(LED_BUILTIN, HIGH); // Indicate that data is received via Serial
   buffer_position = 0;
 
@@ -39,7 +39,7 @@ void receiveData() {
 }
 
 // Process data from the buffer, then route the data to MIDI output 2 or output 3
-void processData() {
+void process_data() {
   int index = 0;
   while (index < buffer_position) {
     if (buffer[index] == stop_byte) {
@@ -48,17 +48,28 @@ void processData() {
     }
     if (buffer[index] == byte_midi_output_2) {
       if (index + 3 < buffer_position) {
-        playNoteMIDI2(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
+        play_note_midi2(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
         index += 4;
-      } else {
+      } 
+      else if(index + 2 < buffer_position){
+        program_change_midi2(buffer[index + 1], buffer[index + 2]);
+        index += 3;
+      }
+      else {
         // Incomplete message
         break;
       }
+
     } else if (buffer[index] == byte_midi_output_3) {
       if (index + 3 < buffer_position) {
-        playNoteMIDI3(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
+        play_note_midi3(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
         index += 4;
-      } else {
+      } 
+      else if(index + 2 < buffer_position){
+        program_change_midi3(buffer[index + 1], buffer[index + 2]);
+        index += 3;
+      }
+      else {
         // Incomplete message
         break;
       }
@@ -68,14 +79,25 @@ void processData() {
   }
 }
 
-void playNoteMIDI2(int channel, int note, int velocity) {
+void play_note_midi2(int channel, int note, int velocity) {
   Serial.write(channel);
   Serial.write(note);
   Serial.write(velocity);
 }
 
-void playNoteMIDI3(int channel, int note, int velocity) {
+void play_note_midi3(int channel, int note, int velocity) {
   softSerial.write(channel);
   softSerial.write(note);
   softSerial.write(velocity);
 }
+
+void program_change_midi2(int channel, int value) {
+  Serial.write(channel);
+  Serial.write(value);
+}
+
+void program_change_midi3(int channel, int value) {
+  softSerial.write(channel);
+  softSerial.write(value);
+}
+

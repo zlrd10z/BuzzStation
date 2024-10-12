@@ -23,6 +23,7 @@ class SongData:
 		self.__playlist_list_of_instruments = ["Drums"]
 		self.__playlist_list_of_midi_assigned = {}
 		self.__last_added_pattern_numer = 1
+		self.__song_loaded = False
 		
 		#==================================================
 		# Drums and samples pattern data:

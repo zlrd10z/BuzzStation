@@ -2,12 +2,9 @@ from pydub import AudioSegment
 import os
 
 def convert_to_pygame_format(input_path):
-	cwd = os.getcwd()
-	path = 
-	
-    output_path = cwd + "\.temp\" + input_path.split("/")[-1]
-    
-	
+    cwd = os.getcwd()
+    output_path = cwd + "\\.temp\\" + input_path.split("/")[-1]
+
     audio = AudioSegment.from_file(input_path)
     
     # Convert to pygame settings (44100 Hz, 16-bit, stereo)

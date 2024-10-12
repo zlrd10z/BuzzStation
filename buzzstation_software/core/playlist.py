@@ -9,6 +9,7 @@ from . import tracker
 from . import pianoroll
 from . import pick_file
 from . import pick_midi_instrument
+from . import convert_audio_to_temp
 
 # Lambdas:
 clear_screen = lambda: os.system("clear")
@@ -36,18 +37,62 @@ GUIgetScreenMatrix = lambda  gui_cursor, playlist, menu_selected, list_of_instru
 								)
 
 
-def saveSong():
-	print("song saved")
-	# testing purpose:
-	#while True: pass
+# Remove all temporary audio files from .temp directory:
+def clear_temp():
+	cwd = os.getcwd()
+	command = "rm " + cwd + "/.temp/* -f"
+	os.system(command)
 
-def loadSong():
-	print("song loaded")
-	# testing purposez
-	#while True: pass
-	
-def playSong():
-	pass
+def save_song(song_data, keys):
+	path_to_file = pick_file.getFilename("save song", keys)
+	should_save_song = True
+
+	# Check if file already exist, then ask user, if he wants to overwrite it:
+	if path_to_file is not None:
+		if os.path.isfile(path_to_file):
+			ok_selected = False
+			screen_matrix = []
+			line = []
+			for i in range(64):
+				line.append(" ")
+			for i in range(17):
+				screen_matrix.append(line[:])
+
+
+			for i in range(len(path_to_file)):
+				screen_matrix[0][i] = path_to_file[i]
+
+			gui_warning_window.main(screen_matrix, ok_selected, "overwrite song")
+
+			while True:
+				key = keys.check_keys()
+				if key != "":
+					if key == "4": ok_selected = True
+					if key == "6": 	ok_selected = False
+					if key == "5":
+						if not ok_selected: should_save_song = False
+						else:
+							os.remove(path_to_file)
+							break
+					clear_screen()
+					gui_warning_window.main(screen_matrix, ok_selected, "overwrite song")
+
+	if should_save_song and path_to_file is not None:
+		with open(path_to_file, 'wb') as file_btp:
+			pickle.dump(song_data, file_btp)
+
+def load_song(song_data, keys):
+	path_to_file = pick_file.getFilename("load song", keys)
+	if path_to_file is not None:
+		with open(path_to_file, 'rb') as file_btp:
+			song_data = pickle.load(file_btp)
+		clear_temp()
+		# Create temporary audio files adjusted for pygame mixer settings:
+		samples = song_data.get_data("samples")
+		for sample in samples:
+			if sample != "Empty":
+				convert_audio_to_temp.convert_to_pygame_format(sample)
+		return song_data
 
 def createEmptySongPlaylist(song_data):
 	song_playlist = song_data.get_data("song_playlist")
@@ -374,42 +419,7 @@ def playlist_loop(keys, song_data):
 							# Accept choice:
 							if selected == 0:
 								# Save song:
-								path_to_file = pick_file.getFilename("save song", keys)
-								should_save_song = True
-								
-								# Check if file already exist, then ask user, if he wants to overwrite it:
-								if path_to_file is not None:
-									if os.path.isfile(path_to_file):
-										ok_selected = False
-										screen_matrix = []
-										line = []
-										for i in range(64):
-											line.append(" ")
-										for i in range(17):
-											screen_matrix.append(line[:])
-									
-											
-										for i in range(len(path_to_file)):
-											screen_matrix[0][i] = path_to_file[i]
-											
-										gui_warning_window.main(screen_matrix, ok_selected, "overwrite song")
-									
-										while True:
-											key = keys.check_keys()
-											if key != "":
-												if key == "4": ok_selected = True
-												if key == "6": 	ok_selected = False
-												if key == "5":
-													if not ok_selected: should_save_song = False
-													else:
-														os.remove(path_to_file)
-														break
-												clear_screen()
-												gui_warning_window.main(screen_matrix, ok_selected, "overwrite song")
-										
-								if should_save_song and path_to_file is not None:
-									with open(path_to_file, 'wb') as file_btp:
-										pickle.dump(song_data, file_btp)
+								save_song(song_data, keys)
 										
 								key = ""
 								clear_screen()
@@ -451,12 +461,10 @@ def playlist_loop(keys, song_data):
 											if ok_selected:
 												if selected == 1:
 													# Load Song
-													path_to_file = pick_file.getFilename("load song", keys)
-													if path_to_file is not None:
-														with open(path_to_file, 'rb') as file_btp:
-															song_data = pickle.load(file_btp)
-															song_playlist = song_data.get_data("song_playlist")
-															playlist_list_of_instruments = song_data.get_data("playlist_list_of_instruments")
+													song_data = load_song(song_data, keys)
+													song_playlist = song_data.get_data("song_playlist")
+													playlist_list_of_instruments = song_data.get_data("playlist_list_of_instruments")
+
 												
 												elif selected == 2:
 													#new song: clear all previous data
@@ -495,12 +503,6 @@ def playlist_loop(keys, song_data):
 					
 							break
 							
-
-	
-
-						
-
-			
 			if key == '*':
 				playSong()
 				

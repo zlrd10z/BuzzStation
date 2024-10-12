@@ -316,10 +316,17 @@ def main(keys, song_data, pattern_number):
 					# Choose sample from disk with getFilename function and get path to choosen sample:
 					sample_path = getFilename("sample", keys)
 					if sample_path is not None:
+						# put path to samples list:
 						samples[tracker_cursor[0]] = sample_path
 						song_data.put_data("samples", samples)
-						song_data.put_data("last_changed_sample", (sample_path, tracker_cursor[0]))
-
+						# generate temp sample file adjusted for pygame mixer settings:
+						samples_temp = song_data.get_data("samples_temp")
+						temp_sample_path = convert_audio_to_temp.convert_to_pygame_format(sample_path)
+						samples_temp[tracker_cursor[0]] = temp_sample_path
+						song_data.put_data("samples_temp", samples_temp)
+						# put path and info for player which sample changed:
+						song_data.put_data("last_changed_sample", (temp_sample_path, tracker_cursor[0]))
+						
 					
 				# if cursor is on playlist:
 				elif tracker_cursor[1] > 0:

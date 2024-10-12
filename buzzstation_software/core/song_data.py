@@ -29,7 +29,7 @@ class SongData:
 		self.__drums_patterns = {}
 		
 		self.__samples = ["Empty", "Empty"]
-		self.__samples_temp = []
+		self.__samples_temp = ["Empty", "Empty"] 
 		self.__last_changed_sample = None
 		self.__samples_volume = [10, 10]
 		self.__drums_last_added_note = ["C5", "F"]

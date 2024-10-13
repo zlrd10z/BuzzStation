@@ -15,34 +15,34 @@ FONT_GREEN = "\033[38;5;10m"
 
 # Change char's background color:
 def text_bg_color(color, text):
-	colored_string = ""
-	if color == "green":
-		colored_string = (f"{BG_GREEN}{FONT_BLACK}{text}{RESET}")
-	elif color == "blue":
-		colored_string = (f"{BG_BLUE}{text}{RESET}")
-	elif color == "grey":
-		colored_string = (f"{BG_GREY}{FONT_BLACK}{text}{RESET}")
-	elif color == "white":
-		colored_string = (f"{BG_WHITE}{FONT_BLACK}{text}{RESET}")
-	elif color == "black grey":
-		colored_string = (f"{BG_BLACK_GREY}{text}{RESET}")
-	elif color == "dark grey":
-		colored_string = (f"{BG_DARK_GREY}{text}{RESET}")
-	elif color == "light grey":
-		colored_string = (f"{BG_LIGHT_GREY}{text}{RESET}")
-	else: pass
-	return colored_string
+    colored_string = ""
+    if color == "green":
+        colored_string = (f"{BG_GREEN}{FONT_BLACK}{text}{RESET}")
+    elif color == "blue":
+        colored_string = (f"{BG_BLUE}{text}{RESET}")
+    elif color == "grey":
+        colored_string = (f"{BG_GREY}{FONT_BLACK}{text}{RESET}")
+    elif color == "white":
+        colored_string = (f"{BG_WHITE}{FONT_BLACK}{text}{RESET}")
+    elif color == "black grey":
+        colored_string = (f"{BG_BLACK_GREY}{text}{RESET}")
+    elif color == "dark grey":
+        colored_string = (f"{BG_DARK_GREY}{text}{RESET}")
+    elif color == "light grey":
+        colored_string = (f"{BG_LIGHT_GREY}{text}{RESET}")
+    else: pass
+    return colored_string
 
 def text_font_color(color, text):
-	colored_string = ""
-	if color == "blue":
-		colored_string = (f"{FONT_BLUE}{text}{RESET}")
-	elif color == "purple":
-		colored_string = (f"{FONT_PURPLE}{text}{RESET}")
-	elif color == "black":
-		colored_string = (f"{FONT_BLACK}{text}{RESET}")
-	elif color == "yellow":
-		colored_string = (f"{FONT_YELLOW}{text}{RESET}")
-	elif color == "green":
-		colored_string = (f"{FONT_GREEN}{text}{RESET}")
-	return colored_string
+    colored_string = ""
+    if color == "blue":
+        colored_string = (f"{FONT_BLUE}{text}{RESET}")
+    elif color == "purple":
+        colored_string = (f"{FONT_PURPLE}{text}{RESET}")
+    elif color == "black":
+        colored_string = (f"{FONT_BLACK}{text}{RESET}")
+    elif color == "yellow":
+        colored_string = (f"{FONT_YELLOW}{text}{RESET}")
+    elif color == "green":
+        colored_string = (f"{FONT_GREEN}{text}{RESET}")
+    return colored_string

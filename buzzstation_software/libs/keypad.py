@@ -42,9 +42,9 @@ class Keypad():
             GPIO.cleanup()
 
 if __name__ == "__main__":
-	#tests:
-	while True:
-			keypad = Keypad()
-			key = keypad.check_keys()
-			if key != "":
-					print(key)
+    #tests:
+    while True:
+            keypad = Keypad()
+            key = keypad.check_keys()
+            if key != "":
+                    print(key)

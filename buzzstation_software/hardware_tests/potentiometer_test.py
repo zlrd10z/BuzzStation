@@ -18,9 +18,9 @@ chan2 = AnalogIn(ads, ADS.P2)
 
 # Reading values from the channels:
 while True:
-	print("----------------")
-	print("A0: " + str(chan0.voltage))
-	print("A1: " + str(chan1.voltage))
-	print("A2: " + str(chan2.voltage))
-	print("----------------")
-	time.sleep(0.5)
+    print("----------------")
+    print("A0: " + str(chan0.voltage))
+    print("A1: " + str(chan1.voltage))
+    print("A2: " + str(chan2.voltage))
+    print("----------------")
+    time.sleep(0.5)

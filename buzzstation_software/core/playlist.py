@@ -1,5 +1,6 @@
 from libs.keypad import Keypad
-from gui import gui_playlist, gui_warning_window
+from gui import gui_playlist
+from gui import gui_warning_window
 from .song_data import SongData
 import time
 import os
@@ -10,11 +11,13 @@ from . import pianoroll
 from . import pick_file
 from . import pick_midi_instrument
 from . import convert_audio_to_temp
+from threading import Thread
+from core.potentiometers_operations import pots_operations
 
 
 # Lambdas:
 clear_screen = lambda: os.system('clear')
-gui_playlist = lambda gui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: gui_playlist.main(
+gui_pl = lambda gui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: gui_playlist.main(
                                 list_of_instruments=list_of_instruments,
                                 bpm_value=bpm,
                                 swing_value=swing,
@@ -46,11 +49,12 @@ def clear_temp():
 
 def save_song(song_data, keys):
     path_to_file = pick_file.get_filename('save song', keys)
-    song_name = path_to_file.split('/')[-1]
-    song_data.put_data('song_name', song_name)
-    should_save_song = True
-    # Check if file already exist, then ask user, if he wants to overwrite it:
+    should_save_song = False
     if path_to_file is not None:
+        song_name = path_to_file.split('/')[-1]
+        song_data.put_data('song_name', song_name)
+        should_save_song = True
+        # Check if file already exist, then ask user, if he wants to overwrite it:
         if os.path.isfile(path_to_file):
             ok_selected = False
             screen_matrix = []
@@ -127,7 +131,7 @@ def pots_values_gui(song_data, previous_printed_values, playlist_cursor,
     bvol = song_data.get_data('bvol')
     if previous_printed_values[0] != bpm or previous_printed_values[1] != swing or previous_printed_values[2] != bvol:
         clear_screen()
-        gui_playlist(gui_cursor = playlist_cursor[:], 
+        gui_pl(gui_cursor = playlist_cursor[:], 
                     playlist = song_playlist, 
                     menu_selected = None, 
                     list_of_instruments = playlist_list_of_instruments, 
@@ -182,7 +186,7 @@ def direction_keys(key, playlist_cursor, song_playlist, playlist_list_of_instrum
     return playlist_cursor
 
 #EDIT key - key with [E] sticker on it:
-def edit_key(song_data, playlist_cursor):
+def edit_key(keys, song_data, playlist_cursor, song_playlist):
     if playlist_cursor[1]-1 < 0:
         pattern_number_for_tracker = None
     else:
@@ -212,8 +216,9 @@ def edit_key(song_data, playlist_cursor):
                                                        )
 
 #Keys with [+] and [-] sticker - changing selected values:
-def plus_n_minus_keys(key, playlist_cursor, song_data, song_playlist):
-    def minus(playlist_cursor, song_data, song_playlist):
+def plus_n_minus_keys(key, playlist_cursor, song_data, song_playlist, playlist_list_of_instruments):
+    def minus(playlist_cursor, song_data, song_playlist, playlist_list_of_instruments):
+        result = None
         # Toggle down midi instrument channel:
         if playlist_cursor[0] != 0 and playlist_cursor[1] == 0:
             if playlist_list_of_instruments[playlist_cursor[0]] != 'Empty':
@@ -240,7 +245,8 @@ def plus_n_minus_keys(key, playlist_cursor, song_data, song_playlist):
                     result = ('playlist', song_playlist)
         return result
     
-    def plus(playlist_cursor, song_data, song_playlist):
+    def plus(playlist_cursor, song_data, song_playlist, playlist_list_of_instruments):
+        result = None
         # Toggle up midi instrument channel:
         if playlist_cursor[0] != 0 and playlist_cursor[1] == 0:
             if playlist_list_of_instruments[playlist_cursor[0]] != 'Empty':
@@ -251,7 +257,7 @@ def plus_n_minus_keys(key, playlist_cursor, song_data, song_playlist):
                     channel = int(midi_instrument[3:]) + 1
                 midi_instrument = midi_instrument[:3] + str(channel)
                 playlist_list_of_instruments[playlist_cursor[0]] = midi_instrument
-                result = ('playlist_list_of_instruments', playlist_list_of_instruments)
+            result = ('playlist_list_of_instruments', playlist_list_of_instruments)
         # Change selected pattern to previous pattern (eg. from pattern 1 to pattern 2):
         elif playlist_cursor[1] != 0:
             # Add pattern to an empty field:
@@ -264,13 +270,13 @@ def plus_n_minus_keys(key, playlist_cursor, song_data, song_playlist):
                     patt_number = int(patt_number) + 1
                     song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = patt_number
                     song_data.put_data('last_added_pattern_numer', patt_number)
-                    result = ('playlist', song_playlist)
+            result = ('playlist', song_playlist)
         return result
     
     if key == '7':
-        result = minus(playlist_cursor, song_data)
+        result = minus(playlist_cursor, song_data, song_playlist, playlist_list_of_instruments)
     if key == '9':
-        result = plus(playlist_cursor, song_data)
+        result = plus(playlist_cursor, song_data, song_playlist, playlist_list_of_instruments)
     
     return result
 
@@ -278,7 +284,7 @@ def plus_n_minus_keys(key, playlist_cursor, song_data, song_playlist):
 def clear_key(keys, screen_matrix, song_playlist, playlist_cursor):
     ok_selected = False
     clear_screen()
-    gui_warning_window.main(screen_matrix, ok_selected, 'clear song')
+    gui_warning_window.main(screen_matrix, ok_selected, 'clear track')
     while True:
         key = keys.check_keys()
         if key != '':
@@ -297,7 +303,7 @@ def clear_key(keys, screen_matrix, song_playlist, playlist_cursor):
                     break
 
             clear_screen()    
-            gui_warning_window.main(screen_matrix, ok_selected, 'clear song')
+            gui_warning_window.main(screen_matrix, ok_selected, 'clear track')
     return song_playlist
 
 def menu_accept_key(keys, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, selected):
@@ -315,7 +321,7 @@ def menu_accept_key(keys, song_data, playlist_cursor, song_playlist, playlist_li
         # Save song:
         save_song(song_data, keys)
         clear_screen()
-        gui_playlist(gui_cursor=playlist_cursor[:], 
+        gui_pl(gui_cursor=playlist_cursor[:], 
                     playlist=song_playlist, 
                     menu_selected=selected, 
                     list_of_instruments=playlist_list_of_instruments, 
@@ -324,7 +330,6 @@ def menu_accept_key(keys, song_data, playlist_cursor, song_playlist, playlist_li
                     bvol=song_data.get_data('bvol'),
                     songname=song_data.get_data('song_name')
                     )
-        break
     elif selected > 0:
         if selected == 1:
             warning_text = 'load song'
@@ -350,13 +355,22 @@ def menu_accept_key(keys, song_data, playlist_cursor, song_playlist, playlist_li
                 # [insert] key - accept key:
                 if key == '5':
                     if ok_selected:
-                        if selected == 1:
-                            # Load Song
-                            song_data = load_song(song_data, keys)
-                        elif selected == 2:
-                            #new song: clear all previous data
-                            song_data = SongData()
-                            create_empty_song_playlist(song_data)
+                        if selected == 1 or selected == 2:
+                            song_data.put_data('song_data_change', True)
+                            while not song_data.get_data('song_data_change'):
+                                pass #Wait to potentiometrs thread to end
+                            if selected == 1:
+                                # Load Song
+                                temp_song_data = load_song(song_data, keys)
+                                if temp_song_data is not None:
+                                    song_data = temp_song_data
+                            elif selected == 2:
+                                #new song: clear all previous data
+                                song_data = SongData()
+                                create_empty_song_playlist(song_data)
+                                time.sleep(0.1) #to properly reload potentiometers on I2C
+                            thread_pots = Thread(target=pots_operations, args=[song_data])
+                            thread_pots.start()
                         elif selected == 3:
                             # Clear entire playlist:
                             song_playlist = song_data.get_data('song_playlist')
@@ -379,7 +393,7 @@ def menu(keys, song_data, playlist_cursor, song_playlist, playlist_list_of_instr
     selected = 0
     menu_cursor = [0, 0]
     clear_screen()
-    gui_playlist(gui_cursor=playlist_cursor[:], 
+    gui_pl(gui_cursor=playlist_cursor[:], 
                 playlist=song_playlist, 
                 menu_selected=selected, 
                 list_of_instruments=playlist_list_of_instruments, 
@@ -432,7 +446,7 @@ def menu(keys, song_data, playlist_cursor, song_playlist, playlist_list_of_instr
             # Check if selected button changed and displayit to user:
             if previous_selected != selected:
                 clear_screen()
-                gui_playlist(gui_cursor=playlist_cursor[:], 
+                gui_pl(gui_cursor=playlist_cursor[:], 
                             playlist=song_playlist, 
                             menu_selected=selected, 
                             list_of_instruments=playlist_list_of_instruments, 
@@ -479,14 +493,15 @@ def main(keys, song_data):
                 playlist_cursor = direction_keys(key, playlist_cursor, song_playlist, playlist_list_of_instruments)        
             # Key with [E] sticker on it - edit selected pattern:
             elif key == '3':
-                edit_key(song_data, playlist_cursor)
+                edit_key(keys, song_data, playlist_cursor, song_playlist)
             # Keys with [+] and [-] sticker - changing selected values:    
             elif key == '7' or key == '9':
-                result = plus_n_minus_keys(key, playlist_cursor, song_data, song_playlist):
-                if result[0] == 'playlist':
-                    playlist = result[1]
-                else:
-                    playlist_list_of_instruments = result[1]
+                result = plus_n_minus_keys(key, playlist_cursor, song_data, song_playlist, playlist_list_of_instruments)
+                if result is not None:
+                    if result[0] == 'playlist':
+                        playlist = result[1]
+                    else:
+                        playlist_list_of_instruments = result[1]
             # Key with [C] sticker - clear track on which cursor is present:
             elif key == '0':
                 # get currently displayed GUI:
@@ -494,25 +509,25 @@ def main(keys, song_data):
                                                         playlist=song_playlist, 
                                                         menu_selected=None, 
                                                         list_of_instruments=playlist_list_of_instruments, 
-                                                        bpm=bpm, 
-                                                        swing=swing, 
-                                                        bvol=bvol,
+                                                        bpm=song_data.get_data('bpm'),
+                                                        swing=song_data.get_data('swing'), 
+                                                        bvol=song_data.get_data('bvol'),
                                                         songname=song_data.get_data('song_name')
                                                        )
                 song_playlist = clear_key(keys, screen_matrix, song_playlist, playlist_cursor)
             # Key with [M] sticker - menu:
             elif key == '#':
                 # Enter menu to save or load song or to clear entinre playlist:
-                new_song_data = menu(keys, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, selected)
+                new_song_data = menu(keys, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments)
                 if new_song_data is not None:
                     song_data = new_song_data
                     song_playlist = song_data.get_data('song_playlist')
                     playlist_list_of_instruments = song_data.get_data('playlist_list_of_instruments')
                     playlist_cursor = [0, 0]
                     clear_screen()
-                    gui_playlist(gui_cursor=playlist_cursor[:], 
+                    gui_pl(gui_cursor=playlist_cursor[:], 
                                 playlist=song_playlist, 
-                                menu_selected=selected, 
+                                menu_selected = None,
                                 list_of_instruments=playlist_list_of_instruments, 
                                 bpm=song_data.get_data('bpm'),
                                 swing=song_data.get_data('swing'), 
@@ -551,13 +566,13 @@ def main(keys, song_data):
             
             # when key was pressed, update displayed GUI:
             clear_screen()
-            gui_playlist(gui_cursor = playlist_cursor[:], 
+            gui_pl(gui_cursor = playlist_cursor[:], 
                         playlist = song_playlist, 
                         menu_selected = None, 
                         list_of_instruments = playlist_list_of_instruments, 
-                        bpm = bpm, 
-                        swing = swing, 
-                        bvol = bvol,
+                        bpm=song_data.get_data('bpm'),
+                        swing=song_data.get_data('swing'), 
+                        bvol=song_data.get_data('bvol'),
                         songname = song_data.get_data('song_name')
                        )    
         

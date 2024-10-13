@@ -24,6 +24,7 @@ class SongData:
         self.__playlist_list_of_midi_assigned = {}
         self.__last_added_pattern_numer = 1
         self.__song_loaded = False
+        self.__song_data_change = False #flag for other threadas that they need to be terminated
         
         #==================================================
         # Drums and samples pattern data:
@@ -70,7 +71,7 @@ class SongData:
             setattr(self, f'_{self.__class__.__name__}__{var_name}', new_value)
             
         else:
-            raise AttributeError(f'Attribute '{var_name}' does not exist.')
+            raise AttributeError(f'Attribute {var_name} does not exist.')
     
     # Get requested value:
     def get_data(self, var_name):
@@ -84,7 +85,7 @@ class SongData:
             return data_to_return
         
         else:
-            raise AttributeError(f'Attribute '{var_name}' does not exist.')
+            raise AttributeError(f'Attribute {var_name} does not exist.')
 
     
     def drums_pattern_operations(self, operation, pattern_number, new_pattern=None):

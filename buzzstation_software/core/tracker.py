@@ -29,7 +29,9 @@ def check_if_pattern_is_empty(pattern):
                 isEmpty = False
     return isEmpty
 
-def menu(song_data, samples, pattern, pattern_number, song_name, tracker_cursor, keys):
+def menu(song_data, samples, pattern, pattern_number, song_name, 
+         tracker_cursor, keys, guitracker, guitracker_noprinting
+):
     def toggle_patterns(song_data, pattern_number, selected):
         new_pattern_number = pattern_number
         if pattern_number - 1 > 0 or pattern_number + 1 < 999:
@@ -50,14 +52,15 @@ def menu(song_data, samples, pattern, pattern_number, song_name, tracker_cursor,
                 # Update pattern order list:
                 new_pattern_number = i
                 song_data.drums_pattern_operations('create or update pattern', new_pattern_number, copy.deepcopy(pattern))
+                break
         return new_pattern_number
     
     # Clear entire pattern:
-    def clear_pattern(keys, screen_matrix, song_data):
+    def clear_pattern(keys, screen_matrix, song_data, guitracker):
         warning_window_selected_ok = False
         # Display warning window to user:
         clear_screen()
-        gui_warning_window.main(screen_matrix, warning_window_selected_ok, 'clear song')
+        gui_warning_window.main(screen_matrix, warning_window_selected_ok, 'clear all tracks')
 
         while True:
             key = keys.check_keys()
@@ -81,7 +84,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name, tracker_cursor,
                         break
                 # When screen was pressed, display action in GUI:
                 clear_screen()
-                gui_warning_window.main(screen_matrix, warning_window_selected_ok, 'clear song')
+                gui_warning_window.main(screen_matrix, warning_window_selected_ok, 'clear all tracks')
         
     
     menu_cursor = [0, 0]
@@ -126,7 +129,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name, tracker_cursor,
                         result = toggle_patterns(song_data, pattern_number, selected)
                     # clone pattern:
                     if selected == 2:
-                        result = clone_pattern(song_data, pattern_number, selected):
+                        result = clone_pattern(song_data, pattern_number, selected)
                     return result
                 #clear pattern:
                 elif selected == 3:
@@ -137,7 +140,8 @@ def menu(song_data, samples, pattern, pattern_number, song_name, tracker_cursor,
                                                            selected_button=selected, 
                                                            cursor=tracker_cursor
                                                          )
-                    clear_pattern(keys, screen_matrix, song_data)
+                    clear_pattern(keys, screen_matrix, song_data, guitracker)
+                    break
                     
             # Update selected (selected is another value:
             if menu_cursor[0] == 0:
@@ -190,7 +194,10 @@ def clear_single_track(keys, samples, pattern_number, song_name, tracker_cursor)
             gui_warning_window.main(screen_matrix, ok_selected, 'clear track')
             
 # This function check if any value from potentiometer, and if it's true, it's displaying new value on screen: 
-def pots_values_gui(samples, pattern, pattern_number, song_name, tracker_cursor, potentiometers_previous_values):
+def pots_values_gui(song_data, samples, pattern, pattern_number, 
+                    song_name, tracker_cursor, potentiometers_previous_values,
+                    guitracker
+):
     bpm = song_data.get_data('bpm')
     swing = song_data.get_data('swing')
     bvol = song_data.get_data('bvol')
@@ -390,11 +397,11 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern):
     
     if key == '7':
         result = minus_key(song_data, tracker_cursor, pattern)
-    if key == '9'
+    if key == '9':
         result = plus_key(song_data, tracker_cursor, pattern)
 
 # key with [insert] sticker on it - accept / insert key:
-def insert_key(song_data, tracker_cursor, keys):
+def insert_key(song_data, tracker_cursor, keys, pattern, pattern_number):
     # If cursor is on samples level, insert sample / change sample to other one:
     if tracker_cursor[1] == 0:
         # Choose sample from disk with get_filename function and get path to choosen sample:
@@ -466,10 +473,11 @@ def main(keys, song_data, pattern_number):
     pattern = song_data.drums_pattern_operations('get pattern', pattern_number)
 
     while True:
-        #Check if any value from potentiometer, and if it's true, it's displaying new value on screen: 
-        temp_pot_values =  pots_values(samples, pattern, pattern_number, song_name, 
-                                       tracker_cursor, potentiometers_previous_values
-                                      )
+        #Check if any value from potentiometers, and if it's true, it's displaying new value on screen: 
+        temp_pot_values =  pots_values_gui(song_data, samples, pattern, pattern_number, 
+                                           song_name, tracker_cursor, potentiometers_previous_values,
+                                           guitracker
+                                          )
         if temp_pot_values is not None:
             potentiometers_previous_values = temp_pot_values
 
@@ -503,7 +511,7 @@ def main(keys, song_data, pattern_number):
                 pattern = plus_n_minus_keys(key, song_data, tracker_cursor, pattern)
             # [Insert] key:
             elif key == '5':
-                temp_pattern = insert_key(song_data, tracker_cursor, keys)
+                temp_pattern = insert_key(song_data, tracker_cursor, keys, pattern, pattern_number)
                 if temp_pattern is not None:
                     pattern = temp_pattern
             #[C] key - clear single track:
@@ -524,8 +532,10 @@ def main(keys, song_data, pattern_number):
             # Pattern Menu:
             elif key == '#':
                 new_pattern_number = menu(song_data, samples, pattern, pattern_number, 
-                                          song_name, tracker_cursor, keys
+                                          song_name, tracker_cursor, keys, guitracker,
+                                          guitracker_noprinting
                                          )
+                pattern = song_data.drums_pattern_operations('get pattern', pattern_number)
                 if new_pattern_number is not None:
                     return new_pattern_number
             # if key was pressed, update displayed gui:

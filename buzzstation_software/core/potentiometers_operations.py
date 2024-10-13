@@ -16,11 +16,17 @@ def pots_operations(song_data):
             song_data.put_data('time_between_quarter_notes', time_between_quarter_notes)
         swing_old_value = song_data.get_data('swing')
         swing_new_value = int(potentiometer_values_transform.swing_from_potentiometer1(pots_values[1]))
+        
         if swing_new_value - swing_old_value > 1 or swing_old_value - swing_new_value > 1:
             swing = swing_new_value
             song_data.put_data('swing', swing)
         bvol_old_value = song_data.get_data('bvol')
         bvol_new_value = int(potentiometer_values_transform.volume_from_potentiometer0(pots_values[0]))
+        
         if bvol_new_value - bvol_old_value > 1 or bvol_old_value - bvol_new_value > 1:
             bvol = bvol_new_value
             song_data.put_data('bvol', bvol)
+            
+        if song_data.get_data('song_data_change'):
+            break
+    song_data.put_data('song_data_change', False)

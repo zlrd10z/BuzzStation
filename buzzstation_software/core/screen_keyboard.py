@@ -112,16 +112,16 @@ def print_keyboard(filename, is_dir):
                         text += keyboard_matrix[j][k]
                     text += fill*2
                 match j:
-                case 0:
-                    text += fill*3
-                case 1:
-                    text += fill*6
-                case 2:
-                    text += fill*9
-                case 3:
-                    text += fill*15
-                case 4:
-                    text += fill*19
+                    case 0:
+                        text += fill*3
+                    case 1:
+                        text += fill*6
+                    case 2:
+                        text += fill*9
+                    case 3:
+                        text += fill*15
+                    case 4:
+                        text += fill*19
 
                 text += fill * keyboard_print_index_start_width + (text_bg_color('blue', ' '))
                 print(text)
@@ -183,6 +183,6 @@ def user_input_filename(is_dir, keypad):
                 else:
                     filename += keyboard_matrix[row][column]    
 
-                print_keyboard(filename, is_dir)
+            print_keyboard(filename, is_dir)
 
     return filename

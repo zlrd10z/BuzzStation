@@ -1,9 +1,10 @@
 from pydub import AudioSegment
 import os
 
+
 def convert_to_pygame_format(input_path):
     cwd = os.getcwd()
-    output_path = cwd + "\\.temp\\" + input_path.split("/")[-1]
+    output_path = cwd + '\\.temp\\' + input_path.split('/')[-1]
 
     audio = AudioSegment.from_file(input_path)
     
@@ -13,6 +14,6 @@ def convert_to_pygame_format(input_path):
     audio = audio.set_channels(2)  #stereo
 
 	#save as wav
-    audio.export(output_path, format="wav")
+    audio.export(output_path, format='wav')
     
     return output_path

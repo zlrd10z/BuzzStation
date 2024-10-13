@@ -1,7 +1,7 @@
 # This code is Python adaptation of C code for arduino from https://docs.arduino.cc/built-in-examples/communication/Midi/
-
 import time
 import serial
+
 
 # UART configuration:
 ser = serial.Serial(

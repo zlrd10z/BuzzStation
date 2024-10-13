@@ -7,11 +7,9 @@ class Keypad():
     cols = [6, 0, 19]
     rows = [5, 21, 26, 13]
 
-
     # Pins setup:
     for i in range(len(cols)):
         GPIO.setup(cols[i], GPIO.OUT)
-
     for i in range(len(rows)):
         GPIO.setup(rows[i], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
@@ -22,7 +20,6 @@ class Keypad():
     ['7', '8', '9'],
     ['*', '0', '#']
     ]
-
 
     def check_keys(self):
         try:
@@ -35,7 +32,6 @@ class Keypad():
                         time.sleep(0.01)
                         if not GPIO.input(self.rows[j]):
                             key = self.keys[j][i]
-                            #print(key)
                         while not GPIO.input(self.rows[j]):
                             pass
                 GPIO.output(self.cols[i], GPIO.HIGH)
@@ -45,11 +41,10 @@ class Keypad():
             print(e)
             GPIO.cleanup()
 
-
-
 if __name__ == "__main__":
-        while True:
-                keypad = Keypad()
-                key = keypad.check_keys()
-                if key != "":
-                        print(key)
+	#tests:
+	while True:
+			keypad = Keypad()
+			key = keypad.check_keys()
+			if key != "":
+					print(key)

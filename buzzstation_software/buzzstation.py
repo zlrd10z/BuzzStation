@@ -1,10 +1,11 @@
 from threading import Thread
 from libs.keypad import Keypad
 from core.song_data import SongData
-from core.playlist import playlist_loop
+from core import playlist
 from core.potentiometers_operations import pots_operations
 import time
 import os
+
 
 # Remove all temporary audio files from .temp directory:
 def clear_temp():
@@ -26,7 +27,7 @@ def main():
 	thread_pots.start()
 	
 	#main loop:
-	playlist_loop(keys, song_data)
+	playlist.main(keys, song_data)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 import serial
 import time
 
+
 # Zamień '/dev/ttyUSB0' na odpowiedni port szeregowy
 serialUSB = serial.Serial('/dev/ttyUSB0', 31250) 
 time.sleep(2)  # Czekaj, aż połączenie zostanie nawiązane

@@ -5,11 +5,11 @@ class SongData:
 		self.__bpm = 0
 		self.__swing = 0
 		self.__bvol = 0
-		self.__timeBetweenQuarterNotes = 0
+		self.__time_between_quarter_notes = 0
 		
 		# Playing:
-		self.__is_playing = False
-		self.__patternmode_is_song_playing = False
+		self.__is_playing = False #true - playing, false - pause
+		self.__is_song_playing = False #true: playing song, false: playing pattern
 		self.__instrument_played = None
 		
 		#==================================================
@@ -18,9 +18,9 @@ class SongData:
 		
 		#==================================================
 		# Song data:
-		self.__song_name = "No songname"
+		self.__song_name = 'No songname'
 		self.__song_playlist = []
-		self.__playlist_list_of_instruments = ["Drums"]
+		self.__playlist_list_of_instruments = ['Drums']
 		self.__playlist_list_of_midi_assigned = {}
 		self.__last_added_pattern_numer = 1
 		self.__song_loaded = False
@@ -29,34 +29,34 @@ class SongData:
 		# Drums and samples pattern data:
 		self.__drums_patterns = {}
 		
-		self.__samples = ["Empty", "Empty"]
-		self.__samples_temp = ["Empty", "Empty"] 
+		self.__samples = ['Empty', 'Empty']
+		self.__samples_temp = ['Empty', 'Empty'] 
 		self.__last_changed_sample = None
 		self.__samples_volume = [10, 10]
-		self.__drums_last_added_note = ["C5", "F"]
+		self.__drums_last_added_note = ['C5', 'F']
 
 		#==================================================
 		# Pianoroll patterns:
 		self.__pianoroll_patterns = {}
 		self.__pianoroll_patterns_notes_to_turn_off = {}
 		
-		self.__pianoroll_last_added_note = ["C5", 1, 8]
+		self.__pianoroll_last_added_note = ['C5', 1, 8]
 	
 		#==================================================
-		# Append instrument list and samples list with 7 * string "Empty":
+		# Append instrument list and samples list with 7 * string 'Empty':
 		for i in range(7):
-			self.__playlist_list_of_instruments.append("Empty")
-			self.__samples.append("Empty")
-			self.__samples.append("Empty")
-			self.__samples_temp.append("Empty")
-			self.__samples_temp.append("Empty")
+			self.__playlist_list_of_instruments.append('Empty')
+			self.__samples.append('Empty')
+			self.__samples.append('Empty')
+			self.__samples_temp.append('Empty')
+			self.__samples_temp.append('Empty')
 			self.__samples_volume.append(10)
 			self.__samples_volume.append(10)
 		
 		for midi in range(1, 4):
 			for channel in range(1, 17):
-				output_and_channel = "M" + str(midi) + "c" + str(channel)
-				self.__playlist_list_of_midi_assigned[output_and_channel] = ("Acoustic Grand Piano", 1)
+				output_and_channel = 'M' + str(midi) + 'c' + str(channel)
+				self.__playlist_list_of_midi_assigned[output_and_channel] = ('Acoustic Grand Piano', 1)
 				
 	
 	# Update requested value:
@@ -70,7 +70,7 @@ class SongData:
 			setattr(self, f'_{self.__class__.__name__}__{var_name}', new_value)
 			
 		else:
-			raise AttributeError(f"Attribute '{var_name}' does not exist.")
+			raise AttributeError(f'Attribute '{var_name}' does not exist.')
 	
 	# Get requested value:
 	def get_data(self, var_name):
@@ -84,27 +84,27 @@ class SongData:
 			return data_to_return
 		
 		else:
-			raise AttributeError(f"Attribute '{var_name}' does not exist.")
+			raise AttributeError(f'Attribute '{var_name}' does not exist.')
 
 	
-	def drums_pattern_operations(self, operation, pattern_number, new_pattern = None):
+	def drums_pattern_operations(self, operation, pattern_number, new_pattern=None):
 		result = None
 		pattern_number = str(pattern_number)
 		
 		# Delete pattern from pattern list and pattern order list:
-		if operation == "delete_pattern":
+		if operation == 'delete_pattern':
 			self.__drums_patterns.pop(pattern_number)
 			
 		# Get pattern from list of patterns:	
-		elif operation == "get pattern":
+		elif operation == 'get pattern':
 			result = self.__drums_patterns[pattern_number]
 			result = result[:]
 		
 		# Update patterns list with new pattern
-		elif operation == "create or update pattern":
+		elif operation == 'create or update pattern':
 			self.__drums_patterns[pattern_number] = new_pattern
 		
-		elif operation == "exists":
+		elif operation == 'exists':
 			if pattern_number in self.__drums_patterns:
 				result = True
 			else:
@@ -112,37 +112,39 @@ class SongData:
 		
 		return result
 	
-	def pianoroll_pattern_operations(self, operation, track = None, pattern_number = None, new_pattern = None, quarter = None, target_notes_to_turn_off = False):
+	def pianoroll_pattern_operations(self, operation, track=None, pattern_number=None, 
+									 new_pattern=None, quarter=None, target_notes_to_turn_off=False
+	):
 		result = None
-		pattern = "pattern" + str(pattern_number)
+		pattern = 'pattern' + str(pattern_number)
 		
 		patterns_collection = self.__pianoroll_patterns
 		if target_notes_to_turn_off:
 			patterns_collection = self.__pianoroll_patterns_notes_to_turn_off
 			
 		
-		if operation == "get pattern for single track":
+		if operation == 'get pattern for single track':
 			result = patterns_collection[track][pattern]
 		
-		elif operation == "get notes":
+		elif operation == 'get notes':
 			if track in patterns_collection:
 				if pattern in patterns_collection[track]:
 					result = patterns_collection[track][pattern][quarter]
 			else:
 				result = None
 		
-		elif operation == "get number of tracks":
+		elif operation == 'get number of tracks':
 			result = len(patterns_collection)
 			
-		elif operation == "create or update pattern":
+		elif operation == 'create or update pattern':
 			if track not in patterns_collection:
 				patterns_collection[track] = {}
 			patterns_collection[track][pattern] = new_pattern
 		
-		elif operation == "delete pattern":
+		elif operation == 'delete pattern':
 			patterns_collection[track].pop(pattern)
 		
-		elif operation == "exists":
+		elif operation == 'exists':
 			if track in patterns_collection:
 				if pattern in patterns_collection[track]:
 					result = True

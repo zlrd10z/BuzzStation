@@ -1,6 +1,7 @@
 import serial
 import time
 
+
 uart = serial.Serial(
     port='/dev/serial0',  
     baudrate=31250  

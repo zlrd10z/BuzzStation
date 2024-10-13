@@ -13,21 +13,15 @@ byte_midi_output_3 = 223
 byte_note_c5 = bytes([144, 72, 50])
 volume0 = bytes([0])
 
-
-
 def send_data_to_arduino(data):
 	try:
 		data.append(stop_byte)
 		data = bytes(data)		
-		
 		# Sending data to arduino:
 		serialUSB.write(data)  	
-
 	except KeyboardInterrupt as exception:
 		print(exception)
 		serialUSB.close()
-
-		
 
 def arduino_turnoff_all_notes():
 	data = []
@@ -43,7 +37,6 @@ def arduino_turnoff_all_notes():
 			data.append(0) #has to be 0
 	
 	send_data_to_arduino(data)
-	
 	
 # For hardware/software testing purpose:
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-
 import smbus
 import time
+
 
 def scan_i2c_bus(bus_number=1):
     bus = smbus.SMBus(bus_number)

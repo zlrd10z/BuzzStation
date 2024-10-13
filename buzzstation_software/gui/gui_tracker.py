@@ -2,14 +2,14 @@ import os, sys
 import time
 from .txtcolor import text_bg_color, text_font_color
 
+
 # Lambdas:
-clear = lambda: os.system("clear")
-formatTextAsSelected = lambda text: text_bg_color("grey", text_font_color("black", text))
+clear = lambda: os.system('clear')
+formatTextAsSelected = lambda text: text_bg_color('grey', text_font_color('black', text))
 
 # 64x18 characters:
 gui_height = 17 #terminal command line is taking one line
 gui_width = 64
-
 
 # Create matrix 16 x 64 chars
 def create_screen_matrix():
@@ -22,7 +22,7 @@ def create_screen_matrix():
 def fill_matrix(screen_matrix):
 	for i in range(gui_height):
 		for j in range(gui_width):
-			screen_matrix[i].append(" ")	
+			screen_matrix[i].append(' ')	
 	return screen_matrix
 
 # This function: 
@@ -37,33 +37,32 @@ def draw_frames_and_numbers(first_number, screen_matrix):
 
 		# Draw Numbers 1-16
 		if(len(id_number) > 1):	
-			screen_matrix[i][0] = text_bg_color("blue", id_number[0])
-			screen_matrix[i][1] = text_bg_color("blue", id_number[1])
+			screen_matrix[i][0] = text_bg_color('blue', id_number[0])
+			screen_matrix[i][1] = text_bg_color('blue', id_number[1])
 			# Mark each bar with yellow:
 			if int(id_number) % 4 == 1:
-				screen_matrix[i][0] = text_font_color("black", screen_matrix[i][0])
-				screen_matrix[i][1] =  text_font_color("black", screen_matrix[i][1])
-
+				screen_matrix[i][0] = text_font_color('black', screen_matrix[i][0])
+				screen_matrix[i][1] =  text_font_color('black', screen_matrix[i][1])
 		else:
-			screen_matrix[i][1] = text_bg_color("blue", id_number)
-			screen_matrix[i][0] = text_bg_color("blue", " ")
+			screen_matrix[i][1] = text_bg_color('blue', id_number)
+			screen_matrix[i][0] = text_bg_color('blue', ' ')
 			if int(id_number) % 4 == 1: 
-				screen_matrix[i][1] = text_font_color("black", screen_matrix[i][1])
+				screen_matrix[i][1] = text_font_color('black', screen_matrix[i][1])
 
 		# Draw horizontal frame at the top on the screen:
 		# On that line, there will be displayed names of samples, assigned to each track
 		for j in range(len(screen_matrix[0])):
-			screen_matrix[0][j] = text_bg_color("blue", " ")
+			screen_matrix[0][j] = text_bg_color('blue', ' ')
 
 		# Draw vertical frames and fill on the right side:
 		for j in range(len(screen_matrix)):
 			tracks = 1
 			for k in range(len(screen_matrix[0])):
 				if(k % 6 == 1 and k > 1 and tracks <= 8):
-					screen_matrix[j][k] = text_bg_color("blue", " ")
+					screen_matrix[j][k] = text_bg_color('blue', ' ')
 					tracks += 1
 				elif(tracks > 8):
-					screen_matrix[j][k] = text_bg_color("blue", " ")
+					screen_matrix[j][k] = text_bg_color('blue', ' ')
 	return screen_matrix
 
 #mark tracks with assigned sample name:
@@ -72,18 +71,18 @@ def name_tracks(list_of_samples, screen_matrix, selected=None):
 		# Extracting names and abbreviate to first 4 letters with ellipsis on the end:
 		for i in range(len(list_of_samples)):
 			sample_path = list_of_samples[i]
-			sample_path = sample_path.split("/")
+			sample_path = sample_path.split('/')
 			sample_name = sample_path[-1]
-			sample_name = sample_name.split(".")
+			sample_name = sample_name.split('.')
 			sample_name = sample_name[0]
 			if len(sample_name) > 5: 
-				sample_name = sample_name[:4] + "…"
+				sample_name = sample_name[:4] + '…'
 			list_of_samples[i] = sample_name
 
 		if(len(list_of_samples) < 8):
 			x = 8 - len(list_of_samples)
 			for i in range(x):
-				list_of_samples.append("Empty")
+				list_of_samples.append('Empty')
 
 		tracks = 1
 		for i in range(len(screen_matrix[0])):
@@ -91,9 +90,9 @@ def name_tracks(list_of_samples, screen_matrix, selected=None):
 				for j in range(5):
 					if j > len(list_of_samples[tracks-1])-1: break
 					if tracks-1 == selected and selected is not None:
-						screen_matrix[0][i+j] = text_bg_color("grey", list_of_samples[tracks-1][j])
+						screen_matrix[0][i+j] = text_bg_color('grey', list_of_samples[tracks-1][j])
 					else:
-						screen_matrix[0][i+j] = text_bg_color("blue", list_of_samples[tracks-1][j])
+						screen_matrix[0][i+j] = text_bg_color('blue', list_of_samples[tracks-1][j])
 				tracks += 1
 		return screen_matrix
 
@@ -105,18 +104,16 @@ def draw_notes(screen_matrix, pattern, selected_note_element=None):
 		for j in range(8):
 			note = pattern[j][i]
 			if len(note) > 0 and len(note[0]) < 3:
-				note[0] += " "
-
+				note[0] += ' '
 
 			if selected_note_element is None: selected_note_element = [None, None, None]
 
 			if len(note) == 0:
 				for k in range(5):	
 					if i == selected_note_element[1] and j == selected_note_element[0]:
-						screen_matrix[i+1][x+k] = formatTextAsSelected(".")
+						screen_matrix[i+1][x+k] = formatTextAsSelected('.')
 					else:
-						screen_matrix[i+1][x+k] = "."
-
+						screen_matrix[i+1][x+k] = '.'
 			else:
 				l = 0
 				for k in range(5):
@@ -136,7 +133,6 @@ def draw_notes(screen_matrix, pattern, selected_note_element=None):
 								screen_matrix[i+1][x+k] = note[1]
 
 			x += 6
-
 	return screen_matrix
 
 # Draw Vertical grey lines for better visibility:
@@ -150,7 +146,7 @@ def draw_vertical_lines(screen_matrix):
 			for j in range(5):
 				# y coordinate for 1, 5, 9, 13 beat:
 				if y % 4 == 1:
-					screen_matrix[y][track_position + j] = text_bg_color("black grey", screen_matrix[y][track_position + j])
+					screen_matrix[y][track_position + j] = text_bg_color('black grey', screen_matrix[y][track_position+j])
 			track_position += 6
 	
 	return screen_matrix
@@ -159,18 +155,18 @@ def draw_vertical_lines(screen_matrix):
 def draw_song_name(screen_matrix, song_name=None):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
-	info_text = " Song name:"
-	# Draw "Song Name:" text
-	for i in range(gui_width - x):
+	info_text = ' Song name:'
+	# Draw 'Song Name:' text
+	for i in range(gui_width-x):
 		if i <= len(info_text)-1:
-			screen_matrix[0][x + i] = text_bg_color("blue", info_text[i])
+			screen_matrix[0][x+i] = text_bg_color('blue', info_text[i])
 
 	if song_name is not None:
 		# Center filename:
 		if len(song_name) < gui_width - x:
 			how_many_fill = gui_width - x - len(song_name)
-			how_many_fill = (how_many_fill / 2) - 1
-			song_name = " " * int(how_many_fill) + song_name
+			how_many_fill = int(how_many_fill/2 - 1)
+			song_name = ' '*how_many_fill + song_name
 
 		# Draw filename (max two lines):
 		for j in range(2):
@@ -179,34 +175,38 @@ def draw_song_name(screen_matrix, song_name=None):
 
 				#if name len exceed space for song name:
 				if j == 1 and i == gui_width - x - 1 and len(song_name) > 1:
-					screen_matrix[1+j][x + i] = text_bg_color("blue", "…")
+					screen_matrix[1+j][x+i] = text_bg_color('blue', '…')
 				else:
-					screen_matrix[1+j][x + i] = text_bg_color("blue", song_name[:1])
+					screen_matrix[1+j][x+i] = text_bg_color('blue', song_name[:1])
 					song_name = song_name[1:]
 	return screen_matrix
 
 def draw_pattern_number(screen_matrix, pattern_numer=1):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
-	info_text = " Pattern: " + str(pattern_numer)
-	# Draw "Song Name:" text
+	info_text = ' Pattern: ' + str(pattern_numer)
+	# Draw 'Song Name:' text
 	for i in range(gui_width - x):
 		if i <= len(info_text)-1:
-			screen_matrix[0][x + i] = text_bg_color("blue", info_text[i])
+			screen_matrix[0][x + i] = text_bg_color('blue', info_text[i])
 	return screen_matrix
 
 def draw_bpm_vol_swing_values(screen_matrix, bpm_value, swing_value, vol_value):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 3 + 6*8
-	info_text = "BPM:    Swing:  bVOL:   "
+	info_text = 'BPM:    Swing:  bVOL:   '
 	for i in range(3):
 		value_to_print = 0
-		if i == 0: value_to_print = bpm_value
-		if i == 1: value_to_print = swing_value
-		if i == 2: value_to_print = vol_value
+		match i:
+			case 0: 
+				value_to_print = bpm_value
+			case 1: 
+				value_to_print = swing_value
+			case 2: 
+				value_to_print = vol_value
 		value_to_print = str(value_to_print)
 		how_many_fills = 3 - len(value_to_print)
-		value_to_print = "0" * how_many_fills + value_to_print
+		value_to_print = '0'*how_many_fills + value_to_print
 		for j in range(11):
 			if j < 8:
 				screen_matrix[1+i][x+j] = info_text[:1]
@@ -220,55 +220,52 @@ def draw_bpm_vol_swing_values(screen_matrix, bpm_value, swing_value, vol_value):
 def draw_menu(screen_matrix, selected=None):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
-	info_text = "    Menu: "
-	# Draw "Song Name:" text
+	info_text = '    Menu: '
+	# Draw 'Song Name:' text
 	for i in range(gui_width - x):
 		if i <= len(info_text)-1:
-			screen_matrix[5][x + i] = text_bg_color("blue", info_text[i])
+			screen_matrix[5][x + i] = text_bg_color('blue', info_text[i])
 
 	# previous button and next pattern buttons:
-	text = "pattern"
+	text = 'pattern'
 	for i in range(gui_width - x):
 		if i <= len(text)-1:
-			screen_matrix[6][x + i] = text_bg_color("blue", text[i])
+			screen_matrix[6][x + i] = text_bg_color('blue', text[i])
 
-	button_text = "⇽"
+	button_text = '⇽'
 	for i in range(gui_width - x):
 		if i <= len(button_text)-1:
 			if selected == 0:
-				screen_matrix[6][x + i + 8] = formatTextAsSelected(button_text[i])
+				screen_matrix[6][x+i+8] = formatTextAsSelected(button_text[i])
 			else:
-				screen_matrix[6][x + i + 8] = button_text[i]
+				screen_matrix[6][x+i+8] = button_text[i]
 
 
-	button_text = "⇾"
+	button_text = '⇾'
 	for i in range(gui_width - x):
 		if i <= len(button_text)-1:
 			if selected == 1:
-				screen_matrix[6][x + i + 11] = formatTextAsSelected(button_text[i])
+				screen_matrix[6][x+i+11] = formatTextAsSelected(button_text[i])
 			else:
-				screen_matrix[6][x + i + 11] = button_text[i]
+				screen_matrix[6][x+i+11] = button_text[i]
 
 	# playlist button:
-	button_text = " Clone "
+	button_text = ' Clone '
 	for i in range(gui_width - x):
 		if i <= len(button_text) - 1:
 			if selected == 2:
-				screen_matrix[7][x + i + 3] = formatTextAsSelected(button_text[i])
+				screen_matrix[7][x+i+3] = formatTextAsSelected(button_text[i])
 			else:
-				screen_matrix[7][x + i + 3] = button_text[i]
+				screen_matrix[7][x+i+3] = button_text[i]
 
 	# clone pattern:
-	button_text = " Clear "
+	button_text = ' Clear '
 	for i in range(gui_width - x):
 		if i <= len(button_text)-1:
 			if selected == 3:
-				screen_matrix[8][x + i + 3] = formatTextAsSelected(button_text[i])
+				screen_matrix[8][x+i+3] = formatTextAsSelected(button_text[i])
 			else: 
-				screen_matrix[8][x + i + 3] = button_text[i]
-
-
-
+				screen_matrix[8][x+i+3] = button_text[i]
 
 	return screen_matrix
 
@@ -276,67 +273,67 @@ def draw_menu(screen_matrix, selected=None):
 def draw_page(screen_matrix, page_number):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
-	info_text = "Page: " + str(page_number)
-	how_many_fills = ((gui_width - x) - len(info_text)) / 2
-	info_text = " " * int(how_many_fills) + info_text
+	info_text = 'Page: ' + str(page_number)
+	how_many_fills = ((gui_width - x) - len(info_text))/2
+	info_text = ' '*int(how_many_fills) + info_text
 
-	# Draw "Song Name:" text
+	# Draw 'Song Name:' text
 	for i in range(gui_width - x):
 		if i <= len(info_text)-1:
-			screen_matrix[15][x + i] = text_bg_color("blue", info_text[i])
+			screen_matrix[15][x + i] = text_bg_color('blue', info_text[i])
 	return screen_matrix
 	
 def draw_play_pause(screen_matrix, is_playing=False, playing_mode=False):
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
-	info_text = "Pause"
+	info_text = 'Pause'
 	if is_playing: 
-		info_text = "Playing"
+		info_text = 'Playing'
 		if playing_mode:
-			info_text += " [S]"
+			info_text += ' [S]'
 		else:
-			info_text += " [P]"
+			info_text += ' [P]'
 	how_many_fills = ((gui_width - x) - len(info_text)) / 2
-	info_text = " " * int(how_many_fills) + info_text
+	info_text = ' ' * int(how_many_fills) + info_text
 
-	# Draw "Song Name:" text
+	# Draw 'Song Name:' text
 	for i in range(gui_width - x):
 		if i <= len(info_text)-1:
-			screen_matrix[16][x + i] = text_bg_color("blue", info_text[i])
+			screen_matrix[16][x + i] = text_bg_color('blue', info_text[i])
 	return screen_matrix
 
 # Above the track there's just few letters for sample name, so it's abreviated, 
 # when sample is selected, on the right side longer filename will be displayed:
 def draw_samplename_long(screen_matrix, sample_path):
-	if sample_path != "Empty":
-		sample_path = sample_path.split("/")
+	if sample_path != 'Empty':
+		sample_path = sample_path.split('/')
 		sample_name = list(sample_path[-1])
 	
 	else:
-		sample_name = list("  [No audio      file       assigned]")
+		sample_name = list('  [No audio      file       assigned]')
 	
 	
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
-	info_text = "Sample Name:"
+	info_text = 'Sample Name:'
 	how_many_fills = ((gui_width - x) - len(info_text)) / 2
-	info_text = " " * int(how_many_fills) + info_text
+	info_text = ' ' * int(how_many_fills) + info_text
 
-	# Draw "Song Name:" text
+	# Draw 'Song Name:' text
 	for i in range(gui_width - x):
 		if i <= len(info_text)-1:
-			screen_matrix[10][x + i] = text_bg_color("blue", info_text[i])
+			screen_matrix[10][x + i] = text_bg_color('blue', info_text[i])
 			
 	for j in range(3):
 		for i in range(gui_width - x):
 			if i <= len(info_text)-1:
 				if len(sample_name) > 0:
-					screen_matrix[11 + j][x + i] = text_bg_color("blue", sample_name[0])
+					screen_matrix[11 + j][x + i] = text_bg_color('blue', sample_name[0])
 					sample_name.pop(0)
 					
 					if j == 2 and i == (gui_width - x - 1):
 						if len(sample_name) > 0:
-							screen_matrix[11 + j][x + i] = text_bg_color("blue", "…")
+							screen_matrix[11 + j][x + i] = text_bg_color('blue', '…')
 						
 					
 				else: break
@@ -345,31 +342,31 @@ def draw_samplename_long(screen_matrix, sample_path):
 	return screen_matrix
 
 def draw_song_name(screen_matrix, song_name):
-	song_name = song_name.split("/")
+	song_name = song_name.split('/')
 	song_name = list(song_name[-1])
 	
 	
 	# x is char on x axis, where the tracks ends, and the song info starts:
 	x = 2 + 6*8
-	info_text = "Song Name:"
+	info_text = 'Song Name:'
 	how_many_fills = ((gui_width - x) - len(info_text)) / 2
-	info_text = " " * int(how_many_fills) + info_text
+	info_text = ' ' * int(how_many_fills) + info_text
 
-	# Draw "Song Name:" text
+	# Draw 'Song Name:' text
 	for i in range(gui_width - x):
 		if i <= len(info_text)-1:
-			screen_matrix[10][x + i] = text_bg_color("blue", info_text[i])
+			screen_matrix[10][x + i] = text_bg_color('blue', info_text[i])
 			
 	for j in range(3):
 		for i in range(gui_width - x):
 			if i <= len(info_text)-1:
 				if len(song_name) > 0:
-					screen_matrix[11 + j][x + i] = text_bg_color("blue", song_name[0])
+					screen_matrix[11+j][x+i] = text_bg_color('blue', song_name[0])
 					song_name.pop(0)
 					
 					if j == 2 and i == (gui_width - x - 1):
 						if len(song_name) > 0:
-							screen_matrix[11 + j][x + i] = text_bg_color("blue", "…")
+							screen_matrix[11+j][x+i] = text_bg_color('blue', '…')
 						
 					
 				else: break
@@ -379,7 +376,7 @@ def draw_song_name(screen_matrix, song_name):
 
 # create string from chars matrix (screen_matrix) and print it out
 def print_screen_matrix(screen_matrix):
-	frame = ""
+	frame = ''
 	for i in range(len(screen_matrix)):
 		for j in range(len(screen_matrix[0])):
 			frame += screen_matrix[i][j]
@@ -393,9 +390,6 @@ def main(list_of_samples, pattern, is_playing, bpm_value,
 ):
 	
 	list_of_samples_full_paths = list_of_samples[:]
-	
-	
-
 	full_selected_sample_name = list_of_samples_full_paths[cursor[0]]
 	if cursor[0] < 8:
 		page_number = 1
@@ -408,30 +402,25 @@ def main(list_of_samples, pattern, is_playing, bpm_value,
 	if cursor[1] == 0:
 		selected_sample = cursor[0]
 		selected_note_element = None
-
-
 	else:
 		selected_note_element = cursor[:]
 		selected_note_element[1] -= 1
 		selected_sample = None
 		
-	
 	if selected_button is not None:
 		selected_sample = None
 		selected_note_element = None
-
-	
 	
 	screen_matrix = create_screen_matrix()
 	sceeen_matrix = fill_matrix(screen_matrix)
 	screen_matrix = draw_frames_and_numbers(1, screen_matrix)
-	screen_matrix = name_tracks(list_of_samples[:], screen_matrix, selected = selected_sample)
+	screen_matrix = name_tracks(list_of_samples[:], screen_matrix, selected=selected_sample)
 	screen_matrix = draw_pattern_number(screen_matrix, pattern_number)
 	screen_matrix = draw_page(screen_matrix, page_number)
 	screen_matrix = draw_notes(screen_matrix, pattern, selected_note_element)
 	if selected_button is None:
 		screen_matrix = draw_samplename_long(screen_matrix, full_selected_sample_name)
-	if selected_button is not None and song_name != "No songname":
+	if selected_button is not None and song_name != 'No songname':
 		screen_matrix = draw_song_name(screen_matrix, song_name)
 	screen_matrix = draw_vertical_lines(screen_matrix)
 	screen_matrix = draw_bpm_vol_swing_values(screen_matrix, bpm_value, swing_value, vol_value)
@@ -439,6 +428,7 @@ def main(list_of_samples, pattern, is_playing, bpm_value,
 	screen_matrix = draw_play_pause(screen_matrix, is_playing, playing_mode)
 	if print_on_screen == True:
 		print_screen_matrix(screen_matrix)
+		
 	return screen_matrix
 
 
@@ -459,18 +449,19 @@ def create_example_pattern():
 	# append kick 4x4 with full volume - hex F
 	for i in range(16):
 		if i % 4 == 0:
-			example_pattern[0][i] = ["C5", "F"]
+			example_pattern[0][i] = ['C5', 'F']
 	
 	# append snare:
 	for i in range(16):
 		if i % 4 == 0 and i > 1 and i != 8:
-			example_pattern[1][i] = ["C5", "9"]
+			example_pattern[1][i] = ['C5', '9']
 	
 	return example_pattern
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+	# Tests
 	example_pattern = create_example_pattern()
-	main(list_of_samples = ["folder/kick_deep_132.mp3", "a"], pattern = example_pattern, selected_note_element = [1, 3, 3])
+	main(list_of_samples = ['folder/kick_deep_132.mp3', 'a'], pattern = example_pattern, selected_note_element = [1, 3, 3])
 	print(example_pattern[0])
 
 	

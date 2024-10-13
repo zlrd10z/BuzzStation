@@ -13,8 +13,6 @@ FONT_BLUE = "\033[38;5;93m"
 FONT_YELLOW = "\033[38;5;226m"
 FONT_GREEN = "\033[38;5;10m"
 
-
-
 # Change char's background color:
 def text_bg_color(color, text):
 	colored_string = ""
@@ -32,7 +30,6 @@ def text_bg_color(color, text):
 		colored_string = (f"{BG_DARK_GREY}{text}{RESET}")
 	elif color == "light grey":
 		colored_string = (f"{BG_LIGHT_GREY}{text}{RESET}")
-		
 	else: pass
 	return colored_string
 

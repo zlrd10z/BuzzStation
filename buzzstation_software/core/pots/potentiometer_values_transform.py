@@ -2,7 +2,7 @@ x_min = -0.070
 x_max = 4.096
 
 def scale_transform(y_min, y_max, x):
-	y = ( (x - x_min) * (y_max - y_min) ) / (x_max - x_min)
+	y = ((x - x_min) * (y_max - y_min)) / (x_max - x_min)
 	y += y_min
 	return y
 

@@ -3,6 +3,7 @@ from gui import gui_warning_window
 from libs.keypad import Keypad
 from core.song_data import SongData
 from core.pick_file import get_filename
+from core import convert_audio_to_temp
 import os
 import copy
 
@@ -161,15 +162,8 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
                cursor=tracker_cursor
                )    
 
-def clear_single_track(keys, samples, pattern_number, song_name, tracker_cursor):
+def clear_single_track(song_data, keys, tracker_cursor, screen_matrix, pattern, pattern_number):
     ok_selected = False
-    screen_matrix = guitracker(samples_list=samples, 
-                               this_pattern=pattern, 
-                               pattern_number=pattern_number, 
-                               song_name=song_name, 
-                               selected_button=None, 
-                               cursor=tracker_cursor
-                              )
     clear_screen()
     gui_warning_window.main(screen_matrix, ok_selected, 'clear track')
 
@@ -186,6 +180,7 @@ def clear_single_track(keys, samples, pattern_number, song_name, tracker_cursor)
                 if ok_selected:
                     for i in range(16):
                         pattern[tracker_cursor[0]][i] = []
+                        song_data.drums_pattern_operations('create or update pattern', pattern_number, new_pattern=pattern)
                         return pattern
                 else: 
                     break    
@@ -215,7 +210,7 @@ def pots_values_gui(song_data, samples, pattern, pattern_number,
                   )
     return potentiometers_previous_values
 
-def direction_key_action(dir_key, tracker_cursor, pattern):
+def direction_keys(dir_key, tracker_cursor, pattern):
     def up(tracker_cursor):
         if tracker_cursor[1] - 1 >= 0:
             tracker_cursor[1] -= 1
@@ -255,12 +250,12 @@ def direction_key_action(dir_key, tracker_cursor, pattern):
         return tracker_cursor
                     
     def left(tracker_cursor, pattern):
-        # move to next sample
+        # move to previous sample
         if tracker_cursor[1] == 0:
-            if tracker_cursor[0] + 1 < 16:
+            if tracker_cursor[0] - 1 >= 0:
                 tracker_cursor[0] -= 1
             else:
-                tracker_cursor[0] = 0
+                tracker_cursor[0] = 15
         else:
             # move jump to next note, if current field is empty, ommit volume subfield:
             if len(pattern[tracker_cursor[0]][tracker_cursor[1]-1]) == 0:
@@ -327,8 +322,8 @@ def change_note(operation, note_and_octave, tracker_cursor):
     return new_note
 
 # key with [+] sticker / key with [-] sticker: 
-def plus_n_minus_keys(key, song_data, tracker_cursor, pattern):
-    def minus_key(song_data, tracker_cursor, pattern):
+def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_list, pattern_number):
+    def minus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number):
         # if field on playlist is highlighted:
         if tracker_cursor[1] > 0:
             # Add note with volume:
@@ -362,7 +357,7 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern):
                 volumes[tracker_cursor[0]] -= 1
                 song_data.put_data('samples_volume', volumes)
     
-    def plus_key(song_data, tracker_cursor, pattern):
+    def plus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number):
         # if field on playlist is highlighted:
         if tracker_cursor[1] > 0:
             # Add note with volume:
@@ -396,9 +391,10 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern):
                 song_data.put_data('samples_volume', volumes)
     
     if key == '7':
-        result = minus_key(song_data, tracker_cursor, pattern)
+        result = minus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number)
     if key == '9':
-        result = plus_key(song_data, tracker_cursor, pattern)
+        result = plus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number)
+    return result
 
 # key with [insert] sticker on it - accept / insert key:
 def insert_key(song_data, tracker_cursor, keys, pattern, pattern_number):
@@ -407,6 +403,7 @@ def insert_key(song_data, tracker_cursor, keys, pattern, pattern_number):
         # Choose sample from disk with get_filename function and get path to choosen sample:
         sample_path = get_filename('sample', keys)
         if sample_path is not None:
+            samples = song_data.get_data('samples')
             # put path to samples list:
             samples[tracker_cursor[0]] = sample_path
             song_data.put_data('samples', samples)
@@ -504,21 +501,27 @@ def main(keys, song_data, pattern_number):
                     song_data.put_data('is_playing', True)
             # Direction keys:
             elif key == '8' or key == '2' or key == '4' or key == '6':
-                tracker_cursor = direction_key_action(key, tracker_cursor, pattern)
+                tracker_cursor = direction_keys(key, tracker_cursor, pattern)
             # [+] and [-] keys:
             elif key == '7' or key == '9':
                 # change selected note's volume value / change selected sample master volume value / change note to higher/lower note:
-                pattern = plus_n_minus_keys(key, song_data, tracker_cursor, pattern)
+                pattern = plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_list, pattern_number)
             # [Insert] key:
             elif key == '5':
                 temp_pattern = insert_key(song_data, tracker_cursor, keys, pattern, pattern_number)
                 if temp_pattern is not None:
                     pattern = temp_pattern
+                samples = song_data.get_data('samples')
             #[C] key - clear single track:
             elif key == '0':
-                modified_pattern = clear_single_track(keys, samples, pattern_number, 
-                                                      song_name, tracker_cursor
-                                                     )
+                screen_matrix = guitracker(samples_list=samples, 
+                           this_pattern=pattern, 
+                           pattern_number=pattern_number, 
+                           song_name=song_name, 
+                           selected_button=None, 
+                           cursor=tracker_cursor
+                          )
+                modified_pattern = clear_single_track(song_data, keys, tracker_cursor, screen_matrix, pattern, pattern_number)
                 if modified_pattern is not None:
                     pattern = modified_pattern
             #[E] key -  Change playing mode from looping pattern to playing whole song:

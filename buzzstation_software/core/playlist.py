@@ -70,8 +70,10 @@ def save_song(song_data, keys):
             while True:
                 key = keys.check_keys()
                 if key != '':
-                    if key == '4': ok_selected = True
-                    if key == '6':     ok_selected = False
+                    if key == '4': 
+                        ok_selected = True
+                    if key == '6':
+                        ok_selected = False
                     if key == '5':
                         if not ok_selected: should_save_song = False
                         else:
@@ -187,6 +189,7 @@ def direction_keys(key, playlist_cursor, song_playlist, playlist_list_of_instrum
 
 #EDIT key - key with [E] sticker on it:
 def edit_key(keys, song_data, playlist_cursor, song_playlist):
+    playlist_list_of_instruments = song_data.get_data('playlist_list_of_instruments')
     if playlist_cursor[1]-1 < 0:
         pattern_number_for_tracker = None
     else:

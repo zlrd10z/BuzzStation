@@ -3,7 +3,9 @@ from gui import gui_pianoroll
 from libs.keypad import Keypad
 from .song_data import SongData
 import copy
+import os
 
+clear_screen = lambda: os.system('clear')
 
 def create_empty_pattern():
     pattern = []
@@ -14,7 +16,7 @@ def create_empty_pattern():
 
 def delete_from_pattern(pattern, beat, note):
     if len(pattern[beat]) > 0:
-        for i in range(len(pattern_beat)):
+        for i in range(len(pattern[beat])):
             if pattern[beat][i] == note:
                 pattern[beat].pop(i)
 
@@ -25,7 +27,7 @@ def gui(song_data, pattern_number, midi_and_channel,
                       bpm_value=song_data.get_data('bpm'), 
                       swing_value=song_data.get_data('swing'), 
                       pattern_number=pattern_number, 
-                      playing_mode=song_data.get_data('patternmode_is_song_playing'), 
+                      playing_mode=song_data.get_data('is_song_playing'), 
                       playing=song_data.get_data('is_playing'), 
                       midi_output_and_channel=midi_and_channel, 
                       selected_note=selected_note, 
@@ -33,24 +35,24 @@ def gui(song_data, pattern_number, midi_and_channel,
                       pattern=pattern, 
                       selected_menu_button=selected_menu_button,
                       print_it=True
-    )            
+                     )            
     
 def get_screen_matrix(song_data, pattern_number, midi_and_channel, 
                       selected_note, selected_beat, pattern, selected_menu_button
 ):
-    gui_pianoroll.main(
-                      bpm_value=song_data.get_data('bpm'), 
-                      swing_value=song_data.get_data('swing'), 
-                      pattern_number=pattern_number, 
-                      playing_mode=song_data.get_data('patternmode_is_song_playing'), 
-                      playing=song_data.get_data('is_playing'), 
-                      midi_output_and_channel=midi_and_channel, 
-                      selected_note=selected_note, 
-                      selecteded_beat=selected_beat, 
-                      pattern=pattern, 
-                      selected_menu_button=selected_menu_button,
-                      print_it=False
-    )
+    screen_matrix = gui_pianoroll.main(bpm_value=song_data.get_data('bpm'), 
+                                       swing_value=song_data.get_data('swing'), 
+                                       pattern_number=pattern_number, 
+                                       playing_mode=song_data.get_data('is_song_playing'), 
+                                       playing=song_data.get_data('is_playing'), 
+                                       midi_output_and_channel=midi_and_channel, 
+                                       selected_note=selected_note, 
+                                       selecteded_beat=selected_beat, 
+                                       pattern=pattern, 
+                                       selected_menu_button=selected_menu_button,
+                                       print_it=False
+                                      )
+    return screen_matrix
 
 def gui_edit_note_length(song_data, pattern_number, midi_and_channel, 
                          selected_note, selected_beat, pattern, selected_menu_button
@@ -59,7 +61,7 @@ def gui_edit_note_length(song_data, pattern_number, midi_and_channel,
                       bpm_value=song_data.get_data('bpm'), 
                       swing_value=song_data.get_data('swing'), 
                       pattern_number=pattern_number, 
-                      playing_mode=song_data.get_data('patternmode_is_song_playing'), 
+                      playing_mode=song_data.get_data('is_song_playing'), 
                       playing=song_data.get_data('is_playing'), 
                       midi_output_and_channel=midi_and_channel, 
                       selected_note=selected_note, 
@@ -76,9 +78,10 @@ def menu(keypad, song_data, pattern_number, midi_and_channel,
         track
 ):
     menu_selected_button = 0
+    clear_screen()
     gui(song_data, pattern_number, midi_and_channel, 
         selected_note_and_octave, selected_beat, pattern[:], 
-        selected_menu_button = menu_selected_button
+        selected_menu_button=menu_selected_button
        )
     while True:
         key = keypad.check_keys()
@@ -122,20 +125,20 @@ def menu(keypad, song_data, pattern_number, midi_and_channel,
                                                                       target_notes_to_turn_off = True
                                                                      )
                             pattern_number = cloned_pattern_number
-                            print(pattern_number)
                     return pattern_number
                 if menu_selected_button == 1:
-                    is_song_playing = song_data.get_data('patternmode_is_song_playing')
+                    is_song_playing = song_data.get_data('is_song_playing')
 
                     if is_song_playing: is_song_playing = False
                     else: is_song_playing = True
 
-                    song_data.put_data('patternmode_is_song_playing', is_song_playing)
+                    song_data.put_data('is_song_playing', is_song_playing)
+                    clear_screen()
                     gui(song_data, pattern_number, midi_and_channel, 
                         selected_note_and_octave, selected_beat, pattern[:], 
                         selected_menu_button = menu_selected_button
                        )
-
+            clear_screen()
             gui(song_data, pattern_number, midi_and_channel, 
                 selected_note_and_octave, selected_beat, pattern[:], 
                 selected_menu_button = menu_selected_button)
@@ -148,14 +151,15 @@ def pots_values_gui(song_data, pattern_number, midi_and_channel,
 ):
             if song_data.get_data('bpm') != previous_values[0] or song_data.get_data('swing') != previous_values[1]:
                 previous_values[0] = song_data.get_data('bpm') 
-                previous_values[1] = song_data.get_data('swing') 
+                previous_values[1] = song_data.get_data('swing')
+                clear_screen()
                 gui(song_data, pattern_number, midi_and_channel, 
                     selected_note_and_octave, selected_beat, pattern[:], 
                     selected_menu_button = None
                    )
             return previous_values
 
-def direction_keys(key, selected_beat, selected_note_and_octave):
+def direction_keys(key, selected_beat, selected_note_and_octave, notes):
     # Direction key - left:
     if key == '4':
         if selected_beat > 0:
@@ -196,7 +200,8 @@ def direction_keys(key, selected_beat, selected_note_and_octave):
 
 # insert/accept key:
 def insert_key(song_data, pattern, pattern_notes_to_turn_off, 
-               selected_beat, selected_note_and_octave, track
+               selected_beat, selected_note_and_octave, track,
+               pattern_number
 ):
     already_exists = False
     index = None
@@ -232,13 +237,24 @@ def insert_key(song_data, pattern, pattern_notes_to_turn_off,
                                           )
     return song_data
 
-def edit_key(keys, song_data, pattern_number, 
-             midi_and_channel, selected_beat, pattern,
-             track
+def edit_key(keypad, song_data, pattern_number, 
+             midi_and_channel, selected_beat,
+             track, selected_note_and_octave
 ):
+    pattern = song_data.pianoroll_pattern_operations(operation='get pattern for single track', 
+                                                     track=track, 
+                                                     pattern_number=pattern_number
+                                                    )
+
+    pattern_notes_to_turn_off = song_data.pianoroll_pattern_operations(operation='get pattern for single track', 
+                                                                       track=track,
+                                                                       pattern_number=pattern_number,
+                                                                       target_notes_to_turn_off=True
+                                                                      )
     if len(pattern[selected_beat]) > 0:
         for i in range(len(pattern[selected_beat])):
             if selected_note_and_octave == pattern[selected_beat][i][0]:
+                clear_screen()
                 gui_edit_note_length(song_data, pattern_number, midi_and_channel, 
                                      selected_note_and_octave, selected_beat, pattern[:], 
                                      selected_menu_button=None
@@ -276,16 +292,17 @@ def edit_key(keys, song_data, pattern_number,
 
                         # Update pattern with start of notes and with end of notes in data storage:
                         song_data.pianoroll_pattern_operations(operation='update pattern', 
-                                                                  track=track, 
-                                                                  pattern_number=pattern_number, 
-                                                                  new_pattern=pattern
-                                                                 )
+                                                               track=track, 
+                                                               pattern_number=pattern_number, 
+                                                               new_pattern=pattern
+                                                              )
                         song_data.pianoroll_pattern_operations(operation='update pattern', 
-                                                                  track=track, 
-                                                                  pattern_number=pattern_number, 
-                                                                  new_pattern=pattern_notes_to_turn_off, 
-                                                                  target_notes_to_turn_off=True
-                                                                 )
+                                                               track=track, 
+                                                               pattern_number=pattern_number, 
+                                                               new_pattern=pattern_notes_to_turn_off, 
+                                                               target_notes_to_turn_off=True
+                                                              )
+                        clear_screen()
                         gui_edit_note_length(song_data, pattern_number, midi_and_channel, 
                                              selected_note_and_octave, selected_beat, pattern[:], 
                                              selected_menu_button=None
@@ -293,15 +310,12 @@ def edit_key(keys, song_data, pattern_number,
 
 # This function clear all notes, but leaves rest of the settings:
 def clear_key(song_data, pattern_number, midi_and_channel, 
-              selected_note_and_octave, selected_beat, pattern,
-              track
+              selected_note_and_octave, selected_beat,
+              track, screen_matrix, keypad
 ):
     is_ok_selected = False
-    screen_matrix = get_screen_matrix(song_data, pattern_number, midi_and_channel, 
-                                      selected_note_and_octave, selected_beat, pattern[:], 
-                                      selected_menu_button=15 #selected_menu_button is selected to 15, to disable cursor or button selection on GUI
-                                     )
     # Display warning window to user, to mitigate accidentaly loss of progress
+    clear_screen()
     gui_warning_window.main(screen_matrix, is_ok_selected, 'clear pattern')
     while True:
         key = keypad.check_keys()
@@ -319,26 +333,27 @@ def clear_key(song_data, pattern_number, midi_and_channel,
                     pattern = create_empty_pattern()
                     pattern_notes_to_turn_off = create_empty_pattern()
                     # Update pattern with start of notes and with end of notes in data storage:
-                    song_data.pianoroll_pattern_operations(operation='update pattern', 
+                    song_data.pianoroll_pattern_operations(operation='create or update pattern', 
                                                               track=track, 
                                                               pattern_number=pattern_number, 
                                                               new_pattern=pattern
                                                              )
-                    song_data.pianoroll_pattern_operations(operation='update pattern', 
+                    song_data.pianoroll_pattern_operations(operation='create or update pattern', 
                                                               track=track, 
                                                               pattern_number=pattern_number, 
                                                               new_pattern=pattern_notes_to_turn_off, 
                                                               target_notes_to_turn_off=True
                                                              )
-                    return song_data
+                    break
                 else:
                     break
             # [Esc] key - abort:
             elif key == '1': 
                 break
+            clear_screen()
             gui_warning_window.main(screen_matrix, is_ok_selected, 'clear pattern')    
 
-def volume_up_down_keys(key, song_data, pattern, selected_beat, selected_note_and_octave, track):
+def volume_up_down_keys(key, song_data, pattern, pattern_number, selected_beat, selected_note_and_octave, track):
     if key == '9':
         if len(pattern[selected_beat]) > 0:
             for i in range(len(pattern[selected_beat])):
@@ -355,7 +370,7 @@ def volume_up_down_keys(key, song_data, pattern, selected_beat, selected_note_an
                         pattern[selected_beat][i][2] -= 1
                         song_data.pianoroll_pattern_operations('update pattern', track, pattern_number, pattern[:])
     return song_data
-            
+      
 def main(keypad, song_data, pattern_number, midi_and_channel, track):
     notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     selected_note_and_octave = 'C5'
@@ -364,44 +379,48 @@ def main(keypad, song_data, pattern_number, midi_and_channel, track):
     # Check is this pattern exist or this is new pattern:
     if song_data.pianoroll_pattern_operations(operation = 'exists', track = track, pattern_number = pattern_number):
         pattern = song_data.pianoroll_pattern_operations(operation = 'get pattern for single track', 
-                                                            track = track, 
-                                                            pattern_number = pattern_number
-                                                           )
+                                                         track = track, 
+                                                         pattern_number = pattern_number
+                                                        )
         
         pattern_notes_to_turn_off = song_data.pianoroll_pattern_operations(operation = 'get pattern for single track', 
-                                                                              track = track,
-                                                                              pattern_number = pattern_number,
-                                                                              target_notes_to_turn_off = True
-                                                                             )
+                                                                           track = track,
+                                                                           pattern_number = pattern_number,
+                                                                           target_notes_to_turn_off = True
+                                                                          )
     else:
         #create new pattern:
         pattern = create_empty_pattern()
         pattern_notes_to_turn_off = create_empty_pattern()
         song_data.pianoroll_pattern_operations(operation = 'create or update pattern', 
-                                                  track = track, 
-                                                  pattern_number = pattern_number, 
-                                                  new_pattern = pattern[:]
-                                                 )
+                                               track = track, 
+                                               pattern_number = pattern_number, 
+                                               new_pattern = pattern[:]
+                                              )
         song_data.pianoroll_pattern_operations(operation = 'create or update pattern', 
-                                                  track = track, 
-                                                  pattern_number = pattern_number, 
-                                                  new_pattern = pattern_notes_to_turn_off[:], 
-                                                  target_notes_to_turn_off = True
-                                                 )
+                                               track = track, 
+                                               pattern_number = pattern_number, 
+                                               new_pattern = pattern_notes_to_turn_off[:], 
+                                               target_notes_to_turn_off = True
+                                              )
     previous_values = [None, None]
     
     # main loop:
     while True:
         #check if values from potentiometers changed, and if yes, update values on GUI:
         previous_values = pots_values_gui(song_data, pattern_number, midi_and_channel, 
-                        elected_note_and_octave, selected_beat, pattern
-        )
+                                          selected_note_and_octave, selected_beat, pattern,
+                                          previous_values
+                                         )
         
         key = keypad.check_keys()
         if key != '':
             # Direction keys:
             if key == '4' or key == '8' or key == '6' or key == '2':
-                selected_beat, selected_note_and_octave = direction_keys(key, selected_beat, selected_note_and_octave)
+                selected_beat, selected_note_and_octave = direction_keys(key, selected_beat, 
+                                                                         selected_note_and_octave, 
+                                                                         notes
+                                                                        )
             # Escape key:
             if key == '1':
                 song_data.put_data('is_playing', False)
@@ -419,67 +438,74 @@ def main(keypad, song_data, pattern_number, midi_and_channel, track):
                     song_data.put_data('is_playing', True)
             # Insert / accept key:
             if key == '5':
-                song_data = insert_key(song_data, pattern, pattern_notes_to_turn_off, selected_beat, selected_note_and_octave, track)
+                song_data = insert_key(song_data, pattern, pattern_notes_to_turn_off, selected_beat, 
+                                      selected_note_and_octave, track, pattern_number
+                                      )
                 pattern = song_data.pianoroll_pattern_operations(operation='get pattern for single track', 
-                                                                track=track, 
-                                                                pattern_number=pattern_number
-                                                                   )
+                                                                 track=track, 
+                                                                 pattern_number=pattern_number
+                                                                )
         
-                pattern_notes_to_turn_off = ong_data.pianoroll_pattern_operations(operation='get pattern for single track', 
-                                                                                      track=track,
-                                                                                      pattern_number=pattern_number,
-                                                                                      target_notes_to_turn_off=True
-                                                                                     )
+                pattern_notes_to_turn_off = song_data.pianoroll_pattern_operations(operation='get pattern for single track', 
+                                                                                   track=track,
+                                                                                   pattern_number=pattern_number,
+                                                                                   target_notes_to_turn_off=True
+                                                                                  )
             # [E] Edit key - Edit selected note's length:
             if key == '3':
-                song_data = edit_key(keys, song_data, pattern_number, 
-                                     midi_and_channel, selected_beat, pattern,
-                                     track
-                                    )
+                edit_key(keypad, song_data, pattern_number, 
+                         midi_and_channel, selected_beat,
+                         track, selected_note_and_octave
+                        )
                 pattern = song_data.pianoroll_pattern_operations(operation='get pattern for single track', 
-                                                                track=track, 
-                                                                pattern_number=pattern_number
-                                                                   )
+                                                                 track=track, 
+                                                                 pattern_number=pattern_number
+                                                                )
         
                 pattern_notes_to_turn_off = song_data.pianoroll_pattern_operations(operation='get pattern for single track', 
-                                                                                      track=track,
-                                                                                      pattern_number=pattern_number,
-                                                                                      target_notes_to_turn_off=True
-                                                                                     )
+                                                                                   track=track,
+                                                                                   pattern_number=pattern_number,
+                                                                                   target_notes_to_turn_off=True
+                                                                                  )
             # [C] - clear key:
             if key == '0':
-                temp_song_data = clear_key(song_data, pattern_number, midi_and_channel, 
-                                             selected_note_and_octave, selected_beat, pattern, track
-                                          )
-                if temp_song_data is not None:
-                    song_data = temp_song_data
+                #selected_menu_button is selected to 15, to disable cursor or button selection on GUI
+                screen_matrix = get_screen_matrix(song_data, pattern_number, midi_and_channel, 
+                                                  selected_note_and_octave, selected_beat, pattern[:], 
+                                                  selected_menu_button=15 
+                                                 )
+                clear_key(song_data, pattern_number, midi_and_channel, 
+                          selected_note_and_octave, selected_beat, 
+                          track, screen_matrix, keypad
+                         )
+
                 pattern = song_data.pianoroll_pattern_operations(operation='get pattern for single track', 
-                                                track=track, 
-                                                pattern_number=pattern_number
-                                                )
+                                                                 track=track, 
+                                                                 pattern_number=pattern_number
+                                                                )
         
                 pattern_notes_to_turn_off = song_data.pianoroll_pattern_operations(operation='get pattern for single track', 
-                                                                                      track=track,
-                                                                                      pattern_number=pattern_number,
-                                                                                      target_notes_to_turn_off=True
-                                                                                     )
+                                                                                   track=track,
+                                                                                   pattern_number=pattern_number,
+                                                                                   target_notes_to_turn_off=True
+                                                                                   )                                                                  
             # volume down/up note:
             if key == '7' or key == '9':
-                song_data = volume_up_down_keys(key, song_data, pattern, 
-                                                selected_beat, selected_note_and_octave, track
-                                               )
+                volume_up_down_keys(key, song_data, pattern, pattern_number, 
+                                    selected_beat, selected_note_and_octave, track
+                                   )
                 pattern = song_data.pianoroll_pattern_operations(operation='get pattern for single track', 
-                                track=track, 
-                                pattern_number=pattern_number
-                                )
+                                                                 track=track, 
+                                                                 pattern_number=pattern_number
+                                                                )
             # Menu key:
             if key == '#':
                 # if in menu there is new pattern selected or pattern is cloned, then close this pattern, return new pattern number to playlist
                 # then playlist will open selected pattern:
                 new_pattern_number = menu(keypad, song_data, pattern_number, midi_and_channel, 
-                                        selected_note_and_octave, selected_beat, pattern, pattern_notes_to_turn_off,
-                                        track
-                                        )
+                                          selected_note_and_octave, selected_beat, pattern, pattern_notes_to_turn_off,
+                                          track
+                                         )
                 
                 if new_pattern_number is not None:
                     return new_pattern_number

@@ -96,7 +96,7 @@ def draw_info_txt(screen_matrix, action_warning):
     elif action_warning == 'clear pattern':
         info_text = 'Are you sure you want to clear this entire pattern? It\'s not reversible!'
     elif action_warning == 'load song':
-        info_text = 'Are you sure you want to load new song? If it\'s not saved, the entire progress will be lost!'
+        info_text = 'Are you sure you want to load other song? If it\'s not saved, the entire progress will be lost!'
     elif action_warning == 'clear track':
         info_text = 'Are you sure you want to clear this entire track? It\'s not reversible!'
     elif action_warning == 'clear all tracks':

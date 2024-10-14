@@ -13,7 +13,7 @@ def create_instruments_dic():
     midi_instruments = {}
     with open('core/midi_instruments_list.txt', 'r') as file:
         for line in file:
-            line = line.split('    ')
+            line = line.split(chr(9))
             if line[1] not in midi_instruments:
                 midi_instruments[line[1]] = {}
             midi_instruments[line[1]][line[2].replace('\n', '')] =  line[0]

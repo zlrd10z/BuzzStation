@@ -1,4 +1,4 @@
-from gui import gui_warning_window
+from core import warning_window
 from gui import gui_pianoroll
 from libs.keypad import Keypad
 from .song_data import SongData
@@ -313,45 +313,23 @@ def clear_key(song_data, pattern_number, midi_and_channel,
               selected_note_and_octave, selected_beat,
               track, screen_matrix, keypad
 ):
-    is_ok_selected = False
-    # Display warning window to user, to mitigate accidentaly loss of progress
-    clear_screen()
-    gui_warning_window.main(screen_matrix, is_ok_selected, 'clear pattern')
-    while True:
-        key = keypad.check_keys()
-        if key != '':
-            # direction key - right:
-            if key == '6' and is_ok_selected:
-                is_ok_selected = False
-            # direction key - left:
-            elif key == '4' and is_ok_selected == False:
-                is_ok_selected = True
-            # accept key:
-            elif key == '5':
-                if is_ok_selected:
-                    # Clear pattern:
-                    pattern = create_empty_pattern()
-                    pattern_notes_to_turn_off = create_empty_pattern()
-                    # Update pattern with start of notes and with end of notes in data storage:
-                    song_data.pianoroll_pattern_operations(operation='create or update pattern', 
-                                                              track=track, 
-                                                              pattern_number=pattern_number, 
-                                                              new_pattern=pattern
-                                                             )
-                    song_data.pianoroll_pattern_operations(operation='create or update pattern', 
-                                                              track=track, 
-                                                              pattern_number=pattern_number, 
-                                                              new_pattern=pattern_notes_to_turn_off, 
-                                                              target_notes_to_turn_off=True
-                                                             )
-                    break
-                else:
-                    break
-            # [Esc] key - abort:
-            elif key == '1': 
-                break
-            clear_screen()
-            gui_warning_window.main(screen_matrix, is_ok_selected, 'clear pattern')    
+    ok_selected = warning_window.main(keypad, screen_matrix, 'clear pattern')
+    if ok_selected:
+        # Clear pattern:
+        pattern = create_empty_pattern()
+        pattern_notes_to_turn_off = create_empty_pattern()
+        # Update pattern with start of notes and with end of notes in data storage:
+        song_data.pianoroll_pattern_operations(operation='create or update pattern', 
+                                                  track=track, 
+                                                  pattern_number=pattern_number, 
+                                                  new_pattern=pattern
+                                                 )
+        song_data.pianoroll_pattern_operations(operation='create or update pattern', 
+                                                  track=track, 
+                                                  pattern_number=pattern_number, 
+                                                  new_pattern=pattern_notes_to_turn_off, 
+                                                  target_notes_to_turn_off=True
+                                                 )
 
 def volume_up_down_keys(key, song_data, pattern, pattern_number, selected_beat, selected_note_and_octave, track):
     if key == '9':

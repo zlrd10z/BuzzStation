@@ -1,6 +1,6 @@
 from libs.keypad import Keypad
 from gui import gui_playlist
-from gui import gui_warning_window
+from core import warning_window
 from .song_data import SongData
 import time
 import os
@@ -56,7 +56,6 @@ def save_song(song_data, keys):
         should_save_song = True
         # Check if file already exist, then ask user, if he wants to overwrite it:
         if os.path.isfile(path_to_file):
-            ok_selected = False
             screen_matrix = []
             line = []
             for i in range(64):
@@ -65,22 +64,12 @@ def save_song(song_data, keys):
                 screen_matrix.append(line[:])
             for i in range(len(path_to_file)):
                 screen_matrix[0][i] = path_to_file[i]
-            # Warning window to prevent unintentional overwrite:
-            gui_warning_window.main(screen_matrix, ok_selected, 'overwrite song')
-            while True:
-                key = keys.check_keys()
-                if key != '':
-                    if key == '4': 
-                        ok_selected = True
-                    if key == '6':
-                        ok_selected = False
-                    if key == '5':
-                        if not ok_selected: should_save_song = False
-                        else:
-                            os.remove(path_to_file)
-                            break
-                    clear_screen()
-                    gui_warning_window.main(screen_matrix, ok_selected, 'overwrite song')
+            ok_selected = warning_window.main(keys, screen_matrix, 'overwrite song')
+            if ok_selected:
+                os.remove(path_to_file)
+            else:
+                # User picked to not overwrite in warning window:
+                should_save_song = False
     if should_save_song and path_to_file is not None:
         with open(path_to_file, 'wb') as file_btp:
             pickle.dump(song_data, file_btp)
@@ -285,28 +274,10 @@ def plus_n_minus_keys(key, playlist_cursor, song_data, song_playlist, playlist_l
 
 # Key with [C] sticker on it:
 def clear_key(keys, screen_matrix, song_playlist, playlist_cursor):
-    ok_selected = False
-    clear_screen()
-    gui_warning_window.main(screen_matrix, ok_selected, 'clear track')
-    while True:
-        key = keys.check_keys()
-        if key != '':
-            if key == '4':
-                ok_selected = True                    
-            elif key == '6':
-                ok_selected == False
-            elif key == '1': 
-                break
-            elif key == '5':
-                if ok_selected:
-                    for i in range(len(song_playlist[playlist_cursor[0]])):
-                        song_playlist[playlist_cursor[0]][i] = ' ' 
-                    break
-                else:
-                    break
-
-            clear_screen()    
-            gui_warning_window.main(screen_matrix, ok_selected, 'clear track')
+    ok_selected = warning_window.main(keys, screen_matrix, 'clear track')
+    if ok_selected:     
+        for i in range(len(song_playlist[playlist_cursor[0]])):
+            song_playlist[playlist_cursor[0]][i] = ' ' 
     return song_playlist
 
 def menu_accept_key(keys, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, selected):
@@ -341,56 +312,35 @@ def menu_accept_key(keys, song_data, playlist_cursor, song_playlist, playlist_li
         if selected == 3:
             warning_text = 'clear all tracks'
 
-        ok_selected = False
-        clear_screen()
-        gui_warning_window.main(screen_matrix, ok_selected, warning_text)
-        while True:
-            key = keys.check_keys()
-            if key != '':
-                # dir key - left:
-                if key == '4':
-                    ok_selected = True
-                # dir key - right:
-                if key == '6':
-                    ok_selected = False
-                # [esc] key:
-                if key == '1': break
-                # [insert] key - accept key:
-                if key == '5':
-                    if ok_selected:
-                        if selected == 1 or selected == 2:
-                            song_data.put_data('song_data_change', True)
-                            while not song_data.get_data('song_data_change'):
-                                pass #Wait to potentiometrs thread to end
-                            if selected == 1:
-                                # Load Song
-                                temp_song_data = load_song(song_data, keys)
-                                if temp_song_data is not None:
-                                    song_data = temp_song_data
-                            elif selected == 2:
-                                #new song: clear all previous data
-                                song_data = SongData()
-                                create_empty_song_playlist(song_data)
-                                time.sleep(0.1) #to properly reload potentiometers on I2C
-                            thread_pots = Thread(target=pots_operations, args=[song_data])
-                            thread_pots.start()
-                        elif selected == 3:
-                            # Clear entire playlist:
-                            song_playlist = song_data.get_data('song_playlist')
-                            track_for_instrument = []
-                            for i in range(16):
-                                track_for_instrument.append(' ')
-                            for i in range(len(song_playlist)):
-                                song_playlist[i] = track_for_instrument[:]
-                            song_data.put_data('song_playlist', song_playlist)
-                        return song_data
-                    # if [no] selected on the screen by user, abort:
-                    else:
-                        break
-                clear_screen()
-                gui_warning_window.main(screen_matrix, ok_selected, warning_text)    
-
-
+        ok_selected = warning_window.main(keys, screen_matrix, warning_text)
+        if ok_selected:            
+            if selected == 1 or selected == 2:
+                song_data.put_data('song_data_change', True)
+                while not song_data.get_data('song_data_change'):
+                    pass #Wait to potentiometrs thread to end
+                if selected == 1:
+                    # Load Song
+                    temp_song_data = load_song(song_data, keys)
+                    if temp_song_data is not None:
+                        song_data = temp_song_data
+                elif selected == 2:
+                    #new song: clear all previous data
+                    song_data = SongData()
+                    create_empty_song_playlist(song_data)
+                    time.sleep(0.1) #to properly reload potentiometers on I2C
+                thread_pots = Thread(target=pots_operations, args=[song_data])
+                thread_pots.start()
+            elif selected == 3:
+                # Clear entire playlist:
+                song_playlist = song_data.get_data('song_playlist')
+                track_for_instrument = []
+                for i in range(16):
+                    track_for_instrument.append(' ')
+                for i in range(len(song_playlist)):
+                    song_playlist[i] = track_for_instrument[:]
+                song_data.put_data('song_playlist', song_playlist)
+            return song_data
+    
 # Enter menu to save or load song:
 def menu(keys, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments):    
     selected = 0

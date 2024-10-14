@@ -1,5 +1,5 @@
 from gui import gui_tracker
-from gui import gui_warning_window
+from core import warning_window
 from libs.keypad import Keypad
 from core.song_data import SongData
 from core.pick_file import get_filename
@@ -58,34 +58,10 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
     
     # Clear entire pattern:
     def clear_pattern(keys, screen_matrix, song_data, guitracker):
-        warning_window_selected_ok = False
-        # Display warning window to user:
-        clear_screen()
-        gui_warning_window.main(screen_matrix, warning_window_selected_ok, 'clear all tracks')
-
-        while True:
-            key = keys.check_keys()
-            if key != '':
-                if key == '4' and warning_window_selected_ok == False:
-                    #[ok] selected on gui:
-                    warning_window_selected_ok = True
-                elif key == '6' and warning_window_selected_ok == True:
-                    #[no] selected on gui:
-                    warning_window_selected_ok = False
-                #[insert] key - accept choice:    
-                elif key == '5':
-                    if warning_window_selected_ok:
-                        pattern = create_new_empty_pattern()
-                        song_data.drums_pattern_operations('create or update pattern', pattern_number, new_pattern=pattern)
-                        break
-                    else:
-                        break
-                #[esc] key - abort:
-                elif key == '1':
-                        break
-                # When screen was pressed, display action in GUI:
-                clear_screen()
-                gui_warning_window.main(screen_matrix, warning_window_selected_ok, 'clear all tracks')
+        ok_selected = warning_window.main(keys, screen_matrix, 'clear all tracks')
+        if ok_selected:
+            pattern = create_new_empty_pattern()
+            song_data.drums_pattern_operations('create or update pattern', pattern_number, new_pattern=pattern)
         
     
     menu_cursor = [0, 0]
@@ -163,30 +139,12 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
                )    
 
 def clear_single_track(song_data, keys, tracker_cursor, screen_matrix, pattern, pattern_number):
-    ok_selected = False
-    clear_screen()
-    gui_warning_window.main(screen_matrix, ok_selected, 'clear track')
-
-    while True:            
-        key = keys.check_keys()
-        if key != '':
-            if key == '1':
-                break
-            elif key == '4' and ok_selected == False: 
-                ok_selected = True
-            elif key == '6' and ok_selected == True: 
-                ok_selected = False
-            elif key == '5':
-                if ok_selected:
-                    for i in range(16):
-                        pattern[tracker_cursor[0]][i] = []
-                        song_data.drums_pattern_operations('create or update pattern', pattern_number, new_pattern=pattern)
-                        return pattern
-                else: 
-                    break    
-
-            clear_screen()
-            gui_warning_window.main(screen_matrix, ok_selected, 'clear track')
+    ok_selected = warning_window.main(keys, screen_matrix, 'clear track')
+    if ok_selected:
+        for i in range(16):
+            pattern[tracker_cursor[0]][i] = []
+            song_data.drums_pattern_operations('create or update pattern', pattern_number, new_pattern=pattern)
+        return pattern
             
 # This function check if any value from potentiometer, and if it's true, it's displaying new value on screen: 
 def pots_values_gui(song_data, samples, pattern, pattern_number, 

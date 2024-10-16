@@ -1,19 +1,10 @@
 from gui.txtcolor import text_font_color, text_bg_color
 from gui.scrmx import create_screen_matrix, fill_matrix, print_screen_matrix
-
+import os
 
 # Format text as selected:
 selected_text = lambda text: text_bg_color('grey', text_font_color('black', text))
-
-def create_instruments_dic():
-    midi_instruments = {}
-    with open('core/midi_params_menu/midi_instruments_list.txt', 'r') as file:
-        for line in file:
-            line = line.split(chr(9))
-            if line[1] not in midi_instruments:
-                midi_instruments[line[1]] = {}
-            midi_instruments[line[1]][line[2].replace('\n', '')] =  line[0]
-    return midi_instruments
+clear_screen = lambda: os.system('clear')
 
 def draw_window(screen_matrix, midi_instruments, instrument_type, midi_output, selected, currently_selected_midi_instrument):
     # Draw box with space on top for text:

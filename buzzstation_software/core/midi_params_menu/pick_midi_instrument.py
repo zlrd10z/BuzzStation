@@ -3,7 +3,15 @@ import os
 from gui.midi_params_menu import gui_pick_midi_instrument
 
 
-clear_screen = lambda: os.system('clear')
+def create_instruments_dic():
+    midi_instruments = {}
+    with open('core/midi_params_menu/midi_instruments_list.txt', 'r') as file:
+        for line in file:
+            line = line.split(chr(9))
+            if line[1] not in midi_instruments:
+                midi_instruments[line[1]] = {}
+            midi_instruments[line[1]][line[2].replace('\n', '')] =  line[0]
+    return midi_instruments
 
 def menu_select_instrument(keys, midi_instruments, instrument_type, midi_output, currently_selected_midi_instrument):
     instruments = list(midi_instruments[instrument_type].keys())
@@ -36,7 +44,9 @@ def menu_instrument_types(keys, midi_instruments, midi_output, currently_selecte
     instrument_types = list(midi_instruments.keys())
     selected = 0
     result = None
-    gui(midi_instruments, midi_output, selected, currently_selected_midi_instrument)
+    gui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
+                  currently_selected_midi_instrument
+                 )
     while True:
         key = keys.check_keys()
         if key != '':
@@ -54,9 +64,9 @@ def menu_instrument_types(keys, midi_instruments, midi_output, currently_selecte
             # Esc Key:
             if key == '1':
                 break
-                gui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
-                                  currently_selected_midi_instrument
-                                 )
+            gui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
+                              currently_selected_midi_instrument
+                             )
     
 def main(keys, midi_output, currently_selected_midi_instrument):
     midi_instruments = create_instruments_dic()

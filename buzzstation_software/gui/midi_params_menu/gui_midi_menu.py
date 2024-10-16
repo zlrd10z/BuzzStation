@@ -1,5 +1,6 @@
 from gui.scrmx import create_screen_matrix
 from gui.scrmx import fill_matrix
+from gui.scrmx import bg_color
 from gui.scrmx import print_screen_matrix
 from gui.txtcolor import text_bg_color
 from gui.txtcolor import text_font_color
@@ -10,13 +11,6 @@ GUI_WIDTH = 64
 chg_bgd_clr = lambda text: text_bg_color('blue', text)
 # Format displayed text, so it looks like selected by cursor:
 txt_color_sel = lambda text: text_bg_color('white', text_font_color('black', text)) 
-
-# Fill screen with blue color:
-def bg_color(screen_matrix):
-    for y in range(len(screen_matrix)):
-        for x in range(len(screen_matrix[y])):
-            screen_matrix[y][x] = chg_bgd_clr(' ') 
-    return screen_matrix
 
 # Draw window title and separate it from the rest of data:
 def draw_win_title(screen_matrix, track):

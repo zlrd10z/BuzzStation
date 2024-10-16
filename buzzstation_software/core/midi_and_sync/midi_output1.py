@@ -1,6 +1,7 @@
 import serial
 import time
 
+NOTE_OFF_BYTE = bytes([123, 0])
 
 uart = serial.Serial(
     port='/dev/serial0',  
@@ -11,13 +12,19 @@ def send_data(data):
     try:
         if not uart.is_open:
             uart.open()  
-            uart.write(data)  
+        uart.write(data)  
 
     except KeyboardInterrupt as exception:
         print(exception)                
 
     finally:
         uart.close()   
+
+def all_notes_off():
+    channel1_noteoff = 176
+    for i in range(16):
+        channel = bytes[(channel1_noteoff + i)]
+        send_data(channel + NOTE_OFF_BYTE)
 
 # For hardware/software testing purpose:        
 if __name__ == "__main__":

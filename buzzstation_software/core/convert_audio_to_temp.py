@@ -4,7 +4,9 @@ import os
 
 def convert_to_pygame_format(input_path):
     cwd = os.getcwd()
-    output_path = cwd + '/.temp/' + input_path.split('/')[-1]
+    filename = input_path.split('/')[-1] #get filename from path
+    filename = filename.split('.')[0] #extract filename without extension
+    output_path = cwd + '/.temp/' + filename + ".wav"
 
     audio = AudioSegment.from_file(input_path)
     

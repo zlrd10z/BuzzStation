@@ -1,4 +1,4 @@
-from .gui_tracker import create_screen_matrix, print_screen_matrix, fill_matrix
+from .scrmx import create_screen_matrix, print_screen_matrix, fill_matrix
 from .txtcolor import text_bg_color, text_font_color
 
 

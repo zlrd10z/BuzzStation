@@ -11,7 +11,7 @@ clear_screen = lambda: os.system('clear')
 
 def create_instruments_dic():
     midi_instruments = {}
-    with open('core/midi_instruments_list.txt', 'r') as file:
+    with open('core/midi_params_menu/midi_instruments_list.txt', 'r') as file:
         for line in file:
             line = line.split(chr(9))
             if line[1] not in midi_instruments:

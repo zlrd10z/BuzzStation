@@ -1,14 +1,17 @@
+GUI_HEIGHT = 17
+GUI_WIDTH = 64
+
 # Create matrix 16 x 64 chars
 def create_screen_matrix():
     screen_matrix = []
-    for i in range(gui_height):
+    for i in range(GUI_HEIGHT):
         screen_matrix.append([])
     return screen_matrix
 
 # Append matrix with spaces characters:
 def fill_matrix(screen_matrix):
-    for i in range(gui_height):
-        for j in range(gui_width):
+    for i in range(GUI_HEIGHT):
+        for j in range(GUI_WIDTH):
             screen_matrix[i].append(' ')    
     return screen_matrix
 

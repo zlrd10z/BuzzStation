@@ -147,16 +147,17 @@ class SongData:
 
     def midi_misc_settings_operations(self, option, track, new_value=None, target_title=None):
         result = None
+        output_and_channel = self.__playlist_list_of_instruments[track]
         match option:
             case "get":
                 if target_title is None:
-                    result = self.__midi_misc_settings[track]
+                    result = self.__midi_misc_settings[output_and_channel]
                 else:
-                    result = self.__midi_misc_settings[track][target_title]
+                    result = self.__midi_misc_settings[output_and_channel][target_title]
             case "update":
                 if new_value is not None:
                     if target_title is None:
-                        self.__midi_misc_settings[track] = new_value
+                        self.__midi_misc_settings[output_and_channel] = new_value
                     else:
-                        self.__midi_misc_settings[track][target_title] = new_value
+                        self.__midi_misc_settings[output_and_channel][target_title] = new_value
         return result

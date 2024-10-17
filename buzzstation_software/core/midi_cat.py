@@ -1,7 +1,7 @@
 import copy
 
 def append_midi_params():
-    midi_misc_settings = [None]
+    midi_misc_settings = {}
     midi_menu_categories = {'Sound Envelopes' : {'Attack' : 0, 
                                                  'Delay' : 0, 
                                                  'Sustain' : 0, 
@@ -32,6 +32,10 @@ def append_midi_params():
                                         'Feedback' : 0,
                                        } 
                         }
-    for i in range(15):
-        midi_misc_settings.append(copy.deepcopy(midi_menu_categories))
+                        
+    for m in range(1, 4):
+        for c in range(1, 17):
+            midi_output_channel = 'M' + str(m) + 'c' + str(c)
+            midi_misc_settings[midi_output_channel] = copy.deepcopy(midi_menu_categories)
+
     return midi_misc_settings

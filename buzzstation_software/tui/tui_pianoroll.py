@@ -5,15 +5,15 @@ clear = lambda: os.system('clear')
 underlined_text = lambda text: (f'\033[4m{text}\033[0m')
 
 # 64x18 characters:
-gui_height = 17 #terminal command line is taking one line
-gui_width = 64
+tui_height = 17 #terminal command line is taking one line
+tui_width = 64
 
 # Create matrix 16 x 64 chars
 def create_screen_matrix():
     screen_matrix = []
-    for i in range(gui_height):
+    for i in range(tui_height):
         row_matrix = []
-        for j in range(gui_width):
+        for j in range(tui_width):
             row_matrix.append('')
         screen_matrix.append(row_matrix)
     return screen_matrix
@@ -148,9 +148,9 @@ def draw_quarter_time(screen_matrix):
 
 def draw_pattern_number(screen_matrix, pattern_number=1):
     text_to_print = 'Pattern: ' + str(pattern_number)
-    axisx_start_printing = (gui_width - len(text_to_print)) - 2
+    axisx_start_printing = (tui_width - len(text_to_print)) - 2
     for i in range(len(text_to_print)):
-        screen_matrix[gui_height-1][axisx_start_printing + i] = text_bg_color('blue', text_to_print[i])
+        screen_matrix[tui_height-1][axisx_start_printing + i] = text_bg_color('blue', text_to_print[i])
 
     return screen_matrix
 
@@ -158,7 +158,7 @@ def draw_pattern_number(screen_matrix, pattern_number=1):
 def draw_swing_bpm_midi(screen_matrix, bpm_value=100, swing_value=40, channel_number=1):
     text_to_print = 'BPM: ' + str(bpm_value) + 8 * ' ' + 'Swing: ' + str(swing_value) + 8 * ' ' + 'Channel: ' + str(channel_number)
     for i in range(len(text_to_print)):
-        screen_matrix[gui_height-1][i+2] = text_bg_color('blue', text_to_print[i])
+        screen_matrix[tui_height-1][i+2] = text_bg_color('blue', text_to_print[i])
     return screen_matrix
 
 
@@ -174,9 +174,9 @@ def draw_play_pause(screen_matrix, is_playing=False, playing_mode=False):
     else:
          playing_sign = '[P]'
         
-    axisx_start_printing = int(gui_width / 2 - len(playing_info))
+    axisx_start_printing = int(tui_width / 2 - len(playing_info))
     for i in range(len(playing_info)):
-        screen_matrix[gui_height-3][axisx_start_printing + 1 + i + x] = text_bg_color('blue', playing_info[i])
+        screen_matrix[tui_height-3][axisx_start_printing + 1 + i + x] = text_bg_color('blue', playing_info[i])
 
     for i in range(3):
         screen_matrix[0][59 + i] = text_bg_color('blue', playing_sign[i])
@@ -197,9 +197,9 @@ def draw_buttons(screen_matrix, selected=None):
             question_mark_counter += 1
             
         elif question_mark_counter == selected:
-            screen_matrix[gui_height-2][16 + i] = text_bg_color('grey', toDraw[i])
+            screen_matrix[tui_height-2][16 + i] = text_bg_color('grey', toDraw[i])
         else:
-            screen_matrix[gui_height-2][16 + i] = toDraw[i]
+            screen_matrix[tui_height-2][16 + i] = toDraw[i]
     return screen_matrix
 
 
@@ -251,7 +251,7 @@ def draw_cursor(screen_matrix, cursor, position, note_length_edit):
     return screen_matrix
     
         
-def print_gui(screen_matrix):
+def print_tui(screen_matrix):
     toprint = ''
     for i in range(len(screen_matrix)):
         for j in range(len(screen_matrix[i])):
@@ -348,7 +348,7 @@ def main(bpm_value, swing_value, pattern_number, playing_mode,
     screen_matrix = draw_midi_info(screen_matrix, midi_output_and_channel)
     screen_matrix = draw_indicators(screen_matrix, pattern)
     if print_it:
-        print_gui(screen_matrix)
+        print_tui(screen_matrix)
     else:
         return screen_matrix
 

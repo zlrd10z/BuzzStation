@@ -1,5 +1,5 @@
-from gui.txtcolor import text_font_color, text_bg_color
-from gui.scrmx import create_screen_matrix, fill_matrix, print_screen_matrix
+from tui.txtcolor import text_font_color, text_bg_color
+from tui.scrmx import create_screen_matrix, fill_matrix, print_screen_matrix
 import os
 
 # Format text as selected:

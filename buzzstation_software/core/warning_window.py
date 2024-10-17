@@ -1,6 +1,6 @@
-from gui import gui_warning_window
-from gui.gui_tracker import create_screen_matrix
-from gui.gui_tracker import fill_matrix
+from tui import tui_warning_window
+from tui.tui_tracker import create_screen_matrix
+from tui.tui_tracker import fill_matrix
 from libs.keypad import Keypad
 import os
 
@@ -10,7 +10,7 @@ def main(keypad, screen_matrix, action):
     ok_selected = False
 
     clear_screen()
-    gui_warning_window.main(screen_matrix, ok_selected, action)
+    tui_warning_window.main(screen_matrix, ok_selected, action)
 
     while True:
         key = keypad.check_keys()
@@ -30,7 +30,7 @@ def main(keypad, screen_matrix, action):
                 result = False
                 break
             clear_screen()
-            gui_warning_window.main(screen_matrix, ok_selected, action)
+            tui_warning_window.main(screen_matrix, ok_selected, action)
     return result
 
 if __name__ == '__main__':

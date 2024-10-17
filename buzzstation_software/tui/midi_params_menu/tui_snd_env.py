@@ -1,5 +1,5 @@
-from gui import scrmx
-from gui import sliders
+from tui import scrmx
+from tui import sliders
 
 def main(percentages, slider_selected):
     screen_matrix = scrmx.create_screen_matrix()

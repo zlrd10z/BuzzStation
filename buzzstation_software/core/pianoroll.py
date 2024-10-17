@@ -1,5 +1,5 @@
 from core import warning_window
-from gui import gui_pianoroll
+from tui import tui_pianoroll
 from libs.keypad import Keypad
 from .song_data import SongData
 import copy
@@ -20,10 +20,10 @@ def delete_from_pattern(pattern, beat, note):
             if pattern[beat][i] == note:
                 pattern[beat].pop(i)
 
-def gui(song_data, pattern_number, midi_and_channel, 
+def tui(song_data, pattern_number, midi_and_channel, 
         selected_note, selected_beat, pattern, selected_menu_button
 ):
-    gui_pianoroll.main(
+    tui_pianoroll.main(
                       bpm_value=song_data.get_data('bpm'), 
                       swing_value=song_data.get_data('swing'), 
                       pattern_number=pattern_number, 
@@ -40,7 +40,7 @@ def gui(song_data, pattern_number, midi_and_channel,
 def get_screen_matrix(song_data, pattern_number, midi_and_channel, 
                       selected_note, selected_beat, pattern, selected_menu_button
 ):
-    screen_matrix = gui_pianoroll.main(bpm_value=song_data.get_data('bpm'), 
+    screen_matrix = tui_pianoroll.main(bpm_value=song_data.get_data('bpm'), 
                                        swing_value=song_data.get_data('swing'), 
                                        pattern_number=pattern_number, 
                                        playing_mode=song_data.get_data('is_song_playing'), 
@@ -54,10 +54,10 @@ def get_screen_matrix(song_data, pattern_number, midi_and_channel,
                                       )
     return screen_matrix
 
-def gui_edit_note_length(song_data, pattern_number, midi_and_channel, 
+def tui_edit_note_length(song_data, pattern_number, midi_and_channel, 
                          selected_note, selected_beat, pattern, selected_menu_button
 ):
-    gui_pianoroll.main(
+    tui_pianoroll.main(
                       bpm_value=song_data.get_data('bpm'), 
                       swing_value=song_data.get_data('swing'), 
                       pattern_number=pattern_number, 
@@ -79,7 +79,7 @@ def menu(keypad, song_data, pattern_number, midi_and_channel,
 ):
     menu_selected_button = 0
     clear_screen()
-    gui(song_data, pattern_number, midi_and_channel, 
+    tui(song_data, pattern_number, midi_and_channel, 
         selected_note_and_octave, selected_beat, pattern[:], 
         selected_menu_button=menu_selected_button
        )
@@ -134,18 +134,18 @@ def menu(keypad, song_data, pattern_number, midi_and_channel,
 
                     song_data.put_data('is_song_playing', is_song_playing)
                     clear_screen()
-                    gui(song_data, pattern_number, midi_and_channel, 
+                    tui(song_data, pattern_number, midi_and_channel, 
                         selected_note_and_octave, selected_beat, pattern[:], 
                         selected_menu_button = menu_selected_button
                        )
             clear_screen()
-            gui(song_data, pattern_number, midi_and_channel, 
+            tui(song_data, pattern_number, midi_and_channel, 
                 selected_note_and_octave, selected_beat, pattern[:], 
                 selected_menu_button = menu_selected_button)
             
 
 # This function check if any value from potentiometer, and if it's true, it's displaying new value on screen: 
-def pots_values_gui(song_data, pattern_number, midi_and_channel, 
+def pots_values_tui(song_data, pattern_number, midi_and_channel, 
                     selected_note_and_octave, selected_beat, pattern,
                     previous_values
 ):
@@ -153,7 +153,7 @@ def pots_values_gui(song_data, pattern_number, midi_and_channel,
                 previous_values[0] = song_data.get_data('bpm') 
                 previous_values[1] = song_data.get_data('swing')
                 clear_screen()
-                gui(song_data, pattern_number, midi_and_channel, 
+                tui(song_data, pattern_number, midi_and_channel, 
                     selected_note_and_octave, selected_beat, pattern[:], 
                     selected_menu_button = None
                    )
@@ -255,7 +255,7 @@ def edit_key(keypad, song_data, pattern_number,
         for i in range(len(pattern[selected_beat])):
             if selected_note_and_octave == pattern[selected_beat][i][0]:
                 clear_screen()
-                gui_edit_note_length(song_data, pattern_number, midi_and_channel, 
+                tui_edit_note_length(song_data, pattern_number, midi_and_channel, 
                                      selected_note_and_octave, selected_beat, pattern[:], 
                                      selected_menu_button=None
                                     )
@@ -303,7 +303,7 @@ def edit_key(keypad, song_data, pattern_number,
                                                                target_notes_to_turn_off=True
                                                               )
                         clear_screen()
-                        gui_edit_note_length(song_data, pattern_number, midi_and_channel, 
+                        tui_edit_note_length(song_data, pattern_number, midi_and_channel, 
                                              selected_note_and_octave, selected_beat, pattern[:], 
                                              selected_menu_button=None
                                             )
@@ -386,7 +386,7 @@ def main(keypad, song_data, pattern_number, midi_and_channel, track):
     # main loop:
     while True:
         #check if values from potentiometers changed, and if yes, update values on GUI:
-        previous_values = pots_values_gui(song_data, pattern_number, midi_and_channel, 
+        previous_values = pots_values_tui(song_data, pattern_number, midi_and_channel, 
                                           selected_note_and_octave, selected_beat, pattern,
                                           previous_values
                                          )
@@ -490,7 +490,7 @@ def main(keypad, song_data, pattern_number, midi_and_channel, track):
             
             # when key was pressed, update GUI displayed:
             clear_screen()
-            gui(song_data, pattern_number, midi_and_channel,
+            tui(song_data, pattern_number, midi_and_channel,
                 selected_note_and_octave, selected_beat,
                 pattern[:], selected_menu_button=None
                )

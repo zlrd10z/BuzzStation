@@ -1,4 +1,4 @@
-from gui.midi_params_menu import gui_midi_menu
+from tui.midi_params_menu import tui_midi_menu
 from core.midi_params_menu import submenus
 from . import pick_midi_instrument
 import os
@@ -43,7 +43,7 @@ def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Syn
     selected = 0
 
     clear_screen()
-    gui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)
+    tui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)
 
     # main loop:
     while True:
@@ -75,4 +75,4 @@ def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Syn
                     submenus.main(keypad, song_data, track, category)
 
             clear_screen()
-            gui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)
+            tui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)

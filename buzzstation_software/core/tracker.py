@@ -1,4 +1,4 @@
-from gui import gui_tracker
+from tui import tui_tracker
 from core import warning_window
 from libs.keypad import Keypad
 from core.song_data import SongData
@@ -31,7 +31,7 @@ def check_if_pattern_is_empty(pattern):
     return isEmpty
 
 def menu(song_data, samples, pattern, pattern_number, song_name, 
-         tracker_cursor, keys, guitracker, guitracker_noprinting
+         tracker_cursor, keys, tuitracker, tuitracker_noprinting
 ):
     def toggle_patterns(song_data, pattern_number, selected):
         new_pattern_number = pattern_number
@@ -57,7 +57,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
         return new_pattern_number
     
     # Clear entire pattern:
-    def clear_pattern(keys, screen_matrix, song_data, guitracker):
+    def clear_pattern(keys, screen_matrix, song_data, tuitracker):
         ok_selected = warning_window.main(keys, screen_matrix, 'clear all tracks')
         if ok_selected:
             pattern = create_new_empty_pattern()
@@ -68,7 +68,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
     selected = 0
 
     clear_screen()
-    guitracker(samples_list=samples, 
+    tuitracker(samples_list=samples, 
                this_pattern=pattern, 
                pattern_number=pattern_number, 
                song_name=song_name, 
@@ -110,14 +110,14 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
                     return result
                 #clear pattern:
                 elif selected == 3:
-                    screen_matrix = guitracker_noprinting(samples_list=samples, 
+                    screen_matrix = tuitracker_noprinting(samples_list=samples, 
                                                            this_pattern=pattern, 
                                                            pattern_number=pattern_number, 
                                                            song_name=song_name, 
                                                            selected_button=selected, 
                                                            cursor=tracker_cursor
                                                          )
-                    clear_pattern(keys, screen_matrix, song_data, guitracker)
+                    clear_pattern(keys, screen_matrix, song_data, tuitracker)
                     break
                     
             # Update selected (selected is another value:
@@ -130,7 +130,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
 
             # when key was pressed, display updated GUI:
             clear_screen()
-            guitracker(samples_list=samples, 
+            tuitracker(samples_list=samples, 
                this_pattern=pattern, 
                pattern_number=pattern_number, 
                song_name=song_name, 
@@ -147,9 +147,9 @@ def clear_single_track(song_data, keys, tracker_cursor, screen_matrix, pattern, 
         return pattern
             
 # This function check if any value from potentiometer, and if it's true, it's displaying new value on screen: 
-def pots_values_gui(song_data, samples, pattern, pattern_number, 
+def pots_values_tui(song_data, samples, pattern, pattern_number, 
                     song_name, tracker_cursor, potentiometers_previous_values,
-                    guitracker
+                    tuitracker
 ):
     bpm = song_data.get_data('bpm')
     swing = song_data.get_data('swing')
@@ -159,7 +159,7 @@ def pots_values_gui(song_data, samples, pattern, pattern_number,
         potentiometers_previous_values[1] = swing
         potentiometers_previous_values[2] = bvol
         clear_screen()
-        guitracker(samples_list=samples, 
+        tuitracker(samples_list=samples, 
                    this_pattern=pattern, 
                    pattern_number=pattern_number, 
                    song_name=song_name, 
@@ -385,7 +385,7 @@ def insert_key(song_data, tracker_cursor, keys, pattern, pattern_number):
         return pattern
     
 def main(keys, song_data, pattern_number):
-    guitracker = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: gui_tracker.main(list_of_samples=samples_list, 
+    tuitracker = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: tui_tracker.main(list_of_samples=samples_list, 
                                 pattern=this_pattern, 
                                 is_playing=song_data.get_data('is_playing'), 
                                 bpm_value=song_data.get_data('bpm'), 
@@ -398,7 +398,7 @@ def main(keys, song_data, pattern_number):
                                 playing_mode=song_data.get_data('is_song_playing')
     )
 
-    guitracker_noprinting = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: gui_tracker.main(list_of_samples=samples_list, 
+    tuitracker_noprinting = lambda samples_list, this_pattern, pattern_number, song_name, selected_button, cursor: tui_tracker.main(list_of_samples=samples_list, 
                                     pattern=this_pattern, 
                                     is_playing=song_data.get_data('is_playing'), 
                                     bpm_value=song_data.get_data('bpm'), 
@@ -429,9 +429,9 @@ def main(keys, song_data, pattern_number):
 
     while True:
         #Check if any value from potentiometers, and if it's true, it's displaying new value on screen: 
-        temp_pot_values =  pots_values_gui(song_data, samples, pattern, pattern_number, 
+        temp_pot_values =  pots_values_tui(song_data, samples, pattern, pattern_number, 
                                            song_name, tracker_cursor, potentiometers_previous_values,
-                                           guitracker
+                                           tuitracker
                                           )
         if temp_pot_values is not None:
             potentiometers_previous_values = temp_pot_values
@@ -472,7 +472,7 @@ def main(keys, song_data, pattern_number):
                 samples = song_data.get_data('samples')
             #[C] key - clear single track:
             elif key == '0':
-                screen_matrix = guitracker(samples_list=samples, 
+                screen_matrix = tuitracker(samples_list=samples, 
                            this_pattern=pattern, 
                            pattern_number=pattern_number, 
                            song_name=song_name, 
@@ -493,15 +493,15 @@ def main(keys, song_data, pattern_number):
             # Pattern Menu:
             elif key == '#':
                 new_pattern_number = menu(song_data, samples, pattern, pattern_number, 
-                                          song_name, tracker_cursor, keys, guitracker,
-                                          guitracker_noprinting
+                                          song_name, tracker_cursor, keys, tuitracker,
+                                          tuitracker_noprinting
                                          )
                 pattern = song_data.drums_pattern_operations('get pattern', pattern_number)
                 if new_pattern_number is not None:
                     return new_pattern_number
-            # if key was pressed, update displayed gui:
+            # if key was pressed, update displayed tui:
             clear_screen()
-            guitracker(samples_list=samples, 
+            tuitracker(samples_list=samples, 
                        this_pattern=pattern, 
                        pattern_number=pattern_number, 
                        song_name=song_name, 

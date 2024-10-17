@@ -1,5 +1,5 @@
 from libs.keypad import Keypad
-from gui import gui_playlist
+from tui import tui_playlist
 from core import warning_window
 from .song_data import SongData
 import time
@@ -17,27 +17,27 @@ from core.midi_params_menu import midi_menu
 
 # Lambdas:
 clear_screen = lambda: os.system('clear')
-gui_pl = lambda gui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: gui_playlist.main(
+tui_pl = lambda tui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: tui_playlist.main(
                                 list_of_instruments=list_of_instruments,
                                 bpm_value=bpm,
                                 swing_value=swing,
                                 vol_value=bvol,
                                 playlist=playlist,
-                                gui_cursor=gui_cursor,
+                                tui_cursor=tui_cursor,
                                 menu_selected=menu_selected,
                                 songname=songname
                                 )
 
-gui_get_screen_matrix = lambda  gui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: gui_playlist.main(
+tui_get_screen_matrix = lambda  tui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: tui_playlist.main(
                                 list_of_instruments= list_of_instruments,
                                 bpm_value=bpm,
                                 swing_value=swing,
                                 vol_value=bvol,
                                 playlist=playlist,
-                                gui_cursor=gui_cursor,
+                                tui_cursor=tui_cursor,
                                 menu_selected=menu_selected,
                                 songname=songname,
-                                printgui=False
+                                printtui=False
                                 )
 
 
@@ -113,7 +113,7 @@ def shorten_playlist_if_possible(playlist):
         return playlist
 
 # This function check if any value from potentiometer, and if it's true, it's displaying new value on screen: 
-def pots_values_gui(song_data, previous_printed_values, playlist_cursor, 
+def pots_values_tui(song_data, previous_printed_values, playlist_cursor, 
                     song_playlist, playlist_list_of_instruments,
 ):
     # Get potentiometers transformed data from data storage object:
@@ -122,7 +122,7 @@ def pots_values_gui(song_data, previous_printed_values, playlist_cursor,
     bvol = song_data.get_data('bvol')
     if previous_printed_values[0] != bpm or previous_printed_values[1] != swing or previous_printed_values[2] != bvol:
         clear_screen()
-        gui_pl(gui_cursor = playlist_cursor[:], 
+        tui_pl(tui_cursor = playlist_cursor[:], 
                     playlist = song_playlist, 
                     menu_selected = None, 
                     list_of_instruments = playlist_list_of_instruments, 
@@ -281,7 +281,7 @@ def clear_key(keypad, screen_matrix, song_playlist, playlist_cursor):
     return song_playlist
 
 def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, selected):
-    screen_matrix = gui_get_screen_matrix(gui_cursor=playlist_cursor[:], 
+    screen_matrix = tui_get_screen_matrix(tui_cursor=playlist_cursor[:], 
                                 playlist=song_playlist, 
                                 menu_selected=None, 
                                 list_of_instruments=playlist_list_of_instruments, 
@@ -295,7 +295,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
         # Save song:
         save_song(song_data, keypad)
         clear_screen()
-        gui_pl(gui_cursor=playlist_cursor[:], 
+        tui_pl(tui_cursor=playlist_cursor[:], 
                     playlist=song_playlist, 
                     menu_selected=selected, 
                     list_of_instruments=playlist_list_of_instruments, 
@@ -346,7 +346,7 @@ def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_ins
     selected = 0
     menu_cursor = [0, 0]
     clear_screen()
-    gui_pl(gui_cursor=playlist_cursor[:], 
+    tui_pl(tui_cursor=playlist_cursor[:], 
                 playlist=song_playlist, 
                 menu_selected=selected, 
                 list_of_instruments=playlist_list_of_instruments, 
@@ -399,7 +399,7 @@ def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_ins
             # Check if selected button changed and displayit to user:
             if previous_selected != selected:
                 clear_screen()
-                gui_pl(gui_cursor=playlist_cursor[:], 
+                tui_pl(tui_cursor=playlist_cursor[:], 
                             playlist=song_playlist, 
                             menu_selected=selected, 
                             list_of_instruments=playlist_list_of_instruments, 
@@ -435,7 +435,7 @@ def main(keypad, song_data):
         playlist_list_of_instruments = song_data.get_data('playlist_list_of_instruments')
         
         # Update screen, if any value from potentiometers has changed:
-        previous_printed_values = pots_values_gui(song_data, previous_printed_values, 
+        previous_printed_values = pots_values_tui(song_data, previous_printed_values, 
                                                   playlist_cursor, song_playlist, playlist_list_of_instruments
                                                   )
         # Get key from keypad:    
@@ -459,7 +459,7 @@ def main(keypad, song_data):
             # Key with [C] sticker - clear track on which cursor is present:
             elif key == '0':
                 # get currently displayed GUI:
-                screen_matrix = gui_get_screen_matrix(gui_cursor=playlist_cursor[:], 
+                screen_matrix = tui_get_screen_matrix(tui_cursor=playlist_cursor[:], 
                                                         playlist=song_playlist, 
                                                         menu_selected=None, 
                                                         list_of_instruments=playlist_list_of_instruments, 
@@ -479,7 +479,7 @@ def main(keypad, song_data):
                     playlist_list_of_instruments = song_data.get_data('playlist_list_of_instruments')
                     playlist_cursor = [0, 0]
                     clear_screen()
-                    gui_pl(gui_cursor=playlist_cursor[:], 
+                    tui_pl(tui_cursor=playlist_cursor[:], 
                                 playlist=song_playlist, 
                                 menu_selected = None,
                                 list_of_instruments=playlist_list_of_instruments, 
@@ -520,7 +520,7 @@ def main(keypad, song_data):
             
             # when key was pressed, update displayed GUI:
             clear_screen()
-            gui_pl(gui_cursor = playlist_cursor[:], 
+            tui_pl(tui_cursor = playlist_cursor[:], 
                         playlist = song_playlist, 
                         menu_selected = None, 
                         list_of_instruments = playlist_list_of_instruments, 

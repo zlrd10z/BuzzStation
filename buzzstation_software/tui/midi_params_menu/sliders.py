@@ -1,5 +1,6 @@
-from gui.txtcolor import text_bg_color
-from gui.txtcolor import text_font_color
+from tui.txtcolor import text_bg_color
+from tui.txtcolor import text_font_color
+
 
 def draw_slider(screen_matrix, y_position, title, percents, is_slider_selected=False):
     GUI_HEIGHT = 17
@@ -55,12 +56,14 @@ def draw_slider(screen_matrix, y_position, title, percents, is_slider_selected=F
     for i in range(len(title)):
         screen_matrix[y_position+1][start_x+i+1] = screen_matrix[y_position+1][start_x+i+1].replace(' ', title[i])
 
-def draw_sliders(screen_matrix, which_slider_selected, *args):
-    for a in range(len(args)):
-        title, percents = args[a]
-        y_position = 3 + 3*a
+def draw_sliders(screen_matrix, which_slider_selected, option_params):
+    keys = [*option_params]
+    for k in range(len(keys)):
+        title = keys[k]
+        percents = option_params[keys[k]]
+        y_position = 3 + 3*k
 
-        if a == which_slider_selected:
+        if k == which_slider_selected:
             is_slider_selected = True
         else:
             is_slider_selected = False

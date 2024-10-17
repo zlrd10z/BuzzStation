@@ -1,4 +1,4 @@
-from .gui_tracker import create_screen_matrix, fill_matrix, draw_frames_and_numbers, name_tracks, print_screen_matrix, draw_bpm_vol_swing_values
+from .tui_tracker import create_screen_matrix, fill_matrix, draw_frames_and_numbers, name_tracks, print_screen_matrix, draw_bpm_vol_swing_values
 from .txtcolor import text_bg_color, text_font_color
 
 
@@ -32,18 +32,18 @@ def draw_info_mode(screen_matrix):
 
 # Draw menu texts and buttons:
 def draw_menu(screen_matrix, selected = None):
-    gui_width = 64
+    tui_width = 64
     # x is char on x axis, where the tracks ends, and the song info starts:
     x = 2 + 6*8
     info_text = '    Menu: '
     # Draw 'Song Name:' text
-    for i in range(gui_width - x):
+    for i in range(tui_width - x):
         if i <= len(info_text)-1:
             screen_matrix[5][x + i] = text_bg_color('blue', info_text[i])
 
     # playlist buttons:
     button_text = ' Save '
-    for i in range(gui_width - x):
+    for i in range(tui_width - x):
         if i <= len(button_text) - 1:
             if selected == 0:
                 screen_matrix[6][x + i] = formatTextAsSelected(button_text[i])
@@ -51,7 +51,7 @@ def draw_menu(screen_matrix, selected = None):
                 screen_matrix[6][x + i] = button_text[i]
 
     button_text = ' Load '
-    for i in range(gui_width - x):
+    for i in range(tui_width - x):
         if i <= len(button_text)-1:
             if selected == 1:
                 screen_matrix[6][x + i + 7] = formatTextAsSelected(button_text[i])
@@ -59,7 +59,7 @@ def draw_menu(screen_matrix, selected = None):
                 screen_matrix[6][x + i + 7] = button_text[i]
     
     button_text = ' New '
-    for i in range(gui_width - x):
+    for i in range(tui_width - x):
         if i <= len(button_text) - 1:
             if selected == 2:
                 screen_matrix[7][x + i + 4] = formatTextAsSelected(button_text[i])
@@ -67,7 +67,7 @@ def draw_menu(screen_matrix, selected = None):
                 screen_matrix[7][x + i + 4] = button_text[i]
     
     button_text = ' Clear '
-    for i in range(gui_width - x):
+    for i in range(tui_width - x):
         if i <= len(button_text) - 1:
             if selected == 3:
                 screen_matrix[8][x + i + 3] = formatTextAsSelected(button_text[i])
@@ -78,7 +78,7 @@ def draw_menu(screen_matrix, selected = None):
 
 # Draw info about selected instrument:
 def draw_info_instrument(screen_matrix, selected_instrument):
-    gui_width = 64
+    tui_width = 64
     x = 2 + 6*8
     text_line_1 = 'Inst. info:'
     for i in range(len(text_line_1)):
@@ -154,7 +154,7 @@ def draw_songname(screen_matrix, songname):
     if songname == 'No songname':
         songname = '  [Song not saved!]'
     
-    gui_width = 64
+    tui_width = 64
     x = 2 + 6*8
     text_line_1 = 'Song name:'
     for i in range(len(text_line_1)):
@@ -178,18 +178,18 @@ def draw_songname(screen_matrix, songname):
     return screen_matrix
 
 def main(list_of_instruments, bpm_value, swing_value, vol_value, 
-     playlist, menu_selected=None, gui_cursor=None, is_playing=False, 
-     songname='DNB24421.btp', printgui=True
+     playlist, menu_selected=None, tui_cursor=None, is_playing=False, 
+     songname='DNB24421.btp', printtui=True
 ):
         
-    page_number = int(gui_cursor[0]/8) + 1
-    first_instrument_to_display = int(gui_cursor[0] / 8) * 8
+    page_number = int(tui_cursor[0]/8) + 1
+    first_instrument_to_display = int(tui_cursor[0] / 8) * 8
     list_of_instruments_to_display = list_of_instruments[first_instrument_to_display: first_instrument_to_display+8]
     
-    first_number = (int(gui_cursor[1] / 16) * 16) + 1
-    if gui_cursor[1] % 16 == 0:
+    first_number = (int(tui_cursor[1] / 16) * 16) + 1
+    if tui_cursor[1] % 16 == 0:
         first_number -= 16
-    if gui_cursor[1] == 0:
+    if tui_cursor[1] == 0:
         first_number = 1
     playlist_to_display = []
 
@@ -199,14 +199,14 @@ def main(list_of_instruments, bpm_value, swing_value, vol_value,
     
     
     if menu_selected is not None:
-        gui_cursor = None
+        tui_cursor = None
     
-    if gui_cursor is not None:
-        if gui_cursor[1] == 0:
-            selected_pattern = gui_cursor[0] % 8
+    if tui_cursor is not None:
+        if tui_cursor[1] == 0:
+            selected_pattern = tui_cursor[0] % 8
             pattern_cursor = None
         else:
-            pattern_cursor = gui_cursor
+            pattern_cursor = tui_cursor
             selected_pattern = None
     else:
         selected_pattern = None
@@ -226,7 +226,7 @@ def main(list_of_instruments, bpm_value, swing_value, vol_value,
     screen_matrix = draw_vertical_lines(screen_matrix)
     screen_matrix = draw_patterns(screen_matrix, selected_pattern, playlist_to_display, first_number, pattern_cursor)
     screen_matrix = draw_page_and_playing(screen_matrix, page_number, is_playing)
-    if printgui:
+    if printtui:
         print_screen_matrix(screen_matrix)
     else:
         return screen_matrix
@@ -235,5 +235,5 @@ if __name__ == '__main__':
     # Tests
     playlist = [[1, None, 2, None],[4000,400,32,134]]
     selected_pattern = [1, 2]
-    main(list_of_instruments=['Drums', 'M1C1'], bpm_value=200, swing_value=50, vol_value=90, playlist=playlist, gui_cursor=[0, 3])
+    main(list_of_instruments=['Drums', 'M1C1'], bpm_value=200, swing_value=50, vol_value=90, playlist=playlist, tui_cursor=[0, 3])
     #cursor [instrument, quareternote]

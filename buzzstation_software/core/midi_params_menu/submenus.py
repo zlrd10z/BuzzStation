@@ -1,6 +1,6 @@
 from libs.keypad import Keypad
-from gui.midi_params_menu import sliders
-from gui import scrmx
+from tui.midi_params_menu import sliders
+from tui import scrmx
 from core.song_data import SongData
 import os
 
@@ -9,7 +9,7 @@ TEMPORARY TEST FUNCTIONS
 '''
 clear_screen = lambda: os.system('clear')
 
-def gui_sliders(title, slider_selected, instruction, percents):
+def tui_sliders(title, slider_selected, instruction, percents):
     title += ':'
     screen_matrix = scrmx.create_screen_matrix()
     scrmx.fill_matrix(screen_matrix)
@@ -68,7 +68,7 @@ def main(keypad, song_data, track, title):
         instruction = 'Press [Insert] to increase slider movement'
 
     clear_screen()
-    gui_sliders(title, slider_selected, instruction, subcategory_params)
+    tui_sliders(title, slider_selected, instruction, subcategory_params)
 
     # Main loop:
     while True:
@@ -117,7 +117,7 @@ def main(keypad, song_data, track, title):
                 break
             # Update screen:
             clear_screen()
-            gui_sliders(title, slider_selected, instruction, subcategory_params)
+            tui_sliders(title, slider_selected, instruction, subcategory_params)
 
 if __name__ == '__main__':
     keypad = Keypad()

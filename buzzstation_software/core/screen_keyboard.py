@@ -1,4 +1,4 @@
-from gui.txtcolor import text_font_color, text_bg_color
+from tui.txtcolor import text_font_color, text_bg_color
 import sys
 import os
 

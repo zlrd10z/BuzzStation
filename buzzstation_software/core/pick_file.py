@@ -1,6 +1,6 @@
 import os, sys
 import subprocess
-from gui.txtcolor import text_font_color, text_bg_color
+from tui.txtcolor import text_font_color, text_bg_color
 from .screen_keyboard import user_input_filename
 from libs.keypad import Keypad 
 

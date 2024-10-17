@@ -1,6 +1,6 @@
 from libs.keypad import Keypad
 import os
-from gui.midi_params_menu import gui_pick_midi_instrument
+from tui.midi_params_menu import tui_pick_midi_instrument
 
 
 def create_instruments_dic():
@@ -16,7 +16,7 @@ def create_instruments_dic():
 def menu_select_instrument(keys, midi_instruments, instrument_type, midi_output, currently_selected_midi_instrument):
     instruments = list(midi_instruments[instrument_type].keys())
     selected = 0
-    gui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
+    tui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
                                   currently_selected_midi_instrument, instrument_type
                                  )
     while True:
@@ -36,7 +36,7 @@ def menu_select_instrument(keys, midi_instruments, instrument_type, midi_output,
             if key == '1':
                 break
             # Update GUI:
-            gui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
+            tui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
                               currently_selected_midi_instrument, instrument_type
                              )
 
@@ -44,7 +44,7 @@ def menu_instrument_types(keys, midi_instruments, midi_output, currently_selecte
     instrument_types = list(midi_instruments.keys())
     selected = 0
     result = None
-    gui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
+    tui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
                   currently_selected_midi_instrument
                  )
     while True:
@@ -64,7 +64,7 @@ def menu_instrument_types(keys, midi_instruments, midi_output, currently_selecte
             # Esc Key:
             if key == '1':
                 break
-            gui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
+            tui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
                               currently_selected_midi_instrument
                              )
     

@@ -1,5 +1,5 @@
-from gui.txtcolor import text_bg_color
-from gui.txtcolor import text_font_color
+from tui.txtcolor import text_bg_color
+from tui.txtcolor import text_font_color
 
 GUI_HEIGHT = 17
 GUI_WIDTH = 64

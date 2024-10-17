@@ -1,8 +1,8 @@
-from gui.scrmx import create_screen_matrix
-from gui.scrmx import fill_matrix
-from gui.scrmx import print_screen_matrix
-from gui.txtcolor import text_bg_color
-from gui.txtcolor import text_font_color
+from tui.scrmx import create_screen_matrix
+from tui.scrmx import fill_matrix
+from tui.scrmx import print_screen_matrix
+from tui.txtcolor import text_bg_color
+from tui.txtcolor import text_font_color
 
 GUI_HEIGHT = 17
 GUI_WIDTH = 64

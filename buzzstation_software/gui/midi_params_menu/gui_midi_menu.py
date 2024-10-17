@@ -1,6 +1,5 @@
 from gui.scrmx import create_screen_matrix
 from gui.scrmx import fill_matrix
-from gui.scrmx import bg_color
 from gui.scrmx import print_screen_matrix
 from gui.txtcolor import text_bg_color
 from gui.txtcolor import text_font_color
@@ -11,6 +10,13 @@ GUI_WIDTH = 64
 chg_bgd_clr = lambda text: text_bg_color('blue', text)
 # Format displayed text, so it looks like selected by cursor:
 txt_color_sel = lambda text: text_bg_color('white', text_font_color('black', text)) 
+
+# Fill screen with blue color:
+def bg_color(screen_matrix):
+    for y in range(len(screen_matrix)):
+        for x in range(len(screen_matrix[y])):
+            screen_matrix[y][x] = chg_bgd_clr(' ') 
+    return screen_matrix
 
 # Draw window title and separate it from the rest of data:
 def draw_win_title(screen_matrix, track):
@@ -46,7 +52,7 @@ def draw_options(screen_matrix, midi_out_chnl, selected_midi_instrument, selecte
         addition_text[i] = addition_text[i] + ' '*n
 
     texts = ['MIDI output: ', 'MIDI channel: ' , 'MIDI Instrument: ', 'Sound Envelopes',]
-    texts = texts + ['Filter', 'Chorus', 'Phaser', 'Reverb']
+    texts = texts + ['Filter', 'Chorus', 'Phaser', 'Reverb', 'Delay']
     for i in range(len(texts)):
         if i < 3:
             for j in range(len(texts[i])):

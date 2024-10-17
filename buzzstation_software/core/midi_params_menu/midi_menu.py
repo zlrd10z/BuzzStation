@@ -1,7 +1,9 @@
 from gui.midi_params_menu import gui_midi_menu
+from core.midi_params_menu import submenus
 from . import pick_midi_instrument
 import os
 
+clear_screen = lambda: os.system('clear')
 
 def plus_minus_keys(song_data, key, selected, track):
     midi_outputs = song_data.get_data('playlist_list_of_instruments')
@@ -36,6 +38,9 @@ def plus_minus_keys(song_data, key, selected, track):
 
 def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Synth Pad 1', 44), track=1):
 
+    menu_categories = ['MIDI output: ', 'MIDI channel: ' , 'MIDI Instrument: ', 'Sound Envelopes',]
+    menu_categories = menu_categories + ['Filter', 'Chorus', 'Phaser', 'Reverb','Delay']
+
     #for testing
     midi_outputs = song_data.get_data('playlist_list_of_instruments')
     midi_outputs[track] = midi_out_chnl
@@ -44,7 +49,7 @@ def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Syn
 
     selected_midi_instrument = selected_midi_instrument[0]
     selected = 0
-    clear = lambda: os.system('clear')
+    clear_screen()
     gui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)
     # main loop:
     while True:
@@ -53,7 +58,7 @@ def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Syn
             # Direction keys:
             if key == '2' and selected - 1 >= 0:
                 selected -= 1
-            if key == '8' and selected + 1 < 8:
+            if key == '8' and selected + 1 < 9:
                 selected += 1
             # [Esc] key - abort:
             if key == '1':
@@ -64,13 +69,17 @@ def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Syn
                     midi_out_chnl = plus_minus_keys(song_data, key, selected, track)
             # [Insert] key or [E] edit key - accept / proceed:
             if key == '5' or key == '3':
-                match selected:
-                    case 2:
-                        midi_instruments = song_data.get_data('playlist_list_of_midi_assigned')
-                        tmp_selected_midi_instrument = pick_midi_instrument.main(keypad, midi_out_chnl, selected_midi_instrument)
-                        if tmp_selected_midi_instrument is not None:
-                            midi_instruments[track] = selected_midi_instrument = tmp_selected_midi_instrument[0]
-                            song_data.put_data('playlist_list_of_midi_assigned', midi_instruments)
-            #clear = lambda: os.system('clear')
-            gui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)
+                if selected == 2:
+                    midi_instruments = song_data.get_data('playlist_list_of_midi_assigned')
+                    tmp_selected_midi_instrument = pick_midi_instrument.main(keypad, midi_out_chnl, selected_midi_instrument)
+                    if tmp_selected_midi_instrument is not None:
+                        midi_instruments[track] = selected_midi_instrument = tmp_selected_midi_instrument[0]
+                        song_data.put_data('playlist_list_of_midi_assigned', midi_instruments)
+                elif selected > 2:
+                    category = menu_categories[selected]
+                    submenus.main(keypad, song_data, track, category)
 
+
+
+            clear_screen()
+            gui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)

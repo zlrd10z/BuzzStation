@@ -11,6 +11,12 @@ unsigned char stop_transsmision_byte = 244;
 unsigned char byte_midi_output_2 = 245;
 unsigned char byte_midi_output_3 = 246;
 unsigned char byte_all_notes_off = 247;
+unsigned char singal_bytes_array[4] = {stop_transsmision_byte, 
+                                       byte_midi_output_2, 
+                                       byte_midi_output_3, 
+                                       byte_all_notes_off
+                                      };
+
 
 SoftwareSerial softSerial(3, 2); // Digital ports as 2 (RX) and 3 (TX)
 
@@ -42,64 +48,85 @@ void receive_data() {
 // Process data from the buffer, then route the data to MIDI output 2 or output 3
 void process_data() {
   int index = 0;
+  bool send_two;
+  bool send_three;
   while (index < buffer_position) {
     if (buffer[index] == stop_transsmision_byte) {
       // Stop byte detected, end of message
       break;
     }
     else if (buffer[index] == byte_all_notes_off){
-      all_notes_off()
+      all_notes_off();
+      index += 1;
     }
-    else if (buffer[index] == byte_midi_output_2) {
-      if (index + 3 < buffer_position) {
-        play_note_midi2(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
-        index += 4;
-      } 
-      else if(index + 2 < buffer_position){
-        program_change_midi2(buffer[index + 1], buffer[index + 2]);
+
+    //Check how long this single signal is:
+    send_two = false;
+    send_three = false;
+    for (int i = 0; i++; i < 4){
+      if (buffer[index+3] == singal_bytes_array[i]){
+        send_two == true;
+        break;
+      }
+      else if (buffer[index+4] == singal_bytes_array[i]){
+        send_three = true;
+        break;
+      }
+    }
+
+   if (buffer[index] == byte_midi_output_2) {
+      if(send_two){
+        send_2bytes_output2(buffer[index + 1], buffer[index + 2]);
         index += 3;
       }
+      else if (send_three){
+        send_3bytes_output2(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
+        index += 4;
+      } 
       else {
         // Incomplete message
         break;
       }
-    } else if (buffer[index] == byte_midi_output_3) {
-      if (index + 3 < buffer_position) {
-        play_note_midi3(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
-        index += 4;
-      } 
-      else if(index + 2 < buffer_position){
-        program_change_midi3(buffer[index + 1], buffer[index + 2]);
+    } 
+    else if (buffer[index] == byte_midi_output_3) {
+      if(send_two){
+        send_2bytes_output3(buffer[index + 1], buffer[index + 2]);
         index += 3;
       }
+      else if (send_three){
+        send_3bytes_output3(buffer[index + 1], buffer[index + 2], buffer[index + 3]);
+        index += 4;
+      } 
       else {
         // Incomplete message
         break;
       }
-    } else {
+    }  
+    else {
       index++;
+      //transsmision / proccessing error, try to proceed to next index in order to recover
     }
   }
 }
 
-void play_note_midi2(int channel, int note, int velocity) {
+void send_3bytes_output2(int channel, int note, int velocity) {
   Serial.write(channel);
   Serial.write(note);
   Serial.write(velocity);
 }
 
-void play_note_midi3(int channel, int note, int velocity) {
+void send_3bytes_output3(int channel, int note, int velocity) {
   softSerial.write(channel);
   softSerial.write(note);
   softSerial.write(velocity);
 }
 
-void program_change_midi2(int channel, int value) {
+void send_2bytes_output2(int channel, int value) {
   Serial.write(channel);
   Serial.write(value);
 }
 
-void program_change_midi3(int channel, int value) {
+void send_2bytes_output3(int channel, int value) {
   softSerial.write(channel);
   softSerial.write(value);
 }
@@ -108,8 +135,9 @@ void program_change_midi3(int channel, int value) {
 void all_notes_off(){
   unsigned char note_off_byte = 123;
   unsigned char control_byte = 0;
+  int channel;
   for(int i = 1; i++; i < 17){
-    int channel = 175;
+    channel = 175;
     channel += i;
     unsigned char channel_byte = (unsigned char) channel;
 
@@ -123,4 +151,3 @@ void all_notes_off(){
   }
 
 }
-

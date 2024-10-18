@@ -83,7 +83,7 @@ def main(song_data, selected_output_channel=None):
             if midi_output_channel[1] == '1':
                 midi_output1.send_data(data_to_send)
             else:
-                midi_output2and3.send_data_to_arduino(data_to_send, serial_usb)
+                midi_output2and3.send_data_to_arduino(data_to_send)
 
 if __name__ == '__main__':
     # Tests
@@ -96,5 +96,5 @@ if __name__ == '__main__':
                'Sustain' : 30, 
                'Release' : 14
               }
-    song_data.midi_misc_settings_operations('update', 1, serial_usb, 'Sound Envelopes')
+    song_data.midi_misc_settings_operations('update', 1, new_value, 'Sound Envelopes')
     main(song_data)

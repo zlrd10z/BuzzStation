@@ -56,8 +56,6 @@ class SongData:
             self.__samples_volume.append(10)
             self.__samples_volume.append(10)
         #================================================
-        # opened serialUSB
-        serial_usb = None
 
         # Append with default instruments:
         for midi in range(1, 4):

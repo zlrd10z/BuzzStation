@@ -39,6 +39,10 @@ class SongData:
         self.__samples_volume = [10, 10]
         self.__drums_last_added_note = ['C5', 'F']
 
+        #================================================
+        # Queues:
+        self.__queue_midi = None    
+
         #==================================================
         # Pianoroll patterns:
         self.__pianoroll_patterns = {}
@@ -55,7 +59,6 @@ class SongData:
             self.__samples_temp.append('Empty')
             self.__samples_volume.append(10)
             self.__samples_volume.append(10)
-        #================================================
 
         # Append with default instruments:
         for midi in range(1, 4):

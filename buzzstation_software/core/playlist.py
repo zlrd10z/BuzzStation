@@ -324,9 +324,11 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                     if temp_song_data is not None:
                         song_data = temp_song_data
                 elif selected == 2:
-                    #new song: clear all previous data
+                    #new song: clear all previous data without serial_usb
+                    serial_usb = song_data.get_data('serial_usb')
                     song_data = SongData()
                     create_empty_song_playlist(song_data)
+                    song_data.put_data('serial_usb', serial_usb)
                     time.sleep(0.1) #to properly reload potentiometers on I2C
                 thread_pots = Thread(target=pots_operations, args=[song_data])
                 thread_pots.start()

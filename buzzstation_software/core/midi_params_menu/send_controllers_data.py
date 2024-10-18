@@ -83,7 +83,7 @@ def main(song_data, selected_output_channel=None):
             if midi_output_channel[1] == '1':
                 midi_output1.send_data(data_to_send)
             else:
-                midi_output2and3.send_data_to_arduino(data_to_send)
+                midi_output2and3.send_data_to_arduino(song_data, data_to_send)
 
 if __name__ == '__main__':
     # Tests

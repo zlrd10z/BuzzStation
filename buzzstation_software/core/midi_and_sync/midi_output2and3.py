@@ -1,5 +1,6 @@
 import serial
 import time
+import threading
 
 serial_usb = serial.Serial('/dev/ttyUSB0', 31250)
 
@@ -10,16 +11,19 @@ byte_all_notes_off = 247
 
 # Note on: 144 - channel 1; 72 - note C5; 100 - volume 
 # byte_note_c5 = bytes([144, 72, 50])
+lock = threading.Lock()
 
-def send_data_to_arduino(data, output=None):
-    try:
-        if output == 2:
-            data = byte_midi_output_2 + data
-        if output == 3:
-            data = byte_midi_output_3 + data
-        data.append(stop_byte)
-        data = bytes(data)        
-        # Sending data to arduino:
-        serial_usb.write(data)      
-    except Exception as exception:
-        print(exception)
+def send_data_to_arduino(song_data, data, output=None):
+    serial_usb = song_data.get_data('serial_usb')
+    with lock:
+        try:
+            if output == 2:
+                data = byte_midi_output_2 + data
+            if output == 3:
+                data = byte_midi_output_3 + data
+            data.append(stop_byte)
+            data = bytes(data)        
+            # Sending data to arduino:
+            serial_usb.write(data)      
+        except Exception as exception:
+            print(exception)

@@ -1,5 +1,6 @@
 import serial
 import time
+import threading 
 
 NOTE_OFF_BYTE = bytes([123, 0])
 
@@ -8,17 +9,20 @@ uart = serial.Serial(
     baudrate=31250  
 )
 
+lock = threading.Lock()
+
 def send_data(data):
-    try:
-        if not uart.is_open:
-            uart.open()  
-        uart.write(data)  
+    with Lock()
+        try:
+            if not uart.is_open:
+                uart.open()  
+            uart.write(data)  
 
-    except KeyboardInterrupt as exception:
-        print(exception)                
+        except KeyboardInterrupt as exception:
+            print(exception)                
 
-    finally:
-        uart.close()   
+        finally:
+            uart.close()   
 
 def all_notes_off():
     channel1_noteoff = 176

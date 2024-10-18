@@ -21,15 +21,13 @@ def main():
     # Create objects:
     keys = Keypad()
     song_data = SongData()
-    # Create another process for midi processing:
-    queue_midi = multiprocessing.Queue
-    proc_midi = multiprocessing.Process(target=midi_sender, args=(queue_midi,))
-    proc_midi.start()
-    song_data.put_data('queue_midi', queue_midi)
-    #Create thread for potentiometers:
+    # Create serial_usb:
+    serial_usb = serial.Serial('/dev/ttyUSB0', 31250)
+    song_data.put_data('serial_usb', serial_usb)
+    # Create thread for potentiometers:
     thread_pots = Thread(target=pots_operations, args=[song_data])
     thread_pots.start()
-    #main loop:
+    # Playlist Loop:
     playlist.main(keys, song_data)
 
 if __name__ == "__main__":

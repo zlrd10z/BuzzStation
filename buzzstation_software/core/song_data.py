@@ -14,7 +14,8 @@ class SongData:
         self.__is_playing = False #true - playing, false - pause
         self.__is_song_playing = False #true: playing song, false: playing pattern
         self.__instrument_played = None
-        
+        self.__serial_usb = None
+
         #==================================================
         # Curosrs:
         self.__playlist_cursor = [0, 0]
@@ -41,7 +42,7 @@ class SongData:
 
         #================================================
         # Queues:
-        self.__queue_midi = None    
+        self.__queue_player = None    
 
         #==================================================
         # Pianoroll patterns:

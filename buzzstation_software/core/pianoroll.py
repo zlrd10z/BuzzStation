@@ -16,9 +16,10 @@ def create_empty_pattern():
 
 def delete_from_pattern(pattern, beat, note):
     if len(pattern[beat]) > 0:
-        for i in range(len(pattern[beat])):
+        for i in range(len(pattern[beat]) - 1, -1, -1):
             if pattern[beat][i] == note:
                 pattern[beat].pop(i)
+                break
 
 def tui(song_data, pattern_number, midi_and_channel, 
         selected_note, selected_beat, pattern, selected_menu_button
@@ -313,6 +314,7 @@ def clear_key(song_data, pattern_number, midi_and_channel,
               selected_note_and_octave, selected_beat,
               track, screen_matrix, keypad
 ):
+    song_data.put_data('is_playing', False)
     ok_selected = warning_window.main(keypad, screen_matrix, 'clear pattern')
     if ok_selected:
         # Clear pattern:
@@ -384,7 +386,7 @@ def main(keypad, song_data, pattern_number, midi_and_channel, track):
     previous_values = [None, None]
     # put data requried to playing pattern in pattern play mode:
     song_data.put_data('playing_pattern', pattern_number)
-    song_data.put_data('playing_track', track)
+    song_data.put_data('playing_track', track+1)
     
     # main loop:
     while True:
@@ -405,16 +407,18 @@ def main(keypad, song_data, pattern_number, midi_and_channel, track):
             # Escape key:
             if key == '1':
                 song_data.put_data('is_playing', False)
-                song_data.put_data('is_song_playing', True)
+                song_data.put_data('is_song_playing', False)
                 song_data.put_data('instrument_played', None)
+                key = ''
                 break
             # play/pause key:
             if key == '*':
                 is_playing = song_data.get_data('is_playing')
+                pattern_exist = song_data.pianoroll_pattern_operations('exists', track, pattern_number)
                 if is_playing:
                     song_data.put_data('is_playing', False)
                     song_data.put_data('instrument_played', None)
-                else:
+                elif not is_playing and pattern_exist:
                     song_data.put_data('instrument_played', track)
                     song_data.put_data('is_playing', True)
             # Insert / accept key:

@@ -27,7 +27,8 @@ def send_data(data):
 def all_notes_off():
     channel1_noteoff = 176
     for i in range(16):
-        channel = bytes[(channel1_noteoff + i)]
+        channel = channel1_noteoff + i
+        channel = bytes([channel])
         send_data(channel + NOTE_OFF_BYTE)
 
 # For hardware/software testing purpose:        

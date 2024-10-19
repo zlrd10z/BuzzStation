@@ -53,13 +53,13 @@ def play_pattern(song_data, send_to_player, nmc):
     even = False
     def wait_for_next_quarter(song_data):
         nonlocal even
-        #time_between_quarters = song_data.get_data('time_between_quarter_notes')
-        time_between_quarters = 0.1
+        time_between_quarters = song_data.get_data('time_between_quarter_notes')
+        swing_to_time = time_between_quarters * (song_data.get_data('swing') / 100)
         if even:
-            time_between_quarters - song_data.get_data('swing')
+            time_between_quarters -= swing_to_time
             even = False
         else:
-            time_between_quarters + song_data.get_data('swing')
+            time_between_quarters += swing_to_time
             even = True
         time.sleep(time_between_quarters)
 
@@ -89,7 +89,6 @@ def play_pattern(song_data, send_to_player, nmc):
                 break
     
     def play_midi(song_data, track_number, pattern_number, nmc):
-        #for each quarter:
         pattern = song_data.pianoroll_pattern_operations('get pattern for single track', track_number, pattern_number)
         pattern_notes_to_turn_off = song_data.pianoroll_pattern_operations(operation = 'get pattern for single track', 
                                                                            track = track_number, 
@@ -119,7 +118,21 @@ def play_pattern(song_data, send_to_player, nmc):
             # turn off notes:
             if len(pattern_notes_to_turn_off[q]) > 0:
                 notes = pattern_notes_to_turn_off[q]
+                for n in range(len(notes)):
+                    note = notes[n]
+                    note_in_bytes = nmc.get_note_in_bytes(note)
+                    vol_in_bytes = bytes([0])
+                    midi_data = midi_channel + note_in_bytes + vol_in_bytes
+                    if midi_output == 1:
+                        midi_output1.send_data(midi_data)
+                    else:
+                        midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
+
+
             if not should_continue_playing(song_data):
+                midi_output1.all_notes_off()
+                #247 - msg to arduino - all notes off byte
+                midi_output2and3.send_data_to_arduino(song_data, bytes([247]), output=None) 
                 break
 
     pattern_number = song_data.get_data('playing_pattern')

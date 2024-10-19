@@ -1,8 +1,8 @@
 from threading import Thread
 import time
-from . import midi_output1
-from . import midi_output2and3
-from . import sync
+from core.midi_and_sync import midi_output1
+from core.midi_and_sync  import midi_output2and3
+from core.midi_and_sync  import sync
 from core.player_proc import SendToPlayer
 
 # bytes used to communication with arduino:
@@ -202,8 +202,9 @@ def main_loop(song_data):
     while True:
         if song_data.get_data('is_playing') and song_data.get_data('is_song_playing'):
             #play_song(song_data)
+            pass
         elif song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
-            play_pattern(song_data, track_number, pattern_number, send_to_player, nmc)
+            play_pattern(song_data, send_to_player, nmc)
         else:
             time.sleep(0.1)
 

@@ -25,6 +25,7 @@ def player_audiofiles(queue_player):
                     channel.stop()
             # Update sample path:
             case 2:
+                print(data)
                 sample_number = data[1]
                 sample_path = data[2]
                 sample_path = temp_dir + sample_path + '_C5'
@@ -48,7 +49,7 @@ def player_audiofiles(queue_player):
 # function in this class communicates via queue with player_audiofiles() working in another process
 class SendToPlayer:
     def __init__(self, queue_player):
-        self.__queue_player
+        self.__queue_player = queue_player
 
     def stop_playing(self):
         queue_player = self.__queue_player
@@ -70,7 +71,7 @@ class SendToPlayer:
         data = (option, sample_number, new_sample_path)
         queue_player.put(data)
 
-    def update_all_samples(self, sample_paths)
+    def update_all_samples(self, sample_paths):
         queue_player = self.__queue_player
         '''
         option 3: Send communicate, that all of the samples should be replaced,
@@ -80,7 +81,7 @@ class SendToPlayer:
         data = (option, sample_paths)
         queue_player.put(data)
 
-    def play_note(self, sample_number, vol)
+    def play_note(self, sample_number, vol):
         queue_player = self.__queue_player
         option = 4
         '''

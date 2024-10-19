@@ -6,7 +6,7 @@ from core.pick_file import get_filename
 from core import convert_audio_to_temp
 import os
 import copy
-
+from core.player_proc import SendToPlayer
 
 #lambdas:
 clear_screen = lambda: os.system('clear')

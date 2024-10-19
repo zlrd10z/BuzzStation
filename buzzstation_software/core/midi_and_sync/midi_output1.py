@@ -12,7 +12,7 @@ uart = serial.Serial(
 lock = threading.Lock()
 
 def send_data(data):
-    with Lock()
+    with lock:
         try:
             if not uart.is_open:
                 uart.open()  

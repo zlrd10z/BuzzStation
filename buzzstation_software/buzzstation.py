@@ -8,6 +8,7 @@ from core.player_proc import player_audiofiles
 import time
 import os
 from core import player
+import serial
 
 
 # Remove all temporary audio files from .temp directory:
@@ -38,7 +39,7 @@ def main():
     thread_pots.start()
 
     # Create thread for note player:
-    thread_player = Thread(target=player.mainloop, args=[song_data])
+    thread_player = Thread(target=player.main_loop, args=[song_data])
     thread_player.start()
 
     # Playlist Loop:

@@ -101,7 +101,7 @@ def print_filelist():
     how_many_lines_visible = 15        
     
     # when there is less than 15 lines to display:
-    if len(ls) < how_many_lines_visible:
+    if len(ls) < how_many_lines_visible and len(ls) > 0:
         for i in range(len(ls)):
             toprint = str(ls[i])
             if toprint == str(ls[selected]):
@@ -166,6 +166,8 @@ def get_filename(selected_option, keypad):
     global p
     global screen_changed
     global option
+    global selected
+    selected = 0
     option = selected_option
     p = PWD()
     load_directory()
@@ -173,7 +175,6 @@ def get_filename(selected_option, keypad):
     print_filelist()
     
     global key
-    global selected
     path_to_selected_file = None
     while True:
         pressed_key =  k.check_keys()

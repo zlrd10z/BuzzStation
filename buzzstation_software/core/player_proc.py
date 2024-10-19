@@ -42,7 +42,6 @@ def player_audiofiles(queue_player):
                 data = data[1]
                 sample_number = data[0]
                 vol = data[1]
-                print(vol)
                 if samples[sample_number] is not None:
                     channels[sample_number].set_volume(vol)
                     channels[sample_number].play(samples[sample_number])

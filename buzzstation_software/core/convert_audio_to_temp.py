@@ -1,15 +1,42 @@
 from pydub import AudioSegment
 import os
+from decimal import Decimal
 
 
-def convert_to_pygame_format(input_path):
+# transorm note to speed for pygame mixer
+def note_to_speed(note_n_octave):
+    notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    note = note_n_octave[:2]
+    octave = int(note_n_octave[-1])
+    # result of 2 / 11, differnce is speed of note vibration between two quarter notes:
+    quarter_speed_diff = Decimal('0.18181818181818181818181818181818181818181818181818')
+    #5 as default refernce octave:
+    octave_diff = octave - 5
+    if octave_diff > 0:
+        octave_speed = octave_diff * 2
+    elif octave_diff < 0:
+        octave_speed = 1 / (abs(octave_diff) * 2)
+    else:
+        octave_speed = 0
+    n = notes.index(note)
+    note_speed = n * quarter_speed_diff + octave_speed
+    return note_speed
+
+def convert_to_pygame_format(input_path, note_n_octave='C5'):
     cwd = os.getcwd()
     filename = input_path.split('/')[-1] #get filename from path
     filename = filename.split('.')[0] #extract filename without extension
-    output_path = cwd + '/.temp/' + filename + ".wav"
+    filename += '_' + note_n_octave
+    output_path = cwd + '/.temp/' + filename
 
     audio = AudioSegment.from_file(input_path)
-    
+
+    # Apply speed change
+    if note_n_octave != 'C5':
+        speed_factor = note_to_speed(note_n_octave)
+        new_frame_rate = int(audio.frame_rate * speed_factor)
+        audio = audio._spawn(audio.raw_data, overrides={'frame_rate': new_frame_rate})
+
     # Convert to pygame settings (44100 Hz, 16-bit, stereo)
     audio = audio.set_frame_rate(44100)  
     audio = audio.set_sample_width(2)  #16-bit
@@ -18,4 +45,4 @@ def convert_to_pygame_format(input_path):
     #save as wav
     audio.export(output_path, format='wav')
     
-    return output_path
+    return filename

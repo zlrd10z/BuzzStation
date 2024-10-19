@@ -15,6 +15,8 @@ class SongData:
         self.__is_song_playing = False #true: playing song, false: playing pattern
         self.__instrument_played = None
         self.__serial_usb = None
+        self.__playing_track = 0
+        self.__playing_pattern = 1 
 
         #==================================================
         # Curosrs:

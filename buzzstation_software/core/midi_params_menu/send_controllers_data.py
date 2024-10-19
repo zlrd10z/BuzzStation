@@ -5,6 +5,7 @@ from core.midi_and_sync import midi_output2and3
 CHANNEL_CHG = 175 #176 for channel 1 and so on up to channel 16
 BYTE_MIDI_OUT_2 = bytes([245])
 BYTE_MIDI_OUT_2 = bytes([246])
+STOP_BYTE = 
 
 #Controlers and it's bytes:
 #param_collection     #param_category     #param: param_byte
@@ -46,7 +47,7 @@ This function sends all contorller data, like for filters and reverb via MIDI ou
 #scale numbers from 0-100 range to 0-127:
 scale_percents_to_byte = lambda x: bytes([int((127 / 100) * x)])
 
-def main(song_data, selected_output_channel=None):
+def send_rest(song_data, selected_output_channel=None):
     params_collection = song_data.get_data('midi_misc_settings')
     midi_outputs = [*params_collection]
     ins = song_data.get_data('playlist_list_of_instruments')
@@ -85,16 +86,18 @@ def main(song_data, selected_output_channel=None):
             else:
                 midi_output2and3.send_data_to_arduino(song_data, data_to_send)
 
-if __name__ == '__main__':
-    # Tests
-    song_data = SongData()
-    ins = song_data.get_data('playlist_list_of_instruments')
-    ins[1] = 'M1c1'
-    song_data.put_data('playlist_list_of_instruments', ins)
-    new_value = {'Attack' : 100, 
-               'Delay' : 80, 
-               'Sustain' : 30, 
-               'Release' : 14
-              }
-    song_data.midi_misc_settings_operations('update', 1, new_value, 'Sound Envelopes')
-    main(song_data)
+# sending assigned midi instruments to channels via midi outputs:
+def send_midi_instruments(song_data):
+    channel = 191
+    midi_instruments = song_data.get_data('playlist_list_of_midi_assigned')
+    instruments = song_data.get_data('playlist_list_of_instruments')
+    for i in range(1, len(midi_instruments)):
+        midi_output_and_channel = instruments[i]
+        midi_instrument = bytes([midi_instruments[instrument][1]])
+        midi_output = midi_output_and_channel[1]
+        midi_channel = midi_output_and_channel[3:]
+        if midi_output == '1':
+            midi_output1.send_data(bytes([191 + midi_channel, midi_instrument]))
+        else:
+            midi_output = int(midi_output)
+            midi_output2and3.send_data_to_arduino(song_data, bytes([191 + midi_channel, midi_instrument]), midi_output)

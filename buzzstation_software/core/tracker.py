@@ -355,7 +355,7 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
     return result
 
 # key with [insert] sticker on it - accept / insert key:
-def insert_key(song_data, tracker_cursor, keys, pattern, pattern_number):
+def insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern_number):
     # If cursor is on samples level, insert sample / change sample to other one:
     if tracker_cursor[1] == 0:
         # Choose sample from disk with get_filename function and get path to choosen sample:
@@ -367,11 +367,12 @@ def insert_key(song_data, tracker_cursor, keys, pattern, pattern_number):
             song_data.put_data('samples', samples)
             # generate temp sample file adjusted for pygame mixer settings:
             samples_temp = song_data.get_data('samples_temp')
-            temp_sample_path = convert_audio_to_temp.convert_to_pygame_format(sample_path)
-            samples_temp[tracker_cursor[0]] = temp_sample_path
+            temp_sample_name = convert_audio_to_temp.convert_to_pygame_format(sample_path)
+            samples_temp[tracker_cursor[0]] = temp_sample_name
             song_data.put_data('samples_temp', samples_temp)
-            # put path and info for player which sample changed:
-            song_data.put_data('last_changed_sample', (temp_sample_path, tracker_cursor[0]))
+            # send info to audio player, which sample changed and it's name:
+            send_to_player.update_sample(tracker_cursor[0], temp_sample_name)
+
     # if cursor is on playlist:
     elif tracker_cursor[1] > 0:
         # if note is empty, add last added note:
@@ -413,6 +414,9 @@ def main(keys, song_data, pattern_number):
     )
     
     song_name = song_data.get_data('song_name')
+    # put data requried to playing pattern in pattern play mode:
+    song_data.put_data('playing_pattern', pattern_number)
+    song_data.put_data('playing_track', 0)
 
     volume_string_list = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
     tracker_cursor = [0, 0, 0]
@@ -426,6 +430,10 @@ def main(keys, song_data, pattern_number):
     # Load samples and pattern:
     samples = song_data.get_data('samples')
     pattern = song_data.drums_pattern_operations('get pattern', pattern_number)
+
+    # communication with player audio process:
+    queue_player = song_data.get_data('queue_player')
+    send_to_player = SendToPlayer(queue_player)
 
     while True:
         #Check if any value from potentiometers, and if it's true, it's displaying new value on screen: 
@@ -466,7 +474,7 @@ def main(keys, song_data, pattern_number):
                 pattern = plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_list, pattern_number)
             # [Insert] key:
             elif key == '5':
-                temp_pattern = insert_key(song_data, tracker_cursor, keys, pattern, pattern_number)
+                temp_pattern = insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern_number)
                 if temp_pattern is not None:
                     pattern = temp_pattern
                 samples = song_data.get_data('samples')

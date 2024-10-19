@@ -13,6 +13,7 @@ from . import convert_audio_to_temp
 from threading import Thread
 from core.potentiometers_operations import pots_operations
 from core.midi_params_menu import midi_menu
+from core.player_proc import SendToPlayer
 
 
 # Lambdas:
@@ -75,6 +76,7 @@ def save_song(song_data, keypad):
             pickle.dump(song_data, file_btp)
 
 def load_song(song_data, keypad):
+    send_to_player = SendToPlayer()
     path_to_file = pick_file.get_filename('load song', keypad)
     if path_to_file is not None:
         with open(path_to_file, 'rb') as file_btp:
@@ -82,9 +84,11 @@ def load_song(song_data, keypad):
         clear_temp()
         # Create temporary audio files adjusted for pygame mixer settings:
         samples = song_data.get_data('samples')
-        for sample in samples:
-            if sample != 'Empty':
-                convert_audio_to_temp.convert_to_pygame_format(sample)
+        samples_temp = song_data.get_data('samples_temp')
+        for i in range(len(samples)):
+            if samples[i] != 'Empty':
+                samples_temp[i] = convert_audio_to_temp.convert_to_pygame_format(samples[i])
+        song_data.put_data('samples_temp', samples_temp)
         # Set song loaded flag for True, this flag is used for update samples list in player in another process
         song_data.put_data('song_loaded', True)
         return song_data
@@ -315,6 +319,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
         ok_selected = warning_window.main(keypad, screen_matrix, warning_text)
         if ok_selected:            
             if selected == 1 or selected == 2:
+                # Send info to potetniometer thread, that is need to stop, beacuse new song_data is loaded
                 song_data.put_data('song_data_change', True)
                 while not song_data.get_data('song_data_change'):
                     pass #Wait to potentiometrs thread to end
@@ -324,14 +329,20 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                     if temp_song_data is not None:
                         song_data = temp_song_data
                 elif selected == 2:
-                    #new song: clear all previous data without serial_usb
+                    # new song: clear all previous data without serial_usb
                     serial_usb = song_data.get_data('serial_usb')
                     song_data = SongData()
                     create_empty_song_playlist(song_data)
                     song_data.put_data('serial_usb', serial_usb)
                     time.sleep(0.1) #to properly reload potentiometers on I2C
+                # Create new pots thread:
                 thread_pots = Thread(target=pots_operations, args=[song_data])
                 thread_pots.start()
+                # Update samples in player in another process:
+                samples_temp = song_data.get_data('samples_temp')
+                queue_player = song_data.get_data('queue_player')
+                send_to_player = SendToPlayer(queue_player)
+                send_to_player.update_all_samples(samples_temp)
             elif selected == 3:
                 # Clear entire playlist:
                 song_playlist = song_data.get_data('song_playlist')

@@ -2,7 +2,6 @@ import serial
 import time
 import threading
 
-serial_usb = serial.Serial('/dev/ttyUSB0', 31250)
 
 stop_byte = 244
 byte_midi_output_2 = 245

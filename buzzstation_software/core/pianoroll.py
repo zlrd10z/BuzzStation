@@ -382,6 +382,9 @@ def main(keypad, song_data, pattern_number, midi_and_channel, track):
                                                target_notes_to_turn_off = True
                                               )
     previous_values = [None, None]
+    # put data requried to playing pattern in pattern play mode:
+    song_data.put_data('playing_pattern', pattern_number)
+    song_data.put_data('playing_track', track)
     
     # main loop:
     while True:

@@ -33,6 +33,7 @@ def main():
     queue_player = multiprocessing.Queue()
     song_data.put_data('queue_player', queue_player)
     proc_player = multiprocessing.Process(target=player_audiofiles, args=(queue_player,))
+    proc_player.start()
 
     # Create thread for potentiometers:
     thread_pots = Thread(target=pots_operations, args=[song_data])

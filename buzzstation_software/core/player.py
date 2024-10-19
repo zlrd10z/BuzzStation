@@ -28,10 +28,10 @@ def convert_midi_vol_to_bytes(vol):
     midi_volume = bytes([midi_volume])
     return midi_volume
 
-#converting volume from hex scale to 1-127 scale
+#converting volume from hex scale to 1-100 scale
 def convert_tracker_volume(vol):
-    vol = tracker_volumes.index(vol)
-    vol = int((vol / 16) * 127)
+    vol = tracker_volumes[vol]
+    vol = int((vol / 16) * 100)
     return vol
 
 class NoteMidiConverter:
@@ -79,7 +79,7 @@ def play_pattern(song_data, send_to_player, nmc):
             for s in range(16):
                 if len(pattern[s][q]) > 0:
                     note = pattern[s][q]
-                    vol = note[1]
+                    vol = convert_tracker_volume(note[1]) # convert hex to to number for int 0 - 16
                     send_to_player.play_note(s, vol)
             if not should_continue_playing(song_data):
                 break

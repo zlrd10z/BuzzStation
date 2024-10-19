@@ -25,10 +25,9 @@ def player_audiofiles(queue_player):
                     channel.stop()
             # Update sample path:
             case 2:
-                print(data)
                 sample_number = data[1]
                 sample_path = data[2]
-                sample_path = temp_dir + sample_path + '_C5'
+                sample_path = temp_dir + sample_path
                 samples[sample_number] = pygame.mixer.Sound(sample_path)
             # Update paths for all of samples
             case 3:
@@ -37,11 +36,13 @@ def player_audiofiles(queue_player):
                     if sample_paths[i] == 'Empty':
                         samples[i] = None
                     else:
-                        sample_path = temp_dir + sample_paths[i] + '_C5'
+                        sample_path = temp_dir + sample_paths[i]
                         samples[i] = pygame.mixer.Sound(sample_path)
             case 4:
-                sample_number = data[1]
-                vol = data[2]
+                data = data[1]
+                sample_number = data[0]
+                vol = data[1]
+                print(vol)
                 if samples[sample_number] is not None:
                     channels[sample_number].set_volume(vol)
                     channels[sample_number].play(samples[sample_number])

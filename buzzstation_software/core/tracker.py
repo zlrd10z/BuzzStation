@@ -67,7 +67,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
     menu_cursor = [0, 0]
     selected = 0
 
-    clear_screen()
+    #clear_screen()
     tuitracker(samples_list=samples, 
                this_pattern=pattern, 
                pattern_number=pattern_number, 
@@ -129,7 +129,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
                 selected = 3
 
             # when key was pressed, display updated GUI:
-            clear_screen()
+            #clear_screen()
             tuitracker(samples_list=samples, 
                this_pattern=pattern, 
                pattern_number=pattern_number, 
@@ -158,7 +158,7 @@ def pots_values_tui(song_data, samples, pattern, pattern_number,
         potentiometers_previous_values[0] = bpm
         potentiometers_previous_values[1] = swing
         potentiometers_previous_values[2] = bvol
-        clear_screen()
+        #clear_screen()
         tuitracker(samples_list=samples, 
                    this_pattern=pattern, 
                    pattern_number=pattern_number, 
@@ -508,7 +508,7 @@ def main(keys, song_data, pattern_number):
                 if new_pattern_number is not None:
                     return new_pattern_number
             # if key was pressed, update displayed tui:
-            clear_screen()
+            #clear_screen()
             tuitracker(samples_list=samples, 
                        this_pattern=pattern, 
                        pattern_number=pattern_number, 

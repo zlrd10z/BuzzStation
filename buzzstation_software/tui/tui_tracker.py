@@ -34,7 +34,6 @@ def draw_frames_and_numbers(first_number, screen_matrix):
         id_number = str(first_number + i)
         #print(id_number)
         i += 1
-
         # Draw Numbers 1-16
         if(len(id_number) > 1):    
             screen_matrix[i][0] = text_bg_color('blue', id_number[0])
@@ -204,9 +203,21 @@ def draw_bpm_vol_swing_values(screen_matrix, bpm_value, swing_value, vol_value):
                 value_to_print = swing_value
             case 2: 
                 value_to_print = vol_value
-        value_to_print = str(value_to_print)
-        how_many_fills = 3 - len(value_to_print)
-        value_to_print = '0'*how_many_fills + value_to_print
+        # swing can varries between -50% and 50%:
+        if i == 1:
+            if value_to_print < 0:
+                sign = '-'
+            else:
+                sign = ' '
+            value_to_print = str(abs(value_to_print))
+            how_many_fills = 2 - len(value_to_print)
+            value_to_print = sign + '0'*how_many_fills + value_to_print
+        else:
+            value_to_print = str(value_to_print)
+            how_many_fills = 3 - len(value_to_print)
+            value_to_print = '0'*how_many_fills + value_to_print
+
+
         for j in range(11):
             if j < 8:
                 screen_matrix[1+i][x+j] = info_text[:1]
@@ -289,10 +300,11 @@ def draw_play_pause(screen_matrix, is_playing=False, playing_mode=False):
     info_text = 'Pause'
     if is_playing: 
         info_text = 'Playing'
-        if playing_mode:
-            info_text += ' [S]'
-        else:
-            info_text += ' [P]'
+    # Add information if Song or Pattern is played    
+    if playing_mode:
+        info_text += ' [S]'
+    else:
+        info_text += ' [P]'
     how_many_fills = ((tui_width - x) - len(info_text)) / 2
     info_text = ' ' * int(how_many_fills) + info_text
 

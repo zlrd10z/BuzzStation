@@ -18,7 +18,7 @@ from core.player_proc import SendToPlayer
 
 # Lambdas:
 clear_screen = lambda: os.system('clear')
-tui_pl = lambda tui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: tui_playlist.main(
+tui_pl = lambda tui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname, is_playing: tui_playlist.main(
                                 list_of_instruments=list_of_instruments,
                                 bpm_value=bpm,
                                 swing_value=swing,
@@ -26,10 +26,11 @@ tui_pl = lambda tui_cursor, playlist, menu_selected, list_of_instruments, bpm, s
                                 playlist=playlist,
                                 tui_cursor=tui_cursor,
                                 menu_selected=menu_selected,
-                                songname=songname
+                                songname=songname,
+                                is_playing=is_playing
                                 )
 
-tui_get_screen_matrix = lambda  tui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname: tui_playlist.main(
+tui_get_screen_matrix = lambda  tui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname, is_playing: tui_playlist.main(
                                 list_of_instruments= list_of_instruments,
                                 bpm_value=bpm,
                                 swing_value=swing,
@@ -38,7 +39,8 @@ tui_get_screen_matrix = lambda  tui_cursor, playlist, menu_selected, list_of_ins
                                 tui_cursor=tui_cursor,
                                 menu_selected=menu_selected,
                                 songname=songname,
-                                printtui=False
+                                printtui=False,
+                                is_playing=is_playing
                                 )
 
 
@@ -133,7 +135,8 @@ def pots_values_tui(song_data, previous_printed_values, playlist_cursor,
                     bpm = bpm, 
                     swing = swing, 
                     bvol = bvol,
-                    songname = song_data.get_data('song_name')
+                    songname = song_data.get_data('song_name'),
+                    is_playing = song_data.get_data('is_playing')
                    )
         previous_printed_values[0] = bpm
         previous_printed_values[1] = swing    
@@ -292,7 +295,8 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                                 bpm=song_data.get_data('bpm'),
                                 swing=song_data.get_data('swing'), 
                                 bvol=song_data.get_data('bvol'),
-                                songname=song_data.get_data('song_name')
+                                songname=song_data.get_data('song_name'),
+                                is_playing = song_data.get_data('is_playing')
                                )
     # Accept choice:
     if selected == 0:
@@ -306,7 +310,8 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                     bpm=song_data.get_data('bpm'),
                     swing=song_data.get_data('swing'), 
                     bvol=song_data.get_data('bvol'),
-                    songname=song_data.get_data('song_name')
+                    songname=song_data.get_data('song_name'),
+                    is_playing = song_data.get_data('is_playing')
                     )
     elif selected > 0:
         if selected == 1:
@@ -366,7 +371,8 @@ def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_ins
                 bpm=song_data.get_data('bpm'),
                 swing=song_data.get_data('swing'), 
                 bvol=song_data.get_data('bvol'),
-                songname=song_data.get_data('song_name')
+                songname=song_data.get_data('song_name'),
+                is_playing = song_data.get_data('is_playing')
                )    
     while True:
         key = keypad.check_keys()
@@ -419,7 +425,8 @@ def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_ins
                             bpm=song_data.get_data('bpm'),
                             swing=song_data.get_data('swing'), 
                             bvol=song_data.get_data('bvol'),
-                            songname=song_data.get_data('song_name')
+                            songname=song_data.get_data('song_name'),
+                            is_playing = song_data.get_data('is_playing')
                             )
                 previous_selected = selected 
 
@@ -429,13 +436,12 @@ def play_pause(song_data):
     if not playing and not playing_song:
         song_data.put_data('is_playing', True)
         song_data.put_data('is_song_playing', True)
+        result = True
     else:
         song_data.put_data('is_playing', False)
         song_data.put_data('is_song_playing', False)
-
-def pause(song_data):
-    song_data.put_data('is_playing', False)
-    song_data.put_data('is_song_playing', False)
+        result = False
+    return result
     
 def main(keypad, song_data):
     create_empty_song_playlist(song_data)
@@ -479,7 +485,8 @@ def main(keypad, song_data):
                                                         bpm=song_data.get_data('bpm'),
                                                         swing=song_data.get_data('swing'), 
                                                         bvol=song_data.get_data('bvol'),
-                                                        songname=song_data.get_data('song_name')
+                                                        songname=song_data.get_data('song_name'),
+                                                        is_playing = song_data.get_data('is_playing')
                                                        )
                 song_playlist = clear_key(keypad, screen_matrix, song_playlist, playlist_cursor)
             # Key with [M] sticker - menu:
@@ -499,7 +506,8 @@ def main(keypad, song_data):
                                 bpm=song_data.get_data('bpm'),
                                 swing=song_data.get_data('swing'), 
                                 bvol=song_data.get_data('bvol'),
-                                songname=song_data.get_data('song_name')
+                                songname=song_data.get_data('song_name'),
+                                is_playing = song_data.get_data('is_playing')
                                 )
             # play button:
             if key == '*':
@@ -540,7 +548,8 @@ def main(keypad, song_data):
                         bpm=song_data.get_data('bpm'),
                         swing=song_data.get_data('swing'), 
                         bvol=song_data.get_data('bvol'),
-                        songname = song_data.get_data('song_name')
+                        songname = song_data.get_data('song_name'),
+                        is_playing = song_data.get_data('is_playing')
                        )    
         
         # Update values in data storage:

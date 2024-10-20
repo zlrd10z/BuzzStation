@@ -156,7 +156,9 @@ def draw_pattern_number(screen_matrix, pattern_number=1):
 
 #draw Swing value, BPM value and MIDI output and channel number
 def draw_swing_bpm_midi(screen_matrix, bpm_value=100, swing_value=40, channel_number=1):
-    text_to_print = 'BPM: ' + str(bpm_value) + 8 * ' ' + 'Swing: ' + str(swing_value) + 8 * ' ' + 'Channel: ' + str(channel_number)
+    text_to_print = 'BPM: ' + str(bpm_value) + (9 - len(str(bpm_value))) * ' '
+    text_to_print += 'Swing: ' + str(swing_value) + (9 - len(str(swing_value))) * ' ' 
+    text_to_print += 'Channel: ' + str(channel_number)
     for i in range(len(text_to_print)):
         screen_matrix[tui_height-1][i+2] = text_bg_color('blue', text_to_print[i])
     return screen_matrix
@@ -175,6 +177,10 @@ def draw_play_pause(screen_matrix, is_playing=False, playing_mode=False):
          playing_sign = '[P]'
         
     axisx_start_printing = int(tui_width / 2 - len(playing_info))
+
+    if is_playing:
+        axisx_start_printing -= 1
+
     for i in range(len(playing_info)):
         screen_matrix[tui_height-3][axisx_start_printing + 1 + i + x] = text_bg_color('blue', playing_info[i])
 

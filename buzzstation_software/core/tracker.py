@@ -359,10 +359,7 @@ def insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern
     # If cursor is on samples level, insert sample / change sample to other one:
     if tracker_cursor[1] == 0:
         # Choose sample from disk with get_filename function and get path to choosen sample:
-        try:
-            sample_path = get_filename('sample', keys)
-        except:
-            sample_path = None
+        sample_path = get_filename('sample', keys)
         if sample_path is not None:
             samples = song_data.get_data('samples')
             # put path to samples list:

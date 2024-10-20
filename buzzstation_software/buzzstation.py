@@ -17,9 +17,19 @@ def clear_temp():
     command = "rm " + cwd + "/.temp/* -f"
     os.system(command)
 
+def default_dirs():
+    cwd = os.getcwd()
+    if not os.path.isdir(cwd + '/samples'):
+        os.system('mkdir ' + cwd + '/samples')
+    if not os.path.isdir(cwd + '/saved_songs'):
+        os.system('mkdir ' + cwd + '/saved_songs')
+
 def main():
     # Clear temp dir:
     clear_temp()
+
+    # Check if default directories for samples and saved songs exists, if not, create them:
+    default_dirs()
 
     # Create objects:
     keys = Keypad()

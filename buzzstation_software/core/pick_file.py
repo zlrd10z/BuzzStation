@@ -21,7 +21,7 @@ def show_cursor():
     sys.stdout.write('\033[?25h')
     sys.stdout.flush()
 
-audio_formats = ['wav', 'mp3']
+audio_formats = ['wav', 'mp3', 'ogg']
 def check_audio_format_compatibility(filename):
     filename = filename.split('.')
     file_format = filename[-1]
@@ -155,8 +155,8 @@ class PWD:
     def update_pwd(self, pwd):
         self.pwd = pwd
 
-def load_directory():
-    pwd = p.pwd
+def load_directory(start_dir=''):
+    pwd = p.pwd + start_dir
     ls = get_filelist(pwd)
     global q
     q = displayed_filelist(ls)
@@ -170,7 +170,12 @@ def get_filename(selected_option, keypad):
     selected = 0
     option = selected_option
     p = PWD()
-    load_directory()
+    if option == 'sample':
+        start_dir = '/samples'
+    else:
+        start_dir = '/saved_songs'
+    p.update_pwd(p.pwd + start_dir)
+    load_directory(start_dir)
     k = keypad
     print_filelist()
     

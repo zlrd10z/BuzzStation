@@ -73,6 +73,8 @@ def play_pattern(song_data, send_to_player, nmc):
     def play_drums(song_data, pattern_number, send_to_player):
         #for each quarter:
         for q in range(16):
+            # Send sync signal through audio jack output:
+            sync.sync_out()
             # get pattern for each note, so notes changes are possible while playing: 
             pattern = song_data.drums_pattern_operations('get pattern', pattern_number)
             # for max 16 samples:
@@ -100,7 +102,9 @@ def play_pattern(song_data, send_to_player, nmc):
         midi_channel = int(midi_ouput_channel[3:])
         midi_channel = convert_notechannel_to_bytes(midi_channel)
         for q in range(16):
-            # for max 16 samples:
+            # Send sync signal through audio jack output:
+            sync.sync_out()
+            # If there is any note to play in quarter: 
             if len(pattern[q]) > 0:
                 notes = pattern[q]
                 for n in range(len(notes)):
@@ -113,7 +117,7 @@ def play_pattern(song_data, send_to_player, nmc):
                     else:
                         midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
 
-            #wait to next quarter note:
+            #wait to next quarter:
             wait_for_next_quarter(song_data)
             # turn off notes:
             if len(pattern_notes_to_turn_off[q]) > 0:

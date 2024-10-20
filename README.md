@@ -30,3 +30,4 @@ Playlist - Matrix with the help of which from loops will be able to arrange into
 This project requires the following Python libraries:
 
 - `adafruit-circuitpython-ads1x15`  # Adafruit CircuitPython library for ADS1x15 ADCs
+- `pygame 2.1.2`  # Pymixer from pygame used for playing audio samples

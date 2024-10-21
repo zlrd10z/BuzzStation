@@ -77,8 +77,8 @@ def save_song(song_data, keypad):
         with open(path_to_file, 'wb') as file_btp:
             pickle.dump(song_data, file_btp)
 
-def load_song(song_data, keypad):
-    send_to_player = SendToPlayer()
+def load_song(song_data, keypad, queue_player):
+    send_to_player = SendToPlayer(queue_player)
     path_to_file = pick_file.get_filename('load song', keypad)
     if path_to_file is not None:
         with open(path_to_file, 'rb') as file_btp:
@@ -91,6 +91,7 @@ def load_song(song_data, keypad):
             if samples[i] != 'Empty':
                 samples_temp[i] = convert_audio_to_temp.convert_to_pygame_format(samples[i])
         song_data.put_data('samples_temp', samples_temp)
+        send_to_player.update_all_samples(samples_temp)
         # Set song loaded flag for True, this flag is used for update samples list in player in another process
         song_data.put_data('song_loaded', True)
         return song_data
@@ -288,6 +289,12 @@ def clear_key(keypad, screen_matrix, song_playlist, playlist_cursor):
     return song_playlist
 
 def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, selected):
+    # Store Queue and USB player for that software run instance.
+    serial_usb = song_data.get_data('serial_usb')
+    queue_player = song_data.get_data('queue_player')
+    song_data.put_data('serial_usb', None)
+    song_data.put_data('queue_player', None)
+
     screen_matrix = tui_get_screen_matrix(tui_cursor=playlist_cursor[:], 
                                 playlist=song_playlist, 
                                 menu_selected=None, 
@@ -302,6 +309,8 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
     if selected == 0:
         # Save song:
         save_song(song_data, keypad)
+        song_data.put_data('serial_usb', serial_usb)
+        song_data.put_data('queue_player', queue_player)
         clear_screen()
         tui_pl(tui_cursor=playlist_cursor[:], 
                     playlist=song_playlist, 
@@ -323,9 +332,6 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
 
         ok_selected = warning_window.main(keypad, screen_matrix, warning_text)
         if ok_selected:
-            # Store Queue and USB player for that software run instance.
-            serial_usb = song_data.get_data('serial_usb')
-            queue_player = song_data.get_data('queue_player')
             if selected == 1 or selected == 2:
                 # Send info to potetniometer thread, that is need to stop, beacuse new song_data is loaded
                 song_data.put_data('song_data_change', True)
@@ -333,7 +339,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                     pass #Wait to potentiometrs thread to end
                 if selected == 1:
                     # Load Song
-                    temp_song_data = load_song(song_data, keypad)
+                    temp_song_data = load_song(song_data, keypad, queue_player)
                     if temp_song_data is not None:
                         song_data = temp_song_data
                 elif selected == 2:
@@ -358,8 +364,8 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                     song_playlist[i] = track_for_instrument[:]
                 song_data.put_data('song_playlist', song_playlist)
             # Put the data back to song_data.
-            serial_usb = song_data.get_data('serial_usb', serial_usb)
-            queue_player = song_data.get_data('queue_player', queue_player)
+            song_data.put_data('serial_usb', serial_usb)
+            song_data.put_data('queue_player', queue_player)
             return song_data
     
 # Enter menu to save or load song:

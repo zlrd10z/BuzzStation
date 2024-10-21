@@ -39,7 +39,7 @@ class NoteMidiConverter:
         notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
         self.notes_to_midi_bytes = {}
         first_note = 36
-        for i in range(6):
+        for i in range(1, 10):
             for note in notes:
                 self.notes_to_midi_bytes[note + str(i)] = first_note
                 first_note += 1
@@ -88,6 +88,7 @@ def play_pattern(song_data, send_to_player, nmc):
 
             wait_for_next_quarter(song_data)
             if not should_continue_playing(song_data):
+                send_to_player.stop_playing()
                 break
     
     def play_midi(song_data, track_number, pattern_number, nmc):
@@ -147,7 +148,28 @@ def play_pattern(song_data, send_to_player, nmc):
         track_number -= 1
         play_midi(song_data, track_number, pattern_number, nmc)
 
-def play_song(song_data):
+#goes thorug playlist and check on which level last pattern was added on the longest track:
+def find_last_patt_lvl(longest_track):
+    last_pattern_index = None
+    for i in range(len(longest_track)-1, -1, -1):
+        if longest_track[i] != ' ':
+            last_pattern_index = i
+            return last_pattern_index
+
+def play_song(song_data, send_to_player, nmc):
+    even = False
+    def wait_for_next_quarter(song_data):
+        nonlocal even
+        time_between_quarters = song_data.get_data('time_between_quarter_notes')
+        swing_to_time = time_between_quarters * (song_data.get_data('swing') / 100)
+        if even:
+            time_between_quarters -= swing_to_time
+            even = False
+        else:
+            time_between_quarters += swing_to_time
+            even = True
+        time.sleep(time_between_quarters)
+
     playlist = song_data.get_data('song_playlist')
     instruments = song_data.get_data('playlist_list_of_instruments')
     even = False
@@ -155,9 +177,14 @@ def play_song(song_data):
     # The length of the playlist for each instrument can vary, then calculate which is the longest:
     longest_list = max(playlist, key=len)
     playlist_singletrack_index = playlist.index(longest_list)
+    last_pattern_index = find_last_patt_lvl(playlist[playlist_singletrack_index])
+
+    # If there is no pattern, don't do anything:
+    if last_pattern_index == None: 
+        return None
 
     # for each pattern in playlist for lonest track:
-    for p in range(len(playlist[playlist_singletrack_index])):
+    for p in range(last_pattern_index+1):
         # Get drums pattern:
         if p < len(playlist[0]):
             if(playlist[0][p] != ' '):
@@ -178,26 +205,42 @@ def play_song(song_data):
                         if drum_pattern is not None:
                             if len(drum_pattern[s][q]) > 0:
                                 note = drum_pattern[s][q]
-                                vol = note[1]
+                                vol = convert_tracker_volume(note[1]) # convert hex to to number for int 0 - 16
                                 send_to_player.play_note(s, vol)
                 
                 else:
                     # MIDI NOTES:
                     if i < len(playlist):
                         if p < len(playlist[i]):
+                            midi_output_channel = instruments[i]
+                            midi_output = int(midi_ouput_channel[1])
+                            midi_channel = int(midi_ouput_channel[3:])
+                            midi_channel = convert_notechannel_to_bytes(midi_channel)
                             notes = song_data.pianoroll_pattern_operations(operation = 'get notes', 
                                                                            track = i - 1, 
                                                                            pattern_number = playlist[i][p], 
                                                                            quarter = q
                                                                            )
-            time_between_quarters = song_data.get_data('time_between_quarter_notes')
-            if even:
-                time_between_quarters - song_data.get_data('swing')
-                even = False
-            else:
-                time_between_quarters + song_data.get_data('swing')
-                even = True
-            time.sleep(time_between_quarters)
+                            # for each note notes in quarter:
+                            for n in range(notes):
+                                note = notes[n]
+                                note_in_bytes = nmc.get_note_in_bytes(note[0])
+                                vol_in_bytes = convert_midi_vol_to_bytes(note[2])
+                                midi_data = midi_channel + note_in_bytes + vol_in_bytes
+                                if midi_output == 1:
+                                    midi_output1.send_data(midi_data)
+                                else:
+                                    midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
+
+            # Stop Playing:
+            if not song_data.get_data('is_playing') or not song_data.get_data('is_song_playing'):
+                midi_output1.all_notes_off()
+                #247 - msg to arduino - all notes off byte
+                midi_output2and3.send_data_to_arduino(song_data, bytes([247]), output=None)
+                send_to_player.stop_playing()
+                break
+
+            wait_for_next_quarter(song_data)
             
             # Turn off MIDI notes:
             for i in range(1, 17):
@@ -208,8 +251,28 @@ def play_song(song_data):
                                                                                    pattern_number = playlist[i][p], 
                                                                                    quarter = q, 
                                                                                    target_notes_to_turn_off = True
-                                                                                  )
+                                                                                   )
+                        midi_output_channel = instruments[i]
+                        midi_output = int(midi_ouput_channel[1])
+                        midi_channel = int(midi_ouput_channel[3:])
+                        midi_channel = convert_notechannel_to_bytes(midi_channel)
+                        if len(notes_to_turn_off) > 0:
+                            for note in notes_to_turn_off:
+                                note_in_bytes = nmc.get_note_in_bytes(note)
+                                vol_in_bytes = bytes([0])
+                                midi_data = midi_channel + note_in_bytes + vol_in_bytes
+                                if midi_output == 1:
+                                    midi_output1.send_data(midi_data)
+                                else:
+                                    midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
+
+
+            # Stop Playing: 
             if not song_data.get_data('is_playing') or not song_data.get_data('is_song_playing'):
+                midi_output1.all_notes_off()
+                #247 - msg to arduino - all notes off byte
+                midi_output2and3.send_data_to_arduino(song_data, bytes([247]), output=None)
+                send_to_player.stop_playing() 
                 break
 
 def main_loop(song_data):
@@ -218,8 +281,7 @@ def main_loop(song_data):
     nmc = NoteMidiConverter()
     while True:
         if song_data.get_data('is_playing') and song_data.get_data('is_song_playing'):
-            #play_song(song_data)
-            pass
+            play_song(song_data)
         elif song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
             play_pattern(song_data, send_to_player, nmc)
         else:

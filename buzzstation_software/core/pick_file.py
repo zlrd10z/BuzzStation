@@ -175,7 +175,7 @@ def get_filename(selected_option, keypad):
     else:
         start_dir = '/saved_songs'
     p.update_pwd(p.pwd + start_dir)
-    load_directory(start_dir)
+    load_directory()
     k = keypad
     print_filelist()
     

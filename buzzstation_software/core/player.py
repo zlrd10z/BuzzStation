@@ -210,11 +210,11 @@ def play_song(song_data, send_to_player, nmc):
                 
                 else:
                     # MIDI NOTES:
-                    if i < len(playlist):
+                    if i < len(playlist) and instruments[i] != 'Empty':
                         if p < len(playlist[i]):
                             midi_output_channel = instruments[i]
-                            midi_output = int(midi_ouput_channel[1])
-                            midi_channel = int(midi_ouput_channel[3:])
+                            midi_output = int(midi_output_channel[1])
+                            midi_channel = int(midi_output_channel[3:])
                             midi_channel = convert_notechannel_to_bytes(midi_channel)
                             notes = song_data.pianoroll_pattern_operations(operation = 'get notes', 
                                                                            track = i - 1, 
@@ -222,7 +222,7 @@ def play_song(song_data, send_to_player, nmc):
                                                                            quarter = q
                                                                            )
                             # for each note notes in quarter:
-                            for n in range(notes):
+                            for n in range(len(notes)):
                                 note = notes[n]
                                 note_in_bytes = nmc.get_note_in_bytes(note[0])
                                 vol_in_bytes = convert_midi_vol_to_bytes(note[2])
@@ -244,7 +244,7 @@ def play_song(song_data, send_to_player, nmc):
             
             # Turn off MIDI notes:
             for i in range(1, 17):
-                if i < len(playlist):
+                if i < len(playlist) and instruments[i] != 'Empty':
                     if p < len(playlist[i]):
                         notes_to_turn_off = song_data.pianoroll_pattern_operations(operation = 'get notes', 
                                                                                    track = i - 1, 
@@ -253,8 +253,8 @@ def play_song(song_data, send_to_player, nmc):
                                                                                    target_notes_to_turn_off = True
                                                                                    )
                         midi_output_channel = instruments[i]
-                        midi_output = int(midi_ouput_channel[1])
-                        midi_channel = int(midi_ouput_channel[3:])
+                        midi_output = int(midi_output_channel[1])
+                        midi_channel = int(midi_output_channel[3:])
                         midi_channel = convert_notechannel_to_bytes(midi_channel)
                         if len(notes_to_turn_off) > 0:
                             for note in notes_to_turn_off:
@@ -281,10 +281,11 @@ def main_loop(song_data):
     nmc = NoteMidiConverter()
     while True:
         if song_data.get_data('is_playing') and song_data.get_data('is_song_playing'):
-            play_song(song_data)
+            play_song(song_data, send_to_player, nmc)
         elif song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
             play_pattern(song_data, send_to_player, nmc)
+        elif song_data.get_data('song_data_change_2'):
+            song_data.put_data('song_data_change_2', False)
+            break
         else:
             time.sleep(0.1)
-
-        

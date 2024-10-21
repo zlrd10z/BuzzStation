@@ -14,6 +14,8 @@ from threading import Thread
 from core.potentiometers_operations import pots_operations
 from core.midi_params_menu import midi_menu
 from core.player_proc import SendToPlayer
+from core import player
+
 
 
 # Lambdas:
@@ -77,8 +79,7 @@ def save_song(song_data, keypad):
         with open(path_to_file, 'wb') as file_btp:
             pickle.dump(song_data, file_btp)
 
-def load_song(song_data, keypad, queue_player):
-    send_to_player = SendToPlayer(queue_player)
+def load_song(song_data, keypad):
     path_to_file = pick_file.get_filename('load song', keypad)
     if path_to_file is not None:
         with open(path_to_file, 'rb') as file_btp:
@@ -91,7 +92,6 @@ def load_song(song_data, keypad, queue_player):
             if samples[i] != 'Empty':
                 samples_temp[i] = convert_audio_to_temp.convert_to_pygame_format(samples[i])
         song_data.put_data('samples_temp', samples_temp)
-        send_to_player.update_all_samples(samples_temp)
         # Set song loaded flag for True, this flag is used for update samples list in player in another process
         song_data.put_data('song_loaded', True)
         return song_data
@@ -239,7 +239,9 @@ def plus_n_minus_keypad(key, playlist_cursor, song_data, song_playlist, playlist
             else:
                 if song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] != ' ':
                     patt_number = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
-                    patt_number = int(patt_number) - 1
+                    patt_number = int(patt_number) 
+                    if patt_number > 1:
+                        patt_number -= 1
                     song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = patt_number
                     song_data.put_data('last_added_pattern_numer', patt_number)
                     result = ('playlist', song_playlist)
@@ -292,8 +294,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
     # Store Queue and USB player for that software run instance.
     serial_usb = song_data.get_data('serial_usb')
     queue_player = song_data.get_data('queue_player')
-    song_data.put_data('serial_usb', None)
-    song_data.put_data('queue_player', None)
+
 
     screen_matrix = tui_get_screen_matrix(tui_cursor=playlist_cursor[:], 
                                 playlist=song_playlist, 
@@ -308,6 +309,8 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
     # Accept choice:
     if selected == 0:
         # Save song:
+        song_data.put_data('serial_usb', None)
+        song_data.put_data('queue_player', None)
         save_song(song_data, keypad)
         song_data.put_data('serial_usb', serial_usb)
         song_data.put_data('queue_player', queue_player)
@@ -335,11 +338,14 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
             if selected == 1 or selected == 2:
                 # Send info to potetniometer thread, that is need to stop, beacuse new song_data is loaded
                 song_data.put_data('song_data_change', True)
-                while not song_data.get_data('song_data_change'):
-                    pass #Wait to potentiometrs thread to end
+                song_data.put_data('song_data_change_2', True)
+                song_data.put_data('is_playing', False)
+                song_data.put_data('is_song_playing', False)
+                while song_data.get_data('song_data_change') and song_data.get_data('song_data_change_2'):
+                    pass #Wait to potentiometrs thread and player thread to end
                 if selected == 1:
                     # Load Song
-                    temp_song_data = load_song(song_data, keypad, queue_player)
+                    temp_song_data = load_song(song_data, keypad)
                     if temp_song_data is not None:
                         song_data = temp_song_data
                 elif selected == 2:
@@ -350,6 +356,12 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                 # Create new pots thread:
                 thread_pots = Thread(target=pots_operations, args=[song_data])
                 thread_pots.start()
+                # Put queue and serial to song data:
+                song_data.put_data('serial_usb', serial_usb)
+                song_data.put_data('queue_player', queue_player)
+                # Create new player thread:
+                thread_player = Thread(target=player.main_loop, args=[song_data])
+                thread_player.start()
                 # Update samples in player in another process:
                 samples_temp = song_data.get_data('samples_temp')
                 send_to_player = SendToPlayer(queue_player)
@@ -363,9 +375,6 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                 for i in range(len(song_playlist)):
                     song_playlist[i] = track_for_instrument[:]
                 song_data.put_data('song_playlist', song_playlist)
-            # Put the data back to song_data.
-            song_data.put_data('serial_usb', serial_usb)
-            song_data.put_data('queue_player', queue_player)
             return song_data
     
 # Enter menu to save or load song:

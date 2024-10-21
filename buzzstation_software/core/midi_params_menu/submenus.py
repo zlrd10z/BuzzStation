@@ -7,7 +7,7 @@ import os
 '''
 TEMPORARY TEST FUNCTIONS
 '''
-clear_screen = lambda: os.system('clear')
+#clear_screen = lambda: os.system('clear')
 
 def tui_sliders(title, slider_selected, instruction, percents):
     title += ':'
@@ -64,10 +64,11 @@ def main(keypad, song_data, track, title):
         #6 sliders will not fit on the sceen, so divide them:
         first_four_params = list(subcategory_params.items())[:4]
         subcategory_params = dict(first_four_params)
+        sliders_number = len(subcategory_params)
     else:
         instruction = 'Press [Insert] to increase slider movement'
 
-    clear_screen()
+    #clear_screen()
     tui_sliders(title, slider_selected, instruction, subcategory_params)
 
     # Main loop:
@@ -76,10 +77,12 @@ def main(keypad, song_data, track, title):
         if key != '':
             # Direction keys:
             if key == '2': #UP
-                if slider_selected > sliders_number-1:
+                print(slider_selected)
+                if slider_selected > 0:
                     slider_selected -= 1
                 else:
                     slider_selected = sliders_number-1
+                print(slider_selected)
             if key == '8': #DOWN
                 if slider_selected < sliders_number-1:
                     slider_selected += 1
@@ -116,7 +119,7 @@ def main(keypad, song_data, track, title):
             if key == '1':
                 break
             # Update screen:
-            clear_screen()
+            #clear_screen()
             tui_sliders(title, slider_selected, instruction, subcategory_params)
 
 if __name__ == '__main__':

@@ -322,7 +322,10 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
             warning_text = 'clear all tracks'
 
         ok_selected = warning_window.main(keypad, screen_matrix, warning_text)
-        if ok_selected:            
+        if ok_selected:
+            # Store Queue and USB player for that software run instance.
+            serial_usb = song_data.get_data('serial_usb')
+            queue_player = song_data.get_data('queue_player')
             if selected == 1 or selected == 2:
                 # Send info to potetniometer thread, that is need to stop, beacuse new song_data is loaded
                 song_data.put_data('song_data_change', True)
@@ -335,17 +338,14 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                         song_data = temp_song_data
                 elif selected == 2:
                     # new song: clear all previous data without serial_usb
-                    serial_usb = song_data.get_data('serial_usb')
                     song_data = SongData()
                     create_empty_song_playlist(song_data)
-                    song_data.put_data('serial_usb', serial_usb)
                     time.sleep(0.1) #to properly reload potentiometers on I2C
                 # Create new pots thread:
                 thread_pots = Thread(target=pots_operations, args=[song_data])
                 thread_pots.start()
                 # Update samples in player in another process:
                 samples_temp = song_data.get_data('samples_temp')
-                queue_player = song_data.get_data('queue_player')
                 send_to_player = SendToPlayer(queue_player)
                 send_to_player.update_all_samples(samples_temp)
             elif selected == 3:
@@ -357,6 +357,9 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                 for i in range(len(song_playlist)):
                     song_playlist[i] = track_for_instrument[:]
                 song_data.put_data('song_playlist', song_playlist)
+            # Put the data back to song_data.
+            serial_usb = song_data.get_data('serial_usb', serial_usb)
+            queue_player = song_data.get_data('queue_player', queue_player)
             return song_data
     
 # Enter menu to save or load song:
@@ -465,6 +468,8 @@ def main(keypad, song_data):
                 playlist_cursor = direction_keypad(key, playlist_cursor, song_playlist, playlist_list_of_instruments)        
             # Key with [E] sticker on it - edit selected pattern:
             elif key == '3':
+                create_empty_song_playlist(song_data)
+                song_playlist = song_data.get_data('song_playlist')
                 edit_key(keypad, song_data, playlist_cursor, song_playlist)
                 playlist_list_of_instruments = song_data.get_data('playlist_list_of_instruments')
             # keypad with [+] and [-] sticker - changing selected values:    

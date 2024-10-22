@@ -30,8 +30,6 @@ class SongData:
         self.__playlist_list_of_midi_assigned = {}
         self.__last_added_pattern_numer = 1
         self.__song_loaded = False
-        self.__song_data_change = False #flag for other threadas that they need to be terminated
-        self.__song_data_change_2 = False
         self.__midi_misc_settings = append_midi_params() #envelopes, filters, effects like reverb
 
         #==================================================

@@ -45,16 +45,24 @@ def main():
     proc_player = multiprocessing.Process(target=player_audiofiles, args=(queue_player,))
     proc_player.start()
 
+    '''
+    All of the song data are stored in song_data object. When song is loaded, 
+    the object is loaded via pickle. List data_for_threads is created, so after loading new song data, 
+    reference in that list to old song_data is replaced by new one. Threads in their main loop are checking, 
+    if reference change, and if it changed, they are updating their reference to song_data object.
+    '''
+    data_for_threads = [song_data]
+
     # Create thread for potentiometers:
-    thread_pots = Thread(target=pots_operations, args=[song_data])
+    thread_pots = Thread(target=pots_operations, args=[data_for_threads])
     thread_pots.start()
 
     # Create thread for note player:
-    thread_player = Thread(target=player.main_loop, args=[song_data])
+    thread_player = Thread(target=player.main_loop, args=[data_for_threads])
     thread_player.start()
 
     # Playlist Loop:
-    playlist.main(keys, song_data)
+    playlist.main(keys, song_data, data_for_threads)
 
 if __name__ == "__main__":
     main()

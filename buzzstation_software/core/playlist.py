@@ -290,7 +290,7 @@ def clear_key(keypad, screen_matrix, song_playlist, playlist_cursor):
             song_playlist[playlist_cursor[0]][i] = ' ' 
     return song_playlist
 
-def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, selected):
+def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, selected, data_for_threads):
     # Store Queue and USB player for that software run instance.
     serial_usb = song_data.get_data('serial_usb')
     queue_player = song_data.get_data('queue_player')
@@ -337,12 +337,8 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
         if ok_selected:
             if selected == 1 or selected == 2:
                 # Send info to potetniometer thread, that is need to stop, beacuse new song_data is loaded
-                song_data.put_data('song_data_change', True)
-                song_data.put_data('song_data_change_2', True)
                 song_data.put_data('is_playing', False)
                 song_data.put_data('is_song_playing', False)
-                while song_data.get_data('song_data_change') and song_data.get_data('song_data_change_2'):
-                    pass #Wait to potentiometrs thread and player thread to end
                 if selected == 1:
                     # Load Song
                     temp_song_data = load_song(song_data, keypad)
@@ -353,19 +349,15 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                     song_data = SongData()
                     create_empty_song_playlist(song_data)
                     time.sleep(0.1) #to properly reload potentiometers on I2C
-                # Create new pots thread:
-                thread_pots = Thread(target=pots_operations, args=[song_data])
-                thread_pots.start()
                 # Put queue and serial to song data:
                 song_data.put_data('serial_usb', serial_usb)
                 song_data.put_data('queue_player', queue_player)
-                # Create new player thread:
-                thread_player = Thread(target=player.main_loop, args=[song_data])
-                thread_player.start()
                 # Update samples in player in another process:
                 samples_temp = song_data.get_data('samples_temp')
                 send_to_player = SendToPlayer(queue_player)
                 send_to_player.update_all_samples(samples_temp)
+                # Update threads with reference to new song_data object:
+                data_for_threads[0] = song_data
             elif selected == 3:
                 # Clear entire playlist:
                 song_playlist = song_data.get_data('song_playlist')
@@ -378,7 +370,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
             return song_data
     
 # Enter menu to save or load song:
-def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments):    
+def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, data_for_threads):    
     selected = 0
     menu_cursor = [0, 0]
     clear_screen()
@@ -418,7 +410,10 @@ def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_ins
                 break
             # accept key:
             if key == '5':
-                new_song_data = menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, selected)
+                new_song_data = menu_accept_key(keypad, song_data, playlist_cursor, 
+                                                song_playlist, playlist_list_of_instruments, 
+                                                selected, data_for_threads
+                                                )
                 if new_song_data is not None:
                     return new_song_data
                 
@@ -461,7 +456,7 @@ def play_pause(song_data):
         result = False
     return result
     
-def main(keypad, song_data):
+def main(keypad, song_data, data_for_threads):
     create_empty_song_playlist(song_data)
     previous_printed_values = [0, 0, 0]
     # Playlist loop:
@@ -512,7 +507,10 @@ def main(keypad, song_data):
             # Key with [M] sticker - menu:
             elif key == '#':
                 # Enter menu to save or load song or to clear entinre playlist:
-                new_song_data = menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments)
+                new_song_data = menu(keypad, song_data, playlist_cursor, 
+                                     song_playlist, playlist_list_of_instruments, 
+                                     data_for_threads
+                                     )
                 if new_song_data is not None:
                     song_data = new_song_data
                     song_playlist = song_data.get_data('song_playlist')

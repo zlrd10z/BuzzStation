@@ -275,7 +275,8 @@ def play_song(song_data, send_to_player, nmc):
                 send_to_player.stop_playing() 
                 break
 
-def main_loop(song_data):
+def main_loop(data_for_thread):
+    song_data = data_for_thread[0]
     queue_player = song_data.get_data('queue_player')
     send_to_player = SendToPlayer(queue_player)
     nmc = NoteMidiConverter()
@@ -284,8 +285,9 @@ def main_loop(song_data):
             play_song(song_data, send_to_player, nmc)
         elif song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
             play_pattern(song_data, send_to_player, nmc)
-        elif song_data.get_data('song_data_change_2'):
-            song_data.put_data('song_data_change_2', False)
-            break
+        # check if song was was loaded by pickle / new song was creaated
+        # if yes, then upload.
+        elif song_data != data_for_thread[0]:
+            song_data = data_for_thread[0]
         else:
             time.sleep(0.1)

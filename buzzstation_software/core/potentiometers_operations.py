@@ -4,7 +4,8 @@ from .pots import potentiometer_values_transform
 from .song_data import SongData
 
 
-def pots_operations(song_data):
+def pots_operations(data_for_thread):
+    song_data = data_for_thread[0]
     while True:
         pots_values = potentiometers.return_potentiometers_values()
         bpm_old_value = song_data.get_data('bpm')
@@ -26,7 +27,8 @@ def pots_operations(song_data):
         if bvol_new_value - bvol_old_value > 1 or bvol_old_value - bvol_new_value > 1:
             bvol = bvol_new_value
             song_data.put_data('bvol', bvol)
+
+        if song_data != data_for_thread[0]:
+            song_data == data_for_thread[0]
             
-        if song_data.get_data('song_data_change'):
-            break
-    song_data.put_data('song_data_change', False)
+

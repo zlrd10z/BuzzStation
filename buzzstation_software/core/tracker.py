@@ -381,7 +381,7 @@ def insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern
     elif tracker_cursor[1] > 0:
         # if note is empty, add last added note:
         if len(pattern[tracker_cursor[0]][tracker_cursor[1] - 1]) == 0:
-            pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = song_data.last_added('tracker', tracker_cursor[0])
+            pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = song_data.last_added('tracker', tracker_cursor[0])[:]
         # if field for note is not empty, delete note:
         else:
             pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = []

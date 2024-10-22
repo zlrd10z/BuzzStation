@@ -81,7 +81,10 @@ def play_pattern(song_data, send_to_player, nmc):
             for s in range(16):
                 if len(pattern[s][q]) > 0:
                     note = pattern[s][q]
-                    vol = convert_tracker_volume(note[1]) # convert hex to to number for int 0 - 16
+                    # Volume
+                    note_vol = convert_tracker_volume(note[1]) # convert hex to to number for int 0 - 100
+                    sample_main_vol = (song_data.get_data('samples_volume')[s]) / 10
+                    vol = (note_vol * sample_main_vol) / 100
                     send_to_player.play_note(s, vol)
             if not should_continue_playing(song_data):
                 break
@@ -210,7 +213,9 @@ def play_song(song_data, send_to_player, nmc):
                         if drum_pattern is not None:
                             if len(drum_pattern[s][q]) > 0:
                                 note = drum_pattern[s][q]
-                                vol = convert_tracker_volume(note[1]) # convert hex to to number for int 0 - 16
+                                note_vol = convert_tracker_volume(note[1]) # convert hex to to number for int 0 - 16
+                                sample_main_vol = (song_data.get_data('samples_volume')[s]) / 10
+                                vol = (note_vol * sample_main_vol) / 100
                                 send_to_player.play_note(s, vol)
                 
                 else:

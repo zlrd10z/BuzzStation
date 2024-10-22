@@ -2,7 +2,7 @@ from collections import namedtuple
 from .pots import potentiometers
 from .pots import potentiometer_values_transform
 from .song_data import SongData
-
+import subprocess
 
 def pots_operations(data_for_thread):
     song_data = data_for_thread[0]
@@ -27,6 +27,8 @@ def pots_operations(data_for_thread):
         if bvol_new_value - bvol_old_value > 1 or bvol_old_value - bvol_new_value > 1:
             bvol = bvol_new_value
             song_data.put_data('bvol', bvol)
+            vol_command = f"amixer set Speaker Playback Volume {bvol}%"
+            subprocess.Popen(vol_command, shell=True, stdout=subprocess.DEVNULL)
 
         if song_data != data_for_thread[0]:
             song_data = data_for_thread[0]

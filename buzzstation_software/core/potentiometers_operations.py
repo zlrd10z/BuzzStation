@@ -29,6 +29,6 @@ def pots_operations(data_for_thread):
             song_data.put_data('bvol', bvol)
 
         if song_data != data_for_thread[0]:
-            song_data == data_for_thread[0]
+            song_data = data_for_thread[0]
             
 

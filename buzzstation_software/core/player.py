@@ -149,12 +149,19 @@ def play_pattern(song_data, send_to_player, nmc):
         play_midi(song_data, track_number, pattern_number, nmc)
 
 #goes thorug playlist and check on which level last pattern was added on the longest track:
-def find_last_patt_lvl(longest_track):
+def find_last_patt_lvl(playlist):
     last_pattern_index = None
-    for i in range(len(longest_track)-1, -1, -1):
-        if longest_track[i] != ' ':
-            last_pattern_index = i
-            return last_pattern_index
+    for track in range(len(playlist)):
+        for pattern in range(len(playlist[track])-1, -1, -1):
+            if playlist[track][pattern] != ' ':
+                if last_pattern_index is None:
+                    last_pattern_index = pattern
+                    break
+                else:
+                    if playlist[track][pattern] > last_pattern_index:
+                        last_pattern_index = playlist[track][pattern]
+                        break
+    return last_pattern_index
 
 def play_song(song_data, send_to_player, nmc):
     even = False
@@ -175,9 +182,7 @@ def play_song(song_data, send_to_player, nmc):
     even = False
     
     # The length of the playlist for each instrument can vary, then calculate which is the longest:
-    longest_list = max(playlist, key=len)
-    playlist_singletrack_index = playlist.index(longest_list)
-    last_pattern_index = find_last_patt_lvl(playlist[playlist_singletrack_index])
+    last_pattern_index = find_last_patt_lvl(playlist)
 
     # If there is no pattern, don't do anything:
     if last_pattern_index == None: 

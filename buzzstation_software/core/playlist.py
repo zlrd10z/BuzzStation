@@ -368,6 +368,20 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                     song_playlist[i] = track_for_instrument[:]
                 song_data.put_data('song_playlist', song_playlist)
             return song_data
+        else:
+            # Action was not confirmed by user in warning window
+            # display menu without warning:
+            clear_screen()
+            tui_pl(tui_cursor=playlist_cursor[:], 
+                        playlist=song_playlist, 
+                        menu_selected=selected, 
+                        list_of_instruments=playlist_list_of_instruments, 
+                        bpm=song_data.get_data('bpm'),
+                        swing=song_data.get_data('swing'), 
+                        bvol=song_data.get_data('bvol'),
+                        songname=song_data.get_data('song_name'),
+                        is_playing = song_data.get_data('is_playing')
+                        )
     
 # Enter menu to save or load song:
 def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, data_for_threads):    

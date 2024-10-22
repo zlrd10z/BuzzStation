@@ -301,9 +301,11 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
                         volume_index -= 1
                         volume = volume_string_list[volume_index]
                     pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = volume
-
-            song_data.put_data('drums_last_added_note', [pattern[tracker_cursor[0]][tracker_cursor[1]-1][0], 
-                        pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
+            note = [
+                    pattern[tracker_cursor[0]][tracker_cursor[1]-1][0], 
+                    pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]
+                    ]
+            song_data.last_added('tracker', pattern[tracker_cursor[0]], note)
 
             # update pattern in data storage:
             song_data.drums_pattern_operations('create or update pattern', pattern_number, new_pattern=pattern)
@@ -336,8 +338,10 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
                         volume = volume_string_list[volume_index]
                     pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = volume
 
-            song_data.put_data('drums_last_added_note', [pattern[tracker_cursor[0]][tracker_cursor[1] - 1][0], 
-                        pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]])
+            note = [pattern[tracker_cursor[0]][tracker_cursor[1] - 1][0], 
+                    pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]
+                    ]
+            song_data.last_added('tracker', pattern[tracker_cursor[0]], note)
             # update pattern in data storage:
             song_data.drums_pattern_operations('create or update pattern', pattern_number, new_pattern=pattern)
             return pattern
@@ -377,7 +381,7 @@ def insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern
     elif tracker_cursor[1] > 0:
         # if note is empty, add last added note:
         if len(pattern[tracker_cursor[0]][tracker_cursor[1] - 1]) == 0:
-            pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = song_data.get_data('drums_last_added_note')
+            pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = song_data.last_added('tracker', pattern[tracker_cursor[0]])
         # if field for note is not empty, delete note:
         else:
             pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = []

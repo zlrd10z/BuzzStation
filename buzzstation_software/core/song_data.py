@@ -39,7 +39,7 @@ class SongData:
         self.__samples_temp = ['Empty', 'Empty'] 
         self.__last_changed_sample = None
         self.__samples_volume = [10, 10]
-        self.__drums_last_added_note = ['C5', 'F']
+        self.__drums_last_added_note = []
 
         #================================================
         # Queues:
@@ -175,14 +175,14 @@ class SongData:
 
     def last_added(self, target, track, new_value=None):
         result = None
-            if new_value is not None:
-                if target == 'playlist':
-                    self.__last_added_pattern_numer[track] = new_value
-                elif target == 'tracker':
-                    self.__drums_last_added_note[track] = new_value
-            else:
-                if target == 'playlist':
-                    result = self.__last_added_pattern_numer[track] 
-                elif target == 'tracker':
-                    result = self.__drums_last_added_note[track]
+        if new_value is not None:
+            if target == 'playlist':
+                self.__last_added_pattern_numer[track] = new_value
+            elif target == 'tracker':
+                self.__drums_last_added_note[track] = new_value
+        else:
+            if target == 'playlist':
+                result = self.__last_added_pattern_numer[track] 
+            elif target == 'tracker':
+                result = self.__drums_last_added_note[track]
         return result

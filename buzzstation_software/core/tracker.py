@@ -305,7 +305,7 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
                     pattern[tracker_cursor[0]][tracker_cursor[1]-1][0], 
                     pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]
                     ]
-            song_data.last_added('tracker', pattern[tracker_cursor[0]], note)
+            song_data.last_added('tracker', tracker_cursor[0], note)
 
             # update pattern in data storage:
             song_data.drums_pattern_operations('create or update pattern', pattern_number, new_pattern=pattern)
@@ -341,7 +341,7 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
             note = [pattern[tracker_cursor[0]][tracker_cursor[1] - 1][0], 
                     pattern[tracker_cursor[0]][tracker_cursor[1] - 1][1]
                     ]
-            song_data.last_added('tracker', pattern[tracker_cursor[0]], note)
+            song_data.last_added('tracker', tracker_cursor[0], note)
             # update pattern in data storage:
             song_data.drums_pattern_operations('create or update pattern', pattern_number, new_pattern=pattern)
             return pattern
@@ -381,7 +381,7 @@ def insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern
     elif tracker_cursor[1] > 0:
         # if note is empty, add last added note:
         if len(pattern[tracker_cursor[0]][tracker_cursor[1] - 1]) == 0:
-            pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = song_data.last_added('tracker', pattern[tracker_cursor[0]])
+            pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = song_data.last_added('tracker', tracker_cursor[0])
         # if field for note is not empty, delete note:
         else:
             pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = []
@@ -475,7 +475,9 @@ def main(keys, song_data, pattern_number):
             # [+] and [-] keys:
             elif key == '7' or key == '9':
                 # change selected note's volume value / change selected sample master volume value / change note to higher/lower note:
-                pattern = plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_list, pattern_number)
+                new_pattern = plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_list, pattern_number)
+                if new_pattern is not None:
+                    pattern = new_pattern
             # [Insert] key:
             elif key == '5':
                 temp_pattern = insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern_number)

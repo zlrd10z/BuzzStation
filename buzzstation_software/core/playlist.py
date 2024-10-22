@@ -243,7 +243,10 @@ def plus_n_minus_keypad(key, playlist_cursor, song_data, song_playlist, playlist
                     if patt_number > 1:
                         patt_number -= 1
                     song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = patt_number
-                    song_data.put_data('last_added_pattern_numer', patt_number)
+                    song_data.last_added(target = 'playlist', 
+                                         track = playlist_cursor[0], 
+                                         new_value = patt_number
+                                         )
                     result = ('playlist', song_playlist)
         return result
     
@@ -271,7 +274,10 @@ def plus_n_minus_keypad(key, playlist_cursor, song_data, song_playlist, playlist
                     patt_number = song_playlist[playlist_cursor[0]][playlist_cursor[1]-1]
                     patt_number = int(patt_number) + 1
                     song_playlist[playlist_cursor[0]][playlist_cursor[1]-1] = patt_number
-                    song_data.put_data('last_added_pattern_numer', patt_number)
+                    song_data.last_added(target = 'playlist', 
+                                         track = playlist_cursor[0], 
+                                         new_value = patt_number
+                                         )
             result = ('playlist', song_playlist)
         return result
     
@@ -566,7 +572,7 @@ def main(keypad, song_data, data_for_threads):
                 elif playlist_cursor[1]  != 0:
                     # Add last picked pattern (pattern picking with buttons [7] and [9]:
                     if song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] == ' ':
-                        song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] = song_data.get_data('last_added_pattern_numer')
+                        song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] = song_data.last_added('playlist', playlist_cursor[0])
                     # delete pattern:    
                     else:
                         song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] = ' '

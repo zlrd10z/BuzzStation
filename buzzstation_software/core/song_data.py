@@ -28,7 +28,7 @@ class SongData:
         self.__song_playlist = []
         self.__playlist_list_of_instruments = ['Drums']
         self.__playlist_list_of_midi_assigned = {}
-        self.__last_added_pattern_numer = 1
+        self.__last_added_pattern_numer = []
         self.__song_loaded = False
         self.__midi_misc_settings = append_midi_params() #envelopes, filters, effects like reverb
 
@@ -52,6 +52,11 @@ class SongData:
         self.__pianoroll_last_added_note = ['C5', 1, 8]
     
         #==================================================
+        for i in range(16):
+            self.__last_added_pattern_numer.append(1)
+            self.__drums_last_added_note.append(['C5', 'F'])
+
+
         # Append instrument list and samples list with 7 * string 'Empty':
         for i in range(7):
             self.__playlist_list_of_instruments.append('Empty')
@@ -166,4 +171,18 @@ class SongData:
                         self.__midi_misc_settings[output_and_channel] = new_value
                     else:
                         self.__midi_misc_settings[output_and_channel][target_title] = new_value
+        return result
+
+    def last_added(self, target, track, new_value=None):
+        result = None
+            if new_value is not None:
+                if target == 'playlist':
+                    self.__last_added_pattern_numer[track] = new_value
+                elif target == 'tracker':
+                    self.__drums_last_added_note[track] = new_value
+            else:
+                if target == 'playlist':
+                    result = self.__last_added_pattern_numer[track] 
+                elif target == 'tracker':
+                    result = self.__drums_last_added_note[track]
         return result

@@ -232,15 +232,16 @@ def play_song(song_data, send_to_player, nmc):
                                                                            quarter = q
                                                                            )
                             # for each note notes in quarter:
-                            for n in range(len(notes)):
-                                note = notes[n]
-                                note_in_bytes = nmc.get_note_in_bytes(note[0])
-                                vol_in_bytes = convert_midi_vol_to_bytes(note[2])
-                                midi_data = midi_channel + note_in_bytes + vol_in_bytes
-                                if midi_output == 1:
-                                    midi_output1.send_data(midi_data)
-                                else:
-                                    midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
+                            if notes is not None:
+                                for n in range(len(notes)):
+                                    note = notes[n]
+                                    note_in_bytes = nmc.get_note_in_bytes(note[0])
+                                    vol_in_bytes = convert_midi_vol_to_bytes(note[2])
+                                    midi_data = midi_channel + note_in_bytes + vol_in_bytes
+                                    if midi_output == 1:
+                                        midi_output1.send_data(midi_data)
+                                    else:
+                                        midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
 
             # Stop Playing:
             if not song_data.get_data('is_playing') or not song_data.get_data('is_song_playing'):
@@ -266,7 +267,7 @@ def play_song(song_data, send_to_player, nmc):
                         midi_output = int(midi_output_channel[1])
                         midi_channel = int(midi_output_channel[3:])
                         midi_channel = convert_notechannel_to_bytes(midi_channel)
-                        if len(notes_to_turn_off) > 0:
+                        if notes_to_turn_off is not None:
                             for note in notes_to_turn_off:
                                 note_in_bytes = nmc.get_note_in_bytes(note)
                                 vol_in_bytes = bytes([0])

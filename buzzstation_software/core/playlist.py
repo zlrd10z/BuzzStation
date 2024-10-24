@@ -52,6 +52,20 @@ def clear_temp():
     command = 'rm ' + cwd + '/.temp/* -f'
     os.system(command)
 
+# Convert samples to different speed according to their note which exist in patterns
+def convert_non_defaults(song_data):
+    sample_paths = song_data.get_data('samples')
+    samples_not_c5 = song_data.get_data('samples_not_c5')
+    # for each sample/track
+    for s in range(len(sample_paths)):
+        if sample_paths[i] != 'Empty':
+        #for each note that appears in patterns for that track:
+        notes = [*samples_not_c5[s]]
+        for n in range(len(notes)):
+            convert_audio_to_temp.convert_to_pygame_format(sample_paths[i], notes[n])
+
+
+
 def save_song(song_data, keypad):
     path_to_file = pick_file.get_filename('save song', keypad)
     should_save_song = False
@@ -91,6 +105,7 @@ def load_song(song_data, keypad):
         for i in range(len(samples)):
             if samples[i] != 'Empty':
                 samples_temp[i] = convert_audio_to_temp.convert_to_pygame_format(samples[i])
+        convert_non_defaults(song_data)
         song_data.put_data('samples_temp', samples_temp)
         # Set song loaded flag for True, this flag is used for update samples list in player in another process
         song_data.put_data('song_loaded', True)
@@ -362,6 +377,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                 samples_temp = song_data.get_data('samples_temp')
                 send_to_player = SendToPlayer(queue_player)
                 send_to_player.update_all_samples(samples_temp)
+                send_to_player.create_new_nondefault()
                 # Update threads with reference to new song_data object:
                 data_for_threads[0] = song_data
             elif selected == 3:

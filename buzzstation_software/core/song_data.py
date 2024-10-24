@@ -41,6 +41,17 @@ class SongData:
         self.__samples_volume = [10, 10]
         self.__drums_last_added_note = []
 
+        '''
+        samples_not_c5 Dictionary contains track number = {} dictionary for each track.
+        If new note non-default(C5) note is added on track, 
+        then thers added string of note and octave,
+        and counter, how many times sample in not != C5 appears in track.
+        Each sample in different note is preconverted to .temp dir, 
+        so this will be used for tracking, if sample is not used any more, 
+        and can be cleared from temp.
+        '''
+        self.__samples_not_c5 = {} 
+
         #================================================
         # Queues:
         self.__queue_player = None    
@@ -55,6 +66,7 @@ class SongData:
         for i in range(16):
             self.__last_added_pattern_numer.append(1)
             self.__drums_last_added_note.append(['C5', 'F'])
+            self.__samples_not_c5[i] = {}
 
 
         # Append instrument list and samples list with 7 * string 'Empty':
@@ -185,4 +197,50 @@ class SongData:
                 result = self.__last_added_pattern_numer[track] 
             elif target == 'tracker':
                 result = self.__drums_last_added_note[track]
+        return result
+
+    def nondefault_note_counter(self, operation, track=None, note=None, pattern=None):
+        def increase(self, track, note):
+            if note != 'C5':
+                if note not in self.__samples_not_c5[track]:
+                    self.__samples_not_c5[track][note] = 1
+                    result = True
+                else:
+                    self.__samples_not_c5[track][note] += 1
+                    result = False
+            else:
+                result = False
+            return result
+            
+        def decrease(self, track, note)
+            if note != 'C5':
+                if note in self.__samples_not_c5[track]:
+                    if self.__samples_not_c5[track][note] == 1:
+                        self.__samples_not_c5[track].pop(note)
+                        return note
+                    else:
+                        self.__samples_not_c5[track][note] -= 1
+
+        result = None
+        if track is not None and note is not None:
+            if operation == 'increase':
+                result = increase(track, note)
+            elif operation == 'decrease':
+                result = [(track, decrease(track, note))]
+        # Cloning / Removing pattern:
+        if pattern is not None:
+            #for each track:
+            for t in range(len(pattern)):
+                # for each quarter:
+                for q in range(len(pattern[t])):
+                    note = pattern[t][q][0]
+                    if note != 'C5':
+                        if operation == 'increase':
+                            increase(t, note)
+                        else:
+                            note_to_remove = decrease(t, note)
+                            if note_to_remove not in result and note_to_remove is not None:
+                                if result is None:
+                                    result = []
+                                result.append((t, note_to_remove))
         return result

@@ -27,7 +27,7 @@ def convert_to_pygame_format(input_path, note_n_octave='C5'):
     filename = input_path.split('/')[-1] #get filename from path
     filename = filename.split('.')[0] #extract filename without extension
     filename += '_' + note_n_octave
-    output_path = cwd + '/.temp/' + filename
+    output_path = cwd + '/.temp/' + filename + '_' + note_n_octave
 
     audio = AudioSegment.from_file(input_path)
 

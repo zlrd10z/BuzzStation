@@ -3,23 +3,23 @@ import os
 from decimal import Decimal
 
 
-# transorm note to speed for pygame mixer
+#transorm note to speed for pygame mixer
 def note_to_speed(note_n_octave):
     notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-    note = note_n_octave[:2]
+    note = note_n_octave[:-1]
     octave = int(note_n_octave[-1])
     # result of 2 / 11, differnce is speed of note vibration between two quarter notes:
-    quarter_speed_diff = Decimal('0.18181818181818181818181818181818181818181818181818')
+    quarter_speed_diff = Decimal(1/12)
     #5 as default refernce octave:
     octave_diff = octave - 5
-    if octave_diff > 0:
-        octave_speed = octave_diff * 2
-    elif octave_diff < 0:
-        octave_speed = 1 / (abs(octave_diff) * 2)
-    else:
-        octave_speed = 0
     n = notes.index(note)
-    note_speed = n * quarter_speed_diff + octave_speed
+    if octave_diff >= 0:
+        octave_speed = pow(2, octave_diff)
+        note_speed = Decimal(octave_speed) * (Decimal(n) * quarter_speed_diff + 1)
+    else:
+        octave_speed = Decimal(1 / pow(2, abs(octave_diff)))
+        note_speed = Decimal(octave_speed) * (Decimal(n) * quarter_speed_diff + 1)
+    
     return note_speed
 
 def convert_to_pygame_format(input_path, note_n_octave='C5'):
@@ -27,7 +27,7 @@ def convert_to_pygame_format(input_path, note_n_octave='C5'):
     filename = input_path.split('/')[-1] #get filename from path
     filename = filename.split('.')[0] #extract filename without extension
     filename += '_' + note_n_octave
-    output_path = cwd + '/.temp/' + filename + '_' + note_n_octave
+    output_path = cwd + '/.temp/' + filename
 
     audio = AudioSegment.from_file(input_path)
 

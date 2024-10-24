@@ -9,7 +9,10 @@ def get_filenames_in_temp():
 
 def get_sample_note_as_two_var(sample_name):
     sample_note = sample_name.split('_')[-1]
-    sample_name_no_note = sample_name.split('_')[:-(len(sample_note)+1)]
+    sample_name_no_note = list(sample_name)
+    for i in range(len(sample_note)+1):
+        sample_name_no_note.pop(-1)
+    sample_name_no_note = ''.join(sample_name_no_note)
     return sample_name_no_note, sample_note
 
 # This function meant to be run as another process, 
@@ -42,9 +45,13 @@ def player_audiofiles(queue_player):
             case 2:
                 sample_number = data[1]
                 sample_path = data[2]
-                samples.pop(sample_filenames[sample_number])
-                sample_filenames[sample_number] = sample_path
-                samples[sample_path]['C5'] = pygame.mixer.Sound(temp_dir + sample_path)
+                if sample_filenames[sample_number] in samples:
+                    samples.pop(sample_filenames[sample_number])
+                sample_name = get_sample_note_as_two_var(sample_path)[0]
+                sample_filenames[sample_number] = sample_name
+                if sample_name not in samples:
+                    samples[sample_name] = {}
+                samples[sample_name]['C5'] = pygame.mixer.Sound(temp_dir + sample_path)
             # Update paths for all of sample_filenames
             case 3:
                 sample_paths = data[1]
@@ -53,8 +60,11 @@ def player_audiofiles(queue_player):
                         sample_filenames[i] = None
                     else:
                         sample_path = temp_dir + sample_paths[i]
-                        sample_filenames[i] = sample_paths[i]
-                        samples[sample_paths[i]]['C5'] = pygame.mixer.Sound(sample_path)
+                        sample_name = get_sample_note_as_two_var(sample_paths[i])[0]
+                        sample_filenames[i] = sample_name
+                        if sample_name not in samples:
+                            samples[sample_name] = {}
+                        samples[sample_name]['C5'] = pygame.mixer.Sound(sample_path)
             case 4:
                 # Play sample
                 playing_data = data[1]
@@ -139,7 +149,7 @@ class SendToPlayer:
         data = (option, note_data)
         queue_player.put(data)
 
-    def update_nondefault(self)
+    def update_nondefault(self):
         queue_player = self.__queue_player
         '''
         option 5: send information to player, that it need to refresh list,
@@ -149,7 +159,7 @@ class SendToPlayer:
         data = (option,)
         queue_player.put(data)
 
-    def create_new_nondefault(self)
+    def create_new_nondefault(self):
         queue_player = self.__queue_player
         '''
         option 5: send information to player, that it need to refresh list,

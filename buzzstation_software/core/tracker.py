@@ -7,10 +7,11 @@ from core import convert_audio_to_temp
 import os
 import copy
 from core.player_proc import SendToPlayer
+import subprocess
 
 
 #lambdas:
-clear_screen = lambda: os.system('clear')
+#clear_screen = lambda: os.system('clear')
 
 def convert_nondefault(song_data, track, note):
     samples = song_data.get_data('samples')
@@ -18,16 +19,17 @@ def convert_nondefault(song_data, track, note):
     convert_audio_to_temp.convert_to_pygame_format(sample_path, note)
 
 def remove_sample_nondefault(song_data, samples_to_be_removed):
-    if isistance(samples_to_be_removed, list):
+    if isinstance(samples_to_be_removed, list):
         samples = song_data.get_data('samples')
         for i in range(len(samples_to_be_removed)):
-            track = samples_to_be_removed[i][0]
-            note = samples_to_be_removed[i][1]
-            sample = samples[track]
-            if sample != 'Empty':
-                cwd = os.getcwd()
-                command = "rm " + cwd + "/.temp/" + sample + '_' + note
-                os.system(command)
+            if None not in samples_to_be_removed[i]:
+                track = samples_to_be_removed[i][0]
+                note = samples_to_be_removed[i][1]
+                sample = samples[track].split("/")[-1]
+                if sample != 'Empty':
+                    cwd = os.getcwd()
+                    command = "rm " + cwd + "/.temp/" + sample + '_' + note
+                    subprocess.run(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def create_new_empty_pattern():
     pattern = []
@@ -72,7 +74,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
                 new_pattern_number = i
                 song_data.drums_pattern_operations('create or update pattern', new_pattern_number, copy.deepcopy(pattern))
                 pattern = song_data.drums_pattern_operations('get pattern', new_pattern_number) 
-                SongData.nondefault_note_counter(operation='increase', 
+                song_data.nondefault_note_counter(operation='increase', 
                                                  pattern=pattern
                                                  )
                 break
@@ -83,7 +85,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
         ok_selected = warning_window.main(keys, screen_matrix, 'clear all tracks')
         if ok_selected:
             pattern = song_data.drums_pattern_operations('get pattern', pattern_number) 
-            samples_to_be_removed = SongData.nondefault_note_counter(operation='decrease', 
+            samples_to_be_removed = song_data.nondefault_note_counter(operation='decrease', 
                                                                      pattern=pattern
                                                                      )
             
@@ -95,7 +97,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
     menu_cursor = [0, 0]
     selected = 0
 
-    clear_screen()
+    #clear_screen()
     tuitracker(samples_list=samples, 
                this_pattern=pattern, 
                pattern_number=pattern_number, 
@@ -157,7 +159,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
                 selected = 3
 
             # when key was pressed, display updated GUI:
-            clear_screen()
+            #clear_screen()
             tuitracker(samples_list=samples, 
                this_pattern=pattern, 
                pattern_number=pattern_number, 
@@ -186,7 +188,7 @@ def pots_values_tui(song_data, samples, pattern, pattern_number,
         potentiometers_previous_values[0] = bpm
         potentiometers_previous_values[1] = swing
         potentiometers_previous_values[2] = bvol
-        clear_screen()
+        #clear_screen()
         tuitracker(samples_list=samples, 
                    this_pattern=pattern, 
                    pattern_number=pattern_number, 
@@ -308,8 +310,8 @@ def change_note(operation, note_and_octave, tracker_cursor):
     return new_note
 
 # key with [+] sticker / key with [-] sticker: 
-def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_list, pattern_number):
-    def minus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number):
+def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_list, pattern_number, send_to_player):
+    def minus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number, send_to_player):
         # if field on playlist is highlighted:
         if tracker_cursor[1] > 0:
             # Add note with volume:
@@ -319,7 +321,7 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
                 # Change note value down:
                 if tracker_cursor[2] == 0:
                     note_and_octave = pattern[tracker_cursor[0]][tracker_cursor[1]-1][tracker_cursor[2]]
-                    samples_to_be_removed = SongData.nondefault_note_counter(operation='decrease', 
+                    samples_to_be_removed = song_data.nondefault_note_counter(operation='decrease', 
                                                                              track=tracker_cursor[0], 
                                                                              note=note_and_octave
                                                                              )
@@ -327,7 +329,7 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
                     remove_sample_nondefault(song_data, samples_to_be_removed)
                     new_note = change_note('semitone down', note_and_octave, tracker_cursor[:])
                     pattern[tracker_cursor[0]][tracker_cursor[1]-1][tracker_cursor[2]] = new_note
-                    should_convert_sample = SongData.nondefault_note_counter(operation='increase', 
+                    should_convert_sample = song_data.nondefault_note_counter(operation='increase', 
                                                                              track=tracker_cursor[0], 
                                                                              note=new_note
                                                                              )
@@ -359,7 +361,7 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
                 volumes[tracker_cursor[0]] -= 1
                 song_data.put_data('samples_volume', volumes)
     
-    def plus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number):
+    def plus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number, send_to_player):
         # if field on playlist is highlighted:
         if tracker_cursor[1] > 0:
             # Add note with volume:
@@ -369,14 +371,14 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
                 # semitone up:
                 if tracker_cursor[2] == 0:
                     note_and_octave = pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]]
-                    samples_to_be_removed = SongData.nondefault_note_counter(operation='decrease', 
+                    samples_to_be_removed = song_data.nondefault_note_counter(operation='decrease', 
                                                                              track=tracker_cursor[0], 
                                                                              note=note_and_octave
                                                                              )
                     remove_sample_nondefault(song_data, samples_to_be_removed)
                     new_note = change_note('semitone up', note_and_octave, tracker_cursor[:])
                     pattern[tracker_cursor[0]][tracker_cursor[1] - 1][tracker_cursor[2]] = new_note
-                    should_convert_sample = SongData.nondefault_note_counter(operation='increase', 
+                    should_convert_sample = song_data.nondefault_note_counter(operation='increase', 
                                                                              track=tracker_cursor[0], 
                                                                              note=new_note
                                                                              )
@@ -408,9 +410,9 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
                 song_data.put_data('samples_volume', volumes)
     
     if key == '7':
-        result = minus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number)
+        result = minus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number, send_to_player)
     if key == '9':
-        result = plus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number)
+        result = plus_key(song_data, tracker_cursor, pattern, volume_string_list, pattern_number, send_to_player)
     return result
 
 # key with [insert] sticker on it - accept / insert key:
@@ -441,7 +443,7 @@ def insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern
             pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = last_added_note_data
             note = last_added_note_data[0]
             if note != 'C5':
-                should_convert_sample = SongData.nondefault_note_counter(operation='increase', 
+                should_convert_sample = song_data.nondefault_note_counter(operation='increase', 
                                                          track=tracker_cursor[0], 
                                                          note=note
                                                          )
@@ -452,9 +454,10 @@ def insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern
         # if field for note is not empty, delete note:
         else:
             note = pattern[tracker_cursor[0]][tracker_cursor[1] - 1]
+            note = note[0]
             pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = []
-            in note != 'C5':
-                samples_to_be_removed = SongData.nondefault_note_counter(operation='decrease', 
+            if note != 'C5':
+                samples_to_be_removed = song_data.nondefault_note_counter(operation='decrease', 
                                                              track=tracker_cursor[0], 
                                                              note=note
                                                              )
@@ -551,7 +554,7 @@ def main(keys, song_data, pattern_number):
             # [+] and [-] keys:
             elif key == '7' or key == '9':
                 # change selected note's volume value / change selected sample master volume value / change note to higher/lower note:
-                new_pattern = plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_list, pattern_number)
+                new_pattern = plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_list, pattern_number, send_to_player)
                 if new_pattern is not None:
                     pattern = new_pattern
             # [Insert] key:
@@ -590,7 +593,7 @@ def main(keys, song_data, pattern_number):
                 if new_pattern_number is not None:
                     return new_pattern_number
             # if key was pressed, update displayed tui:
-            clear_screen()
+            #clear_screen()
             tuitracker(samples_list=samples, 
                        this_pattern=pattern, 
                        pattern_number=pattern_number, 

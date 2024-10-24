@@ -211,8 +211,8 @@ class SongData:
             else:
                 result = False
             return result
-            
-        def decrease(self, track, note)
+
+        def decrease(self, track, note):
             if note != 'C5':
                 if note in self.__samples_not_c5[track]:
                     if self.__samples_not_c5[track][note] == 1:
@@ -224,9 +224,9 @@ class SongData:
         result = None
         if track is not None and note is not None:
             if operation == 'increase':
-                result = increase(track, note)
+                result = increase(self, track, note)
             elif operation == 'decrease':
-                result = [(track, decrease(track, note))]
+                result = [(track, decrease(self, track, note))]
         # Cloning / Removing pattern:
         if pattern is not None:
             #for each track:
@@ -236,9 +236,9 @@ class SongData:
                     note = pattern[t][q][0]
                     if note != 'C5':
                         if operation == 'increase':
-                            increase(t, note)
+                            increase(self, t, note)
                         else:
-                            note_to_remove = decrease(t, note)
+                            note_to_remove = decrease(self, t, note)
                             if note_to_remove not in result and note_to_remove is not None:
                                 if result is None:
                                     result = []

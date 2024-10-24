@@ -59,10 +59,10 @@ def convert_non_defaults(song_data):
     # for each sample/track
     for s in range(len(sample_paths)):
         if sample_paths[i] != 'Empty':
-        #for each note that appears in patterns for that track:
-        notes = [*samples_not_c5[s]]
-        for n in range(len(notes)):
-            convert_audio_to_temp.convert_to_pygame_format(sample_paths[i], notes[n])
+            #for each note that appears in patterns for that track:
+            notes = [*samples_not_c5[s]]
+            for n in range(len(notes)):
+                convert_audio_to_temp.convert_to_pygame_format(sample_paths[i], notes[n])
 
 
 

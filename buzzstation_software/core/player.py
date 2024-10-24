@@ -85,7 +85,10 @@ def play_pattern(song_data, send_to_player, nmc):
                     note_vol = convert_tracker_volume(note[1]) # convert hex to to number for int 0 - 100
                     sample_main_vol = (song_data.get_data('samples_volume')[s]) / 10
                     vol = (note_vol * sample_main_vol) / 100
-                    send_to_player.play_note(s, vol)
+                    sample_note = note[0]
+                    if ' ' in sample_note:
+                        sample_note = sample_note[:2]
+                    send_to_player.play_note(s, sample_note, vol)
             if not should_continue_playing(song_data):
                 break
 

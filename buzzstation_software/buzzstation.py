@@ -23,6 +23,8 @@ def default_dirs():
         os.system('mkdir ' + cwd + '/samples')
     if not os.path.isdir(cwd + '/saved_songs'):
         os.system('mkdir ' + cwd + '/saved_songs')
+    if not os.path.isdir(cwd + '/.temp'):
+        os.system('mkdir ' + cwd + '/.temp')
 
 def main():
     # Clear temp dir:

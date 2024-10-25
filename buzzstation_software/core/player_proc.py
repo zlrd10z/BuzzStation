@@ -67,7 +67,6 @@ def player_audiofiles(queue_player):
                         samples[sample_name]['C5'] = pygame.mixer.Sound(sample_path)
             case 4:
                 # Play sample
-                print(samples)
                 playing_data = data[1]
                 sample_number = playing_data[0]
                 note = playing_data[1]

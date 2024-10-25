@@ -58,13 +58,11 @@ def convert_non_defaults(song_data):
     samples_not_c5 = song_data.get_data('samples_not_c5')
     # for each sample/track
     for s in range(len(sample_paths)):
-        if sample_paths[i] != 'Empty':
+        if sample_paths[s] != 'Empty':
             #for each note that appears in patterns for that track:
             notes = [*samples_not_c5[s]]
             for n in range(len(notes)):
-                convert_audio_to_temp.convert_to_pygame_format(sample_paths[i], notes[n])
-
-
+                convert_audio_to_temp.convert_to_pygame_format(sample_paths[s], notes[n])
 
 def save_song(song_data, keypad):
     path_to_file = pick_file.get_filename('save song', keypad)
@@ -370,6 +368,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
                     song_data = SongData()
                     create_empty_song_playlist(song_data)
                     time.sleep(0.1) #to properly reload potentiometers on I2C
+                    song_data.new_nondefaults() #Create new list of nondefaults notes
                 # Put queue and serial to song data:
                 song_data.put_data('serial_usb', serial_usb)
                 song_data.put_data('queue_player', queue_player)

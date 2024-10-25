@@ -13,10 +13,21 @@ import subprocess
 #lambdas:
 #clear_screen = lambda: os.system('clear')
 
+# Converst single non C5 note for single track
 def convert_nondefault(song_data, track, note):
     samples = song_data.get_data('samples')
     sample_path = samples[track]
-    convert_audio_to_temp.convert_to_pygame_format(sample_path, note)
+    if sample_path != 'Empty':
+        convert_audio_to_temp.convert_to_pygame_format(sample_path, note)
+
+# Convert all non C5 notes for single track:
+def convert_all_nondefaults_track(song_data, track):
+    samples_not_c5 = song_data.get_data('samples_not_c5')
+    notes_for_track = samples_not_c5[track]
+    notes_for_track = [*notes_for_track]
+    for note in notes_for_track:
+        convert_nondefault(song_data, track, note)
+
 
 def remove_sample_nondefault(song_data, samples_to_be_removed):
     if isinstance(samples_to_be_removed, list):
@@ -333,6 +344,7 @@ def plus_n_minus_keys(key, song_data, tracker_cursor, pattern, volume_string_lis
                                                                              track=tracker_cursor[0], 
                                                                              note=new_note
                                                                              )
+
                     if should_convert_sample:
                         convert_nondefault(song_data, tracker_cursor[0], new_note)
                         send_to_player.update_nondefault()
@@ -433,6 +445,7 @@ def insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern
             song_data.put_data('samples_temp', samples_temp)
             # send info to audio player, which sample changed and it's name:
             send_to_player.update_sample(tracker_cursor[0], temp_sample_name)
+            convert_all_nondefaults_track(song_data, tracker_cursor[0])
             send_to_player.update_nondefault()
 
     # if cursor is on playlist:

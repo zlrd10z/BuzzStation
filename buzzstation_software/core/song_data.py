@@ -244,3 +244,8 @@ class SongData:
                                     result = []
                                 result.append((t, note_to_remove))
         return result
+
+    def new_nondefaults(self):
+        self.__samples_not_c5 = {}
+        for i in range(16):
+            self.__samples_not_c5[i] = {}

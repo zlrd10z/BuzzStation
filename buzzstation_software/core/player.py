@@ -216,10 +216,13 @@ def play_song(song_data, send_to_player, nmc):
                         if drum_pattern is not None:
                             if len(drum_pattern[s][q]) > 0:
                                 note = drum_pattern[s][q]
+                                sample_speed = note[0]
+                                if ' ' in sample_speed:
+                                    sample_speed = sample_speed[:-1]
                                 note_vol = convert_tracker_volume(note[1]) # convert hex to to number for int 0 - 16
                                 sample_main_vol = (song_data.get_data('samples_volume')[s]) / 10
                                 vol = (note_vol * sample_main_vol) / 100
-                                send_to_player.play_note(s, vol)
+                                send_to_player.play_note(s, sample_speed, vol)
                 
                 else:
                     # MIDI NOTES:

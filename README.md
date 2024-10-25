@@ -31,3 +31,4 @@ This project requires the following Python libraries:
 
 - `adafruit-circuitpython-ads1x15`  # Adafruit CircuitPython library for ADS1x15 ADCs
 - `pygame 2.1.2`  # Pymixer from pygame used for playing audio samples
+- `pydub 0.24.1` # pydub for audio converting

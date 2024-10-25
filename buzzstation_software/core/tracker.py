@@ -16,7 +16,6 @@ clear_screen = lambda: os.system('clear')
 
 # Converst single non C5 note for single track
 def convert_nondefault(song_data, track, note):
-    load_scrn.draw()
     samples = song_data.get_data('samples')
     sample_path = samples[track]
     if sample_path != 'Empty':
@@ -24,7 +23,6 @@ def convert_nondefault(song_data, track, note):
 
 # Convert all non C5 notes for single track:
 def convert_all_nondefaults_track(song_data, track):
-    load_scrn.draw()
     samples_not_c5 = song_data.get_data('samples_not_c5')
     notes_for_track = samples_not_c5[track]
     notes_for_track = [*notes_for_track]
@@ -111,7 +109,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
     menu_cursor = [0, 0]
     selected = 0
 
-    clear_screen()
+    
     tuitracker(samples_list=samples, 
                this_pattern=pattern, 
                pattern_number=pattern_number, 
@@ -173,7 +171,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
                 selected = 3
 
             # when key was pressed, display updated GUI:
-            clear_screen()
+            
             tuitracker(samples_list=samples, 
                this_pattern=pattern, 
                pattern_number=pattern_number, 
@@ -202,7 +200,7 @@ def pots_values_tui(song_data, samples, pattern, pattern_number,
         potentiometers_previous_values[0] = bpm
         potentiometers_previous_values[1] = swing
         potentiometers_previous_values[2] = bvol
-        clear_screen()
+        
         tuitracker(samples_list=samples, 
                    this_pattern=pattern, 
                    pattern_number=pattern_number, 
@@ -609,7 +607,7 @@ def main(keys, song_data, pattern_number):
                 if new_pattern_number is not None:
                     return new_pattern_number
             # if key was pressed, update displayed tui:
-            clear_screen()
+            
             tuitracker(samples_list=samples, 
                        this_pattern=pattern, 
                        pattern_number=pattern_number, 

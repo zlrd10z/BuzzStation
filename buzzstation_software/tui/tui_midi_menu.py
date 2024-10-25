@@ -3,13 +3,15 @@ from scrmx import fill_matrix
 from scrmx import print_screen_matrix
 from txtcolor import text_bg_color
 from txtcolor import text_font_color
+import os
 
 GUI_HEIGHT = 17
 GUI_WIDTH = 64
 
 chg_bgd_clr = lambda text: text_bg_color('blue', text)
 # Format displayed text, so it looks like selected by cursor:
-txt_color_sel = lambda text: text_bg_color('white', text_font_color('black', text)) 
+txt_color_sel = lambda text: text_bg_color('white', text_font_color('black', text))
+clear_screen = lambda: os.system('clear')
 
 # Fill screen with blue color:
 def bg_color(screen_matrix):
@@ -93,6 +95,7 @@ def main(midi_out_chnl, selected_midi_instrument, track, selected):
     screen_matrix = draw_win_title(screen_matrix, track)
     screen_matrix = draw_options(screen_matrix, midi_out_chnl, selected_midi_instrument, selected)
     screen_matrix = draw_instruction(screen_matrix, selected)
+    clear_screen()
     print_screen_matrix(screen_matrix)
 
 if __name__ == '__main__':

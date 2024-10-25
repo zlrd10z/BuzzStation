@@ -1,7 +1,8 @@
 from .tui_tracker import create_screen_matrix, fill_matrix, draw_frames_and_numbers, name_tracks, print_screen_matrix, draw_bpm_vol_swing_values
 from .txtcolor import text_bg_color, text_font_color
+import os
 
-
+clear_screen = lambda: os.system('clear')
 formatTextAsSelected = lambda text: text_bg_color('grey', text_font_color('black', text))
 
 #Create vertical lines for better visibility:
@@ -227,6 +228,7 @@ def main(list_of_instruments, bpm_value, swing_value, vol_value,
     screen_matrix = draw_patterns(screen_matrix, selected_pattern, playlist_to_display, first_number, pattern_cursor)
     screen_matrix = draw_page_and_playing(screen_matrix, page_number, is_playing)
     if printtui:
+        clear_screen()
         print_screen_matrix(screen_matrix)
     else:
         return screen_matrix

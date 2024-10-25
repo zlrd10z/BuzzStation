@@ -4,7 +4,7 @@ from .txtcolor import text_bg_color, text_font_color
 
 
 # Lambdas:
-clear = lambda: os.system('clear')
+clear_screen = lambda: os.system('clear')
 formatTextAsSelected = lambda text: text_bg_color('grey', text_font_color('black', text))
 
 # 64x18 characters:
@@ -439,8 +439,8 @@ def main(list_of_samples, pattern, is_playing, bpm_value,
     screen_matrix = draw_menu(screen_matrix, selected_button)
     screen_matrix = draw_play_pause(screen_matrix, is_playing, playing_mode)
     if print_on_screen == True:
+        clear_screen()
         print_screen_matrix(screen_matrix)
-        
     return screen_matrix
 
 

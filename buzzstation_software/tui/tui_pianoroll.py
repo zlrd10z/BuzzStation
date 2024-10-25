@@ -1,7 +1,8 @@
 from .txtcolor import text_font_color, text_bg_color
+import os
 
 # Lambdas:
-clear = lambda: os.system('clear')
+clear_screen = lambda: os.system('clear')
 underlined_text = lambda text: (f'\033[4m{text}\033[0m')
 
 # 64x18 characters:
@@ -354,6 +355,7 @@ def main(bpm_value, swing_value, pattern_number, playing_mode,
     screen_matrix = draw_midi_info(screen_matrix, midi_output_and_channel)
     screen_matrix = draw_indicators(screen_matrix, pattern)
     if print_it:
+        clear_screen()
         print_tui(screen_matrix)
     else:
         return screen_matrix

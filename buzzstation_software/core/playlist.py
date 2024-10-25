@@ -19,7 +19,6 @@ from tui import load_scrn
 
 
 # Lambdas:
-clear_screen = lambda: os.system('clear')
 tui_pl = lambda tui_cursor, playlist, menu_selected, list_of_instruments, bpm, swing, bvol, songname, is_playing: tui_playlist.main(
                                 list_of_instruments=list_of_instruments,
                                 bpm_value=bpm,
@@ -142,7 +141,7 @@ def pots_values_tui(song_data, previous_printed_values, playlist_cursor,
     swing = song_data.get_data('swing')
     bvol = song_data.get_data('bvol')
     if previous_printed_values[0] != bpm or previous_printed_values[1] != swing or previous_printed_values[2] != bvol:
-        clear_screen()
+        
         tui_pl(tui_cursor = playlist_cursor[:], 
                     playlist = song_playlist, 
                     menu_selected = None, 
@@ -334,7 +333,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
         save_song(song_data, keypad)
         song_data.put_data('serial_usb', serial_usb)
         song_data.put_data('queue_player', queue_player)
-        clear_screen()
+        
         tui_pl(tui_cursor=playlist_cursor[:], 
                     playlist=song_playlist, 
                     menu_selected=selected, 
@@ -393,7 +392,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
         else:
             # Action was not confirmed by user in warning window
             # display menu without warning:
-            clear_screen()
+            
             tui_pl(tui_cursor=playlist_cursor[:], 
                         playlist=song_playlist, 
                         menu_selected=selected, 
@@ -409,7 +408,7 @@ def menu_accept_key(keypad, song_data, playlist_cursor, song_playlist, playlist_
 def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments, data_for_threads):    
     selected = 0
     menu_cursor = [0, 0]
-    clear_screen()
+    
     tui_pl(tui_cursor=playlist_cursor[:], 
                 playlist=song_playlist, 
                 menu_selected=selected, 
@@ -466,7 +465,7 @@ def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_ins
 
             # Check if selected button changed and displayit to user:
             if previous_selected != selected:
-                clear_screen()
+                
                 tui_pl(tui_cursor=playlist_cursor[:], 
                             playlist=song_playlist, 
                             menu_selected=selected, 
@@ -552,7 +551,7 @@ def main(keypad, song_data, data_for_threads):
                     song_playlist = song_data.get_data('song_playlist')
                     playlist_list_of_instruments = song_data.get_data('playlist_list_of_instruments')
                     playlist_cursor = [0, 0]
-                    clear_screen()
+                    
                     tui_pl(tui_cursor=playlist_cursor[:], 
                                 playlist=song_playlist, 
                                 menu_selected = None,
@@ -594,7 +593,7 @@ def main(keypad, song_data, data_for_threads):
                         song_playlist[playlist_cursor[0]][playlist_cursor[1] - 1] = ' '
             
             # when key was pressed, update displayed GUI:
-            clear_screen()
+            
             tui_pl(tui_cursor = playlist_cursor[:], 
                         playlist = song_playlist, 
                         menu_selected = None, 

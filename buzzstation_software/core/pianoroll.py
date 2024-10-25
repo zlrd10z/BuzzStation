@@ -79,7 +79,7 @@ def menu(keypad, song_data, pattern_number, midi_and_channel,
         track
 ):
     menu_selected_button = 0
-    clear_screen()
+    
     tui(song_data, pattern_number, midi_and_channel, 
         selected_note_and_octave, selected_beat, pattern[:], 
         selected_menu_button=menu_selected_button
@@ -134,12 +134,12 @@ def menu(keypad, song_data, pattern_number, midi_and_channel,
                     else: is_song_playing = True
 
                     song_data.put_data('is_song_playing', is_song_playing)
-                    clear_screen()
+                    
                     tui(song_data, pattern_number, midi_and_channel, 
                         selected_note_and_octave, selected_beat, pattern[:], 
                         selected_menu_button = menu_selected_button
                        )
-            clear_screen()
+            
             tui(song_data, pattern_number, midi_and_channel, 
                 selected_note_and_octave, selected_beat, pattern[:], 
                 selected_menu_button = menu_selected_button)
@@ -153,7 +153,7 @@ def pots_values_tui(song_data, pattern_number, midi_and_channel,
             if song_data.get_data('bpm') != previous_values[0] or song_data.get_data('swing') != previous_values[1]:
                 previous_values[0] = song_data.get_data('bpm') 
                 previous_values[1] = song_data.get_data('swing')
-                clear_screen()
+                
                 tui(song_data, pattern_number, midi_and_channel, 
                     selected_note_and_octave, selected_beat, pattern[:], 
                     selected_menu_button = None
@@ -255,7 +255,7 @@ def edit_key(keypad, song_data, pattern_number,
     if len(pattern[selected_beat]) > 0:
         for i in range(len(pattern[selected_beat])):
             if selected_note_and_octave == pattern[selected_beat][i][0]:
-                clear_screen()
+                
                 tui_edit_note_length(song_data, pattern_number, midi_and_channel, 
                                      selected_note_and_octave, selected_beat, pattern[:], 
                                      selected_menu_button=None
@@ -303,7 +303,7 @@ def edit_key(keypad, song_data, pattern_number,
                                                                new_pattern=pattern_notes_to_turn_off, 
                                                                target_notes_to_turn_off=True
                                                               )
-                        clear_screen()
+                        
                         tui_edit_note_length(song_data, pattern_number, midi_and_channel, 
                                              selected_note_and_octave, selected_beat, pattern[:], 
                                              selected_menu_button=None
@@ -496,7 +496,7 @@ def main(keypad, song_data, pattern_number, midi_and_channel, track):
                     return new_pattern_number
             
             # when key was pressed, update GUI displayed:
-            clear_screen()
+            
             tui(song_data, pattern_number, midi_and_channel,
                 selected_note_and_octave, selected_beat,
                 pattern[:], selected_menu_button=None

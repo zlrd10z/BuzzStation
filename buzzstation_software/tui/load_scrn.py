@@ -1,6 +1,7 @@
 from tui import scrmx
 from tui.txtcolor import text_bg_color
 from tui.txtcolor import text_font_color
+import os
 
 
 ascii_txt_loading = []
@@ -24,7 +25,8 @@ def draw():
     scrmx.draw_box(screen_matrix)
     scrmx.draw_instr(screen_matrix, 'BuzzStation')
     draw_ascii_art(screen_matrix, 8, 6)
-    scrmx.print_screen_matrix(screen_matrix)
+    os.system('clear') #clear screen
+    scrmx.print_screen_matrix(screen_matrix) #display loading screen
 
 if __name__ == '__main__':
     draw()

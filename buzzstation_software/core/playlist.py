@@ -54,7 +54,7 @@ def clear_temp():
 
 # Convert samples to different speed according to their note which exist in patterns
 def convert_non_defaults(song_data):
-    load_scrn()
+    load_scrn.draw()
     sample_paths = song_data.get_data('samples')
     samples_not_c5 = song_data.get_data('samples_not_c5')
     # for each sample/track

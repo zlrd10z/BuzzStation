@@ -138,12 +138,20 @@ def draw_piano(screen_matrix, octave, start_note, selected_note):
 def draw_quarter_time(screen_matrix):
     x_position = 9
     x = 0
-    for i in range(16):
-        char_number = chr(0x2488 + i)
+    for i in range(1, 17):
+        char_number = str(i)
         if i % 4 == 0:
-            screen_matrix[0][x_position + x] = text_font_color('black', text_bg_color('blue', char_number))
+            if len(char_number) > 1:
+                screen_matrix[0][x_position+x] = text_font_color('black', text_bg_color('blue', char_number[0]))
+                screen_matrix[0][x_position+x+1] = text_font_color('black', text_bg_color('blue', char_number[1]))
+            else:
+                screen_matrix[0][x_position+x] = text_font_color('black', text_bg_color('blue', char_number))
         else:
-            screen_matrix[0][x_position + x] = text_bg_color('blue', char_number)
+            if len(char_number) > 1:
+                screen_matrix[0][x_position+x] = text_bg_color('blue', char_number[0])
+                screen_matrix[0][x_position+x+1] = text_bg_color('blue', char_number[1])
+            else:    
+                screen_matrix[0][x_position+x] = text_bg_color('blue', char_number)
         x += 3
     return screen_matrix
 
@@ -194,8 +202,8 @@ def draw_buttons(screen_matrix, selected=None):
     button_playlist = ' Playlist '
     button_playing_mode = ' Playing mode '
     button_clone = ' Clone '
-    button_previous_pattern = ' ⇽ '
-    button_next_pattern = ' ⇾ '
+    button_previous_pattern = ' < '
+    button_next_pattern = ' > '
     
     toDraw =  button_previous_pattern + '?' + button_playing_mode + '?' +  button_clone + '?' + button_next_pattern
     question_mark_counter = 0
@@ -237,10 +245,10 @@ def draw_cursor(screen_matrix, cursor, position, note_length_edit):
     note = cursor.replace(octave, '')
     y = y_position - notes_displayed.index(cursor)
     x = x_position + position * 3
-    cursor_char = '☟'
+    cursor_char = 'v'
     
     if note_length_edit:
-        cursor_char = '↔'
+        cursor_char = '-'
     
     if ' ' in screen_matrix[y-1][x]:
         screen_matrix[y-1][x] = screen_matrix[y-1][x].replace(' ', cursor_char)
@@ -306,9 +314,9 @@ def draw_indicators(screen_matrix, pattern):
                     below = True
                     
     if above:
-        screen_matrix[1][57] = text_bg_color('blue', '⇡')
+        screen_matrix[1][57] = text_bg_color('blue', '∧')
     if below:
-        screen_matrix[13][57] = text_bg_color('blue', '⇣')
+        screen_matrix[13][57] = text_bg_color('blue', '∧')
     
     return screen_matrix
 
@@ -355,7 +363,6 @@ def main(bpm_value, swing_value, pattern_number, playing_mode,
     screen_matrix = draw_midi_info(screen_matrix, midi_output_and_channel)
     screen_matrix = draw_indicators(screen_matrix, pattern)
     if print_it:
-        clear_screen()
         print_tui(screen_matrix)
     else:
         return screen_matrix

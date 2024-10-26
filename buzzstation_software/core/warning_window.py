@@ -7,10 +7,8 @@ import os
 
 
 def main(keypad, screen_matrix, action):
-    clear_screen = lambda: os.system('clear')
     ok_selected = False
 
-    clear_screen()
     tui_warning_window.main(screen_matrix, ok_selected, action)
 
     while True:
@@ -30,7 +28,6 @@ def main(keypad, screen_matrix, action):
             if key == '1':
                 result = False
                 break
-            clear_screen()
             tui_warning_window.main(screen_matrix, ok_selected, action)
     return result
 

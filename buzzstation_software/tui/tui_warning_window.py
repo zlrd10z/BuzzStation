@@ -7,7 +7,6 @@ BOLD = '\033[1m'
 RESET = '\033[0m'
 
 # Lambdas:
-clear_screen = lambda: os.system('clear')
 bold_text = lambda text: f'{BOLD}{text}{RESET}'
 formatTextAsSelected = lambda text: text_bg_color('grey', text_font_color('black', text))
 
@@ -153,5 +152,4 @@ def main(screen_matrix, ok_selected, action):
     screen_matrix = draw_warning_txt(screen_matrix)
     screen_matrix = draw_buttons(screen_matrix, ok_selected)
     screen_matrix = draw_info_txt(screen_matrix, action)
-    clear_screen()
     print_screen_matrix(screen_matrix)

@@ -228,7 +228,6 @@ def main(list_of_instruments, bpm_value, swing_value, vol_value,
     screen_matrix = draw_patterns(screen_matrix, selected_pattern, playlist_to_display, first_number, pattern_cursor)
     screen_matrix = draw_page_and_playing(screen_matrix, page_number, is_playing)
     if printtui:
-        clear_screen()
         print_screen_matrix(screen_matrix)
     else:
         return screen_matrix

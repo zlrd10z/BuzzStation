@@ -95,7 +95,6 @@ def main(midi_out_chnl, selected_midi_instrument, track, selected):
     screen_matrix = draw_win_title(screen_matrix, track)
     screen_matrix = draw_options(screen_matrix, midi_out_chnl, selected_midi_instrument, selected)
     screen_matrix = draw_instruction(screen_matrix, selected)
-    clear_screen()
     print_screen_matrix(screen_matrix)
 
 if __name__ == '__main__':

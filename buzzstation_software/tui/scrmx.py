@@ -1,8 +1,12 @@
 from tui.txtcolor import text_bg_color
 from tui.txtcolor import text_font_color
+import os
+
 
 GUI_HEIGHT = 17
 GUI_WIDTH = 64
+
+clear_screen = lambda: os.system('clear')
 
 # Create matrix 16 x 64 chars
 def create_screen_matrix():
@@ -65,4 +69,5 @@ def print_screen_matrix(screen_matrix):
     for i in range(len(screen_matrix)):
         for j in range(len(screen_matrix[0])):
             frame += screen_matrix[i][j]
+    clear_screen()
     print(frame)

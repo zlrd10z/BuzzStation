@@ -243,7 +243,7 @@ def draw_menu(screen_matrix, selected=None):
         if i <= len(text)-1:
             screen_matrix[6][x + i] = text_bg_color('blue', text[i])
 
-    button_text = '⇽'
+    button_text = '<'
     for i in range(tui_width - x):
         if i <= len(button_text)-1:
             if selected == 0:
@@ -252,7 +252,7 @@ def draw_menu(screen_matrix, selected=None):
                 screen_matrix[6][x+i+8] = button_text[i]
 
 
-    button_text = '⇾'
+    button_text = '>'
     for i in range(tui_width - x):
         if i <= len(button_text)-1:
             if selected == 1:
@@ -439,7 +439,6 @@ def main(list_of_samples, pattern, is_playing, bpm_value,
     screen_matrix = draw_menu(screen_matrix, selected_button)
     screen_matrix = draw_play_pause(screen_matrix, is_playing, playing_mode)
     if print_on_screen == True:
-        clear_screen()
         print_screen_matrix(screen_matrix)
     return screen_matrix
 

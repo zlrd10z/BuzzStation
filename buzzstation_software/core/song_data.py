@@ -120,8 +120,17 @@ class SongData:
             self.__drums_patterns.pop(pattern_number)
         # Get pattern from list of patterns:    
         elif operation == 'get pattern':
-            result = self.__drums_patterns[pattern_number]
-            result = result[:]
+            if pattern_number in self.__drums_patterns:
+                result = self.__drums_patterns[pattern_number]
+                result = result[:]
+            else:
+                dummy_pattern = []
+                for i in range(16):
+                    part = []
+                    for i in range(16):
+                        part.append([])
+                    dummy_pattern.append(part)
+                result = dummy_pattern
         # Update patterns list with new pattern
         elif operation == 'create or update pattern':
             self.__drums_patterns[pattern_number] = new_pattern

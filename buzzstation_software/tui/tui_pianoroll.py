@@ -194,8 +194,8 @@ def draw_buttons(screen_matrix, selected=None):
     button_playlist = ' Playlist '
     button_playing_mode = ' Playing mode '
     button_clone = ' Clone '
-    button_previous_pattern = ' < '
-    button_next_pattern = ' > '
+    button_previous_pattern = ' ⇽ '
+    button_next_pattern = ' ⇾ '
     
     toDraw =  button_previous_pattern + '?' + button_playing_mode + '?' +  button_clone + '?' + button_next_pattern
     question_mark_counter = 0

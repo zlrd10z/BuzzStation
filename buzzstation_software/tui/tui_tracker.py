@@ -243,7 +243,7 @@ def draw_menu(screen_matrix, selected=None):
         if i <= len(text)-1:
             screen_matrix[6][x + i] = text_bg_color('blue', text[i])
 
-    button_text = '<'
+    button_text = '⇽'
     for i in range(tui_width - x):
         if i <= len(button_text)-1:
             if selected == 0:
@@ -252,7 +252,7 @@ def draw_menu(screen_matrix, selected=None):
                 screen_matrix[6][x+i+8] = button_text[i]
 
 
-    button_text = '>'
+    button_text = '⇾'
     for i in range(tui_width - x):
         if i <= len(button_text)-1:
             if selected == 1:

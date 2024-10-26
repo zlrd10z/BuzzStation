@@ -138,20 +138,12 @@ def draw_piano(screen_matrix, octave, start_note, selected_note):
 def draw_quarter_time(screen_matrix):
     x_position = 9
     x = 0
-    for i in range(1, 17):
-        char_number = str(i)
+    for i in range(16):
+        char_number = chr(0x2488 + i)
         if i % 4 == 0:
-            if len(char_number) > 1:
-                screen_matrix[0][x_position+x] = text_font_color('black', text_bg_color('blue', char_number[0]))
-                screen_matrix[0][x_position+x+1] = text_font_color('black', text_bg_color('blue', char_number[1]))
-            else:
-                screen_matrix[0][x_position+x] = text_font_color('black', text_bg_color('blue', char_number))
+            screen_matrix[0][x_position + x] = text_font_color('black', text_bg_color('blue', char_number))
         else:
-            if len(char_number) > 1:
-                screen_matrix[0][x_position+x] = text_bg_color('blue', char_number[0])
-                screen_matrix[0][x_position+x+1] = text_bg_color('blue', char_number[1])
-            else:    
-                screen_matrix[0][x_position+x] = text_bg_color('blue', char_number)
+            screen_matrix[0][x_position + x] = text_bg_color('blue', char_number)
         x += 3
     return screen_matrix
 
@@ -245,10 +237,10 @@ def draw_cursor(screen_matrix, cursor, position, note_length_edit):
     note = cursor.replace(octave, '')
     y = y_position - notes_displayed.index(cursor)
     x = x_position + position * 3
-    cursor_char = 'v'
+    cursor_char = '☟'
     
     if note_length_edit:
-        cursor_char = '-'
+        cursor_char = '↔'
     
     if ' ' in screen_matrix[y-1][x]:
         screen_matrix[y-1][x] = screen_matrix[y-1][x].replace(' ', cursor_char)
@@ -314,9 +306,9 @@ def draw_indicators(screen_matrix, pattern):
                     below = True
                     
     if above:
-        screen_matrix[1][57] = text_bg_color('blue', '∧')
+        screen_matrix[1][57] = text_bg_color('blue', '⇡')
     if below:
-        screen_matrix[13][57] = text_bg_color('blue', '∧')
+        screen_matrix[13][57] = text_bg_color('blue', '⇣')
     
     return screen_matrix
 

@@ -1,6 +1,10 @@
 import os, sys
 import time
-from .txtcolor import text_bg_color, text_font_color
+from .txtcolor import text_bg_color
+from .txtcolor import text_font_color
+from .scrmx import create_screen_matrix
+from .scrmx import fill_matrix
+from .scrmx import print_screen_matrix
 
 
 # Lambdas:
@@ -10,20 +14,6 @@ formatTextAsSelected = lambda text: text_bg_color('grey', text_font_color('black
 # 64x18 characters:
 tui_height = 17 #terminal command line is taking one line
 tui_width = 64
-
-# Create matrix 16 x 64 chars
-def create_screen_matrix():
-    screen_matrix = []
-    for i in range(tui_height):
-        screen_matrix.append([])
-    return screen_matrix
-
-# Append matrix with spaces characters:
-def fill_matrix(screen_matrix):
-    for i in range(tui_height):
-        for j in range(tui_width):
-            screen_matrix[i].append(' ')    
-    return screen_matrix
 
 # This function: 
 # Draws numbers on the left, from 1-16, which represents quaternotes in pattern
@@ -385,16 +375,6 @@ def draw_song_name(screen_matrix, song_name):
         if len(song_name) == 0: break
                 
     return screen_matrix
-
-# create string from chars matrix (screen_matrix) and print it out
-def print_screen_matrix(screen_matrix):
-    frame = ''
-    for i in range(len(screen_matrix)):
-        for j in range(len(screen_matrix[0])):
-            frame += screen_matrix[i][j]
-    print(frame)
-
-
 
 def main(list_of_samples, pattern, is_playing, bpm_value, 
          swing_value, playing_mode, vol_value, pattern_number, 

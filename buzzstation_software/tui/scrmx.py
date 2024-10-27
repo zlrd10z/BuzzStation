@@ -66,8 +66,10 @@ def draw_instr(screen_matrix, info_text):
 # create string from chars matrix (screen_matrix) and print it out
 def print_screen_matrix(screen_matrix):
     frame = ''
+    print('\033[H', end='')
     for i in range(len(screen_matrix)):
         for j in range(len(screen_matrix[0])):
             frame += screen_matrix[i][j]
-    clear_screen()
-    print(frame)
+        frame = (15-i)*'\033[F' + '\033[K' + frame
+        print(frame, flush=True)
+        frame = ''

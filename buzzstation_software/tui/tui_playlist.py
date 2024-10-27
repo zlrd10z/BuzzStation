@@ -1,6 +1,12 @@
-from .tui_tracker import create_screen_matrix, fill_matrix, draw_frames_and_numbers, name_tracks, print_screen_matrix, draw_bpm_vol_swing_values
+from .scrmx import create_screen_matrix
+from .scrmx import fill_matrix
+from .scrmx import print_screen_matrix
+from .tui_tracker import draw_frames_and_numbers
+from .tui_tracker import name_tracks
+from .tui_tracker import draw_bpm_vol_swing_values
 from .txtcolor import text_bg_color, text_font_color
 import os
+
 
 clear_screen = lambda: os.system('clear')
 formatTextAsSelected = lambda text: text_bg_color('grey', text_font_color('black', text))

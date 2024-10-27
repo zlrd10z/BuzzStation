@@ -1,5 +1,10 @@
-from .txtcolor import text_font_color, text_bg_color
+from .txtcolor import text_font_color
+from .txtcolor import text_bg_color
 import os
+from scrmx import create_screen_matrix
+from scrmx import fill_matrix
+from scrmx import print_screen_matrix
+
 
 # Lambdas:
 clear_screen = lambda: os.system('clear')
@@ -8,16 +13,6 @@ underlined_text = lambda text: (f'\033[4m{text}\033[0m')
 # 64x18 characters:
 tui_height = 17 #terminal command line is taking one line
 tui_width = 64
-
-# Create matrix 16 x 64 chars
-def create_screen_matrix():
-    screen_matrix = []
-    for i in range(tui_height):
-        row_matrix = []
-        for j in range(tui_width):
-            row_matrix.append('')
-        screen_matrix.append(row_matrix)
-    return screen_matrix
 
 def draw_frame(screen_matrix):
     for i in range(len(screen_matrix)):
@@ -257,15 +252,6 @@ def draw_cursor(screen_matrix, cursor, position, note_length_edit):
     
     return screen_matrix
     
-        
-def print_tui(screen_matrix):
-    toprint = ''
-    for i in range(len(screen_matrix)):
-        for j in range(len(screen_matrix[i])):
-            toprint += screen_matrix[i][j]
-    print(toprint)
-
-    
 def get_starting_note_and_octave(selected_note):
     global notes_displayed
     octave = int(selected_note[-1:])
@@ -339,6 +325,7 @@ def main(bpm_value, swing_value, pattern_number, playing_mode,
     channel_number = midi_output_and_channel[3:]
     
     screen_matrix = create_screen_matrix()
+    screen_matrix - fill_matrix(screen_matrix)
     screen_matrix = draw_frame(screen_matrix)
     screen_matrix = draw_vertical_lines(screen_matrix)
     screen_matrix = draw_horizontal_lines(screen_matrix)
@@ -355,7 +342,7 @@ def main(bpm_value, swing_value, pattern_number, playing_mode,
     screen_matrix = draw_midi_info(screen_matrix, midi_output_and_channel)
     screen_matrix = draw_indicators(screen_matrix, pattern)
     if print_it:
-        print_tui(screen_matrix)
+        print_screen_matrix(screen_matrix)
     else:
         return screen_matrix
 

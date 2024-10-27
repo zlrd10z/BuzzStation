@@ -68,13 +68,15 @@ class Keypad():
             for i in range(len(pins)):
                 GPIO.setup(pins[i], GPIO.IN, pull_up_down=GPIO.PUD_UP)
             GPIO.setup(pins[p], GPIO.OUT)
-            GPIO.output(pins[p], GPIO.HIGH)
+            GPIO.output(pins[p], GPIO.LOW)
             time.sleep(0.01)
             for i in range(len(pins)):
                 if GPIO.input(pins[i]):
                     time.sleep(0.01)
                     print('='*64)
+                    GPIO.output(pins[p], GPIO.HIGH)
                     return [pins[i], pins[p]]
+            GPIO.output(pins[p], GPIO.HIGH)
             time.sleep(0.01)
         
 
@@ -122,7 +124,7 @@ class Keypad():
         # Now pins are segregatet for cols and rows
         cols = cols + list(set(pins) - set(rows))
         # but two column pins may be mixed up:
-        if detect_rol_col(8, pins=[rows[0]]) is None:
+        if detect_rol_col(8, pins=[rows[2]]) is None:
             temp_col = cols[1]
             cols[1] = cols[2]
             cols[2] = temp_col

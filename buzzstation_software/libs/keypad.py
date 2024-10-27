@@ -108,6 +108,8 @@ class Keypad():
                     rows.append(pins_temp[0])
                     rows.append(pins_temp_2[0])
                     break
+            if len(pins_temp) < 2 or len(pins_temp_2) < 2: 
+                break
                 
         '''
         Search for row with key [7] and row with key [*] (first column keys):

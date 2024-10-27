@@ -91,7 +91,7 @@ class Keypad():
         rows = []
         cols = []
         # Search for column and row for 1 key, not knowing which one is which:
-        pins_temp = detect_rol_col(1)
+        pins_temp = self.detect_rol_col(1)
         
         '''
         Search for col and row for 4 key, col for keys 4 is the same as for key 2,
@@ -141,11 +141,11 @@ class Keypad():
 if __name__ == '__main__':
     keypad = Keypad()
     while True:
-        choice = input('1. Detect colls and rows.  \n2. Check if keys working.\nq. Quit')
+        choice = input('1. Detect colls and rows.  \n2. Check if keys working.\nq. Quit\n')
         if choice == '1':
             keypad.detect_colls_rows()
             while True:
-                choice = input('Do you want to test keys?.\ny. \nn. no')
+                choice = input('Do you want to test keys?.\ny. \nn. no\n')
                 if choice == 'y':
                     keypad.test_keys()
                 elif choice == 'n':

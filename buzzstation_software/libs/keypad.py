@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import pickle
 from pathlib import Path
-
+import os
 
 class Keypad():
     GPIO.setmode(GPIO.BCM)

@@ -3,6 +3,7 @@ import subprocess
 from tui.txtcolor import text_font_color, text_bg_color
 from .screen_keyboard import user_input_filename
 from libs.keypad import Keypad 
+from tui.scrmx import clear_screen
 
 
 key = ''
@@ -12,7 +13,6 @@ p = ''
 screen_changed = True
 option = ''
 
-clear = lambda: os.system('clear')
 
 def hide_cursor():
     sys.stdout.write('\033[?25l')
@@ -95,7 +95,7 @@ def print_filelist():
         text = blue_fill + text + ' ' * (62 - text_len) + blue_fill
         return text
             
-    clear()
+    clear_screen()
     display_instruction_to_user(option)
     ls = q.getList()
     how_many_lines_visible = 15        
@@ -212,12 +212,12 @@ def get_filename(selected_option, keypad):
                     dir_path = pwd + '/' + dir_name
                     os.mkdir(dir_path)
                     load_directory()
-                    clear()
+                    clear_screen()
                 elif q.l[selected] == '[Save here as new file]':
                     pwd = p.pwd
                     created_filename = user_input_filename(False, k)
                     path_to_selected_file = pwd + '/' + created_filename
-                    clear()
+                    clear_screen()
                     break
                 # change directory:
                 elif '/' in q.l[selected]:
@@ -231,7 +231,7 @@ def get_filename(selected_option, keypad):
                     if option == 'sample':
                         if check_audio_format_compatibility(filename) == True:
                             path_to_selected_file = p.pwd +'/'+ filename
-                            clear()
+                            clear_screen()
                             break
                     # to avoid overwriting important file to user, only .btp extensions are accepted: 
                     if option == 'load song' or option == 'save song':
@@ -240,12 +240,12 @@ def get_filename(selected_option, keypad):
                         print(file_extension)
                         if file_extension == 'btp':
                             path_to_selected_file = p.pwd +'/'+ filename
-                            clear()
+                            clear_screen()
                             screen_changed = False
                             break
             # [Esc] key - abort:
             if pressed_key == '1':
-                clear()
+                clear_screen()
                 break
             # display on GUI:
             print_filelist()

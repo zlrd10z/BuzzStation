@@ -1,9 +1,8 @@
 from tui.txtcolor import text_font_color, text_bg_color
+from tui.scrmx import clear_screen
 import sys
 import os
 
-
-clear = lambda: os.system('clear')
 
 x = 0
 y = 0
@@ -95,7 +94,7 @@ def print_keyboard(filename, is_dir):
         text += ' ' * number_of_fields_to_fill
         text = text_bg_color('blue', text)
         print(text)
-    clear()
+    clear_screen()
     print_colored_line('  Please enter the name of song project')
     # starting index to print keyboard on center of the screen, between each key there would be two spaces
     # screen width 64 signs - 2 chars for bottom and top blue line, divided by two to get ceneter

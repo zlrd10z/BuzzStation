@@ -6,8 +6,6 @@ import os
 GUI_HEIGHT = 17
 GUI_WIDTH = 64
 
-clear_screen = lambda: os.system('clear')
-
 # Create matrix 16 x 64 chars
 def create_screen_matrix():
     screen_matrix = []
@@ -73,3 +71,6 @@ def print_screen_matrix(screen_matrix):
         frame = (15-i)*'\033[F' + '\033[K' + frame
         print(frame, flush=True)
         frame = ''
+
+def clear_screen():
+    print('\033[H', end='')

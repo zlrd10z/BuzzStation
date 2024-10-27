@@ -325,7 +325,7 @@ def main(bpm_value, swing_value, pattern_number, playing_mode,
     channel_number = midi_output_and_channel[3:]
     
     screen_matrix = create_screen_matrix()
-    screen_matrix - fill_matrix(screen_matrix)
+    screen_matrix = fill_matrix(screen_matrix)
     screen_matrix = draw_frame(screen_matrix)
     screen_matrix = draw_vertical_lines(screen_matrix)
     screen_matrix = draw_horizontal_lines(screen_matrix)

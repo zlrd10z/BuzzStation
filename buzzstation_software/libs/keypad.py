@@ -104,7 +104,7 @@ class Keypad():
                 if pins_temp[i] == pins_temp_2[j]:
                     cols.append(pins_temp[i])
                     pins_temp.pop(pins_temp[i])
-                    pins_temp.pop(pins_temp[i])
+                    pins_temp_2.pop(pins_temp[i])
                     rows.append(pins_temp[0])
                     rows.append(pins_temp_2[0])
                     break

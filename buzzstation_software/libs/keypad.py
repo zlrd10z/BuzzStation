@@ -62,6 +62,7 @@ class Keypad():
                     continue
             if pins is None:
                 pins = self.cols + self.rows
+                pins = list(pins)
             if p in pins:
                 pins.pop(p)
             for i in range(len(pins)):
@@ -90,8 +91,9 @@ class Keypad():
         pins = self.cols + self.rows
         rows = []
         cols = []
+        detect_rol_col = self.detect_rol_col
         # Search for column and row for 1 key, not knowing which one is which:
-        pins_temp = self.detect_rol_col(1)
+        pins_temp = detect_rol_col(1)
         
         '''
         Search for col and row for 4 key, col for keys 4 is the same as for key 2,

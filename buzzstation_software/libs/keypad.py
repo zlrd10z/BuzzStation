@@ -72,12 +72,11 @@ class Keypad():
             time.sleep(0.01)
             for i in range(len(pins)):
                 if GPIO.input(pins[i]):
-                    GPIO.cleanup()
                     time.sleep(0.01)
-                return [pins[i], pins[p]]
-            GPIO.cleanup()
+                    print('='*71)
+                    return [pins[i], pins[p]]
             time.sleep(0.01)
-        print('='*71)
+        
 
     '''
     This method, if the keyboard has been connected to a good range of pins, 

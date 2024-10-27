@@ -55,7 +55,7 @@ class Keypad():
     # Detects row pin and col pin for selected pressed key
     def detect_rol_col(self, key, sel_p=None, pins=None):
         number_of_pins = len(self.cols + self.rows)
-        input(f'Press [{key}] on keypad, then press any key on keyboard to continue...')
+        input(f'Press [{key}] on keypad, then press [enter] key on keyboard to continue...')
         for p in range(number_of_pins):
             if sel_p is not None:
                 if sel_p != p:
@@ -73,7 +73,7 @@ class Keypad():
             for i in range(len(pins)):
                 if GPIO.input(pins[i]):
                     time.sleep(0.01)
-                    print('='*71)
+                    print('='*64)
                     return [pins[i], pins[p]]
             time.sleep(0.01)
         
@@ -102,9 +102,9 @@ class Keypad():
         for i in range(2):
             for j in range(2):
                 if pins_temp[i] == pins_temp_2[j]:
-                    cols.append(pin_temp[i])
-                    pins_temp.pop(pin_temp[i])
-                    pins_temp.pop(pin_temp[i])
+                    cols.append(pins_temp[i])
+                    pins_temp.pop(pins_temp[i])
+                    pins_temp.pop(pins_temp[i])
                     rows.append(pins_temp[0])
                     rows.append(pins_temp_2[0])
                     break

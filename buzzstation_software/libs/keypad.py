@@ -141,14 +141,14 @@ class Keypad():
 if __name__ == '__main__':
     keypad = Keypad()
         while True:
-        choice = input('1. Detect colls and rows.  \n2. Check if keys working.\nq. Quit')
-        if choice == '1':
-            keypad.detect_colls_rows()
-            while True:
-                choice = input('Do you want to test keys?.\ny. \nn. no')
-                if choice == 'y':
-                    keypad.test_keys()
-                elif choice == 'n':
-                    break
-        if choice == '2':
-            keypad.test_keys()
+            choice = input('1. Detect colls and rows.  \n2. Check if keys working.\nq. Quit')
+            if choice == '1':
+                keypad.detect_colls_rows()
+                while True:
+                    choice = input('Do you want to test keys?.\ny. \nn. no')
+                    if choice == 'y':
+                        keypad.test_keys()
+                    elif choice == 'n':
+                        break
+            if choice == '2':
+                keypad.test_keys()

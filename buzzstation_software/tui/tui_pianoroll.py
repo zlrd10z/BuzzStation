@@ -1,9 +1,9 @@
 from .txtcolor import text_font_color
 from .txtcolor import text_bg_color
 import os
-from scrmx import create_screen_matrix
-from scrmx import fill_matrix
-from scrmx import print_screen_matrix
+from .scrmx import create_screen_matrix
+from .scrmx import fill_matrix
+from .scrmx import print_screen_matrix
 
 
 # Lambdas:

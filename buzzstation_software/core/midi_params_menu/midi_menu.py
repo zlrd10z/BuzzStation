@@ -41,7 +41,6 @@ def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Syn
     menu_categories = menu_categories + ['Filter', 'Chorus', 'Phaser', 'Reverb','Delay']
     selected_midi_instrument = selected_midi_instrument[0]
     selected = 0
-
     tui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)
 
     # main loop:
@@ -72,6 +71,4 @@ def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Syn
                 elif selected > 2:
                     category = menu_categories[selected]
                     submenus.main(keypad, song_data, track, category)
-
-            clear_screen()
             tui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)

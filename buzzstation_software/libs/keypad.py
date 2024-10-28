@@ -5,7 +5,7 @@ from pathlib import Path
 import os
 
 
-class Keypad():
+class Keypad:
     GPIO.setmode(GPIO.BCM)
     # Default settings:
     cols = (26, 0, 5)
@@ -18,18 +18,21 @@ class Keypad():
             cols = sorted_pins[0]
             rows = sorted_pins[1]
 
-    # Pins setup:
-    for i in range(len(cols)):
-        GPIO.setup(cols[i], GPIO.OUT)
-    for i in range(len(rows)):
-        GPIO.setup(rows[i], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
     keys = (
     ('1', '2', '3'),
     ('4', '5', '6'),
     ('7', '8', '9'),
     ('*', '0', '#')
     )
+
+    def __init__(self):
+        pins_setup()
+
+    def pins_setup(self):
+        for i in range(len(self.cols)):
+            GPIO.setup(self.cols[i], GPIO.OUT)
+        for i in range(len(self.rows)):
+            GPIO.setup(self.rows[i], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     def check_keys(self):
         try:
@@ -167,6 +170,7 @@ if __name__ == '__main__':
                     print(50*'-')
                     choice = input('Do you want to test keys?.\ny. \nn. no\n')
                     if choice == 'y':
+                        keypad.pins_setup()
                         keypad.test_keys()
                     elif choice == 'n':
                         break

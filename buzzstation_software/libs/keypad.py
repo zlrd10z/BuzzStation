@@ -139,7 +139,9 @@ class Keypad:
                 rows.append(pins_temp[0])
 
         # Now pins are segregatet for cols and rows
-        cols = list(set(pins) - set(rows))
+        rest_cols = list(set(pins) - set(rows))
+        rest_cols.remove(cols[0])
+        cols = cols + rest_cols
         # but two column pins may be mixed up:
         if detect_rol_col(key=8, sel_p=None, pins=[rows[2]]) is not None:
             temp_col = cols[1]
@@ -183,3 +185,5 @@ if __name__ == '__main__':
         if choice == '2':
             50*'-'
             keypad.test_keys()
+        if choice == 'q':
+            break

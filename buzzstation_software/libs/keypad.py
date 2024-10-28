@@ -154,19 +154,26 @@ class Keypad():
         while True:
             key = keypad.check_keys()
             if key != '':
-                    print(key)
+                    print('Key: 'key)
 
 if __name__ == '__main__':
     keypad = Keypad()
     while True:
         choice = input('1. Detect colls and rows.  \n2. Check if keys working.\nq. Quit\n')
         if choice == '1':
-            keypad.detect_colls_rows()
-            while True:
-                choice = input('Do you want to test keys?.\ny. \nn. no\n')
-                if choice == 'y':
-                    keypad.test_keys()
-                elif choice == 'n':
-                    break
+            50*'-'
+            try: 
+                keypad.detect_colls_rows()
+                while True:
+                    choice = input(50*'-' ,'Do you want to test keys?.\ny. \nn. no\n')
+                    if choice == 'y':
+                        keypad.test_keys()
+                    elif choice == 'n':
+                        break
+            except Exception as e:
+                print('Check your connection and please try again.')
+                print('Error: ', e)
+                GPIO.cleanup()
         if choice == '2':
+            50*'-'
             keypad.test_keys()

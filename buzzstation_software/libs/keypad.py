@@ -113,7 +113,8 @@ class Keypad:
         for i in range(2):
             for j in range(2):
                 if pins_temp[i] == pins_temp_2[j]:
-                    cols.append(pins_temp[i])
+                    if pins_temp[i] not in cols:
+                        cols.append(pins_temp[i])
                     ind1 = pins_temp.index(pins_temp[i])
                     ind2 = pins_temp_2.index(pins_temp[i])
                     pins_temp_2.pop(ind2)

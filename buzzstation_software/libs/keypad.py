@@ -14,7 +14,8 @@ class Keypad:
 
     # If file with non-default setting exits, load this settings:
     if os.path.exists(path_stored_config):
-        with open(path_stored_config, 'rb') as sorted_pins:
+        with open(path_stored_config, 'rb') as config_to_load:
+            sorted_pins = pickle.load(config_to_load)
             cols = sorted_pins[0]
             rows = sorted_pins[1]
 

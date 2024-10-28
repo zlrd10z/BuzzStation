@@ -1,6 +1,9 @@
 from tui.txtcolor import text_font_color, text_bg_color
-from tui.scrmx import create_screen_matrix, fill_matrix, print_screen_matrix
+from tui.scrmx import create_screen_matrix
+from tui.scrmx import fill_matrix
+from tui.scrmx import print_screen_matrix
 import os
+
 
 # Format text as selected:
 selected_text = lambda text: text_bg_color('grey', text_font_color('black', text))
@@ -70,5 +73,4 @@ def main(midi_instruments, midi_output, selected, currently_selected_midi_instru
     screen_matrix = create_screen_matrix()
     screen_matrix = fill_matrix(screen_matrix)
     draw_window(screen_matrix, midi_instruments, instrument_type, midi_output, selected, currently_selected_midi_instrument)
-    clear_screen()
     print_screen_matrix(screen_matrix)

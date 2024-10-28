@@ -42,7 +42,6 @@ def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Syn
     selected_midi_instrument = selected_midi_instrument[0]
     selected = 0
 
-    clear_screen()
     tui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)
 
     # main loop:

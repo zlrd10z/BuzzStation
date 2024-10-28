@@ -146,8 +146,8 @@ class Keypad():
         self.rows = rows
         self.cols = cols
         # Save with picle
-        with open(self.path_stored_config, 'wb') as sorted_pins:
-            pickle.dump(sorted_pins, sorted_pins)
+        with open(self.path_stored_config, 'wb') as config_to_save:
+            pickle.dump(sorted_pins, config_to_save)
 
     def test_keys(self):
         while True:

@@ -26,7 +26,7 @@ class Keypad:
     )
 
     def __init__(self):
-        pins_setup()
+        self.pins_setup()
 
     def pins_setup(self):
         for i in range(len(self.cols)):

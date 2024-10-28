@@ -140,11 +140,12 @@ class Keypad:
         # Now pins are segregatet for cols and rows
         cols = cols + list(set(pins) - set(rows))
         # but two column pins may be mixed up:
-        if detect_rol_col(key=8, sel_p=None, pins=[rows[2]]) is None:
+        if detect_rol_col(key=8, sel_p=None, pins=[rows[2]]) is not None:
             temp_col = cols[1]
             cols[1] = cols[2]
             cols[2] = temp_col
         sorted_pins = [cols, rows]
+        print(sorted_pins)
 
         self.rows = rows
         self.cols = cols

@@ -10,11 +10,11 @@ class Keypad():
     # Default settings:
     cols = (26, 0, 5)
     rows = (6, 19, 13, 21)
-    path_class_dir = os.path.dirname(__file__)
+    path_stored_config = os.path.dirname(__file__) + '/sorted_pins'
 
     # If file with non-default setting exits, load this settings:
-    if os.path.exists(path_class_dir + '/sorted_pins'):
-        with open(path_to_file, 'rb') as sorted_pins:
+    if os.path.exists(path_stored_config):
+        with open(path_stored_config, 'rb') as sorted_pins:
             cols = sorted_pins[0]
             rows = sorted_pins[1]
 
@@ -146,9 +146,8 @@ class Keypad():
         self.rows = rows
         self.cols = cols
         # Save with picle
-        with open(path_to_file, 'wb') as file_btp:
-            path = self.path_to_class + '/sorted_pins'
-            pickle.dump(sorted_pins, path)
+        with open(self.path_stored_config, 'wb') as sorted_pins:
+            pickle.dump(sorted_pins, sorted_pins)
 
     def test_keys(self):
         while True:

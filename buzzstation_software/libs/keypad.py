@@ -78,12 +78,12 @@ class Keypad:
             GPIO.output(pins[p], GPIO.LOW)
             time.sleep(0.1)
             for i in range(len(pins)):
-                print(pins[i])
                 if not GPIO.input(pins[i]) and pins[p] != pins[i]:
                     time.sleep(0.01)
                     print('='*64)
                     GPIO.output(pins[p], GPIO.HIGH)
                     print(pins[i], pins[p])
+                    print('-'*64)
                     return [pins[i], pins[p]]
             GPIO.output(pins[p], GPIO.HIGH)
             time.sleep(0.01)
@@ -131,9 +131,6 @@ class Keypad:
         for i in range(2):
             keys = (7, '*')
             pins_temp = detect_rol_col(keys[i], cols[0])
-            print(pins_temp)
-            print('row', rows)
-            print('cols', cols)
             if pins_temp is not None:
                 pins_temp.remove(cols[0])
                 rows.append(pins_temp[0])
@@ -148,7 +145,6 @@ class Keypad:
             cols[1] = cols[2]
             cols[2] = temp_col
         sorted_pins = [cols, rows]
-        print(sorted_pins)
 
         self.rows = rows
         self.cols = cols

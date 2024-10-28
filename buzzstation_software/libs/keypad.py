@@ -164,7 +164,8 @@ if __name__ == '__main__':
             try: 
                 keypad.detect_colls_rows()
                 while True:
-                    choice = input(50*'-' ,'Do you want to test keys?.\ny. \nn. no\n')
+                    print(50*'-')
+                    choice = input('Do you want to test keys?.\ny. \nn. no\n')
                     if choice == 'y':
                         keypad.test_keys()
                     elif choice == 'n':

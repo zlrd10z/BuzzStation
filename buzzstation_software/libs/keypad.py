@@ -154,7 +154,7 @@ class Keypad():
         while True:
             key = keypad.check_keys()
             if key != '':
-                    print('Key: 'key)
+                    print('Key: ', key)
 
 if __name__ == '__main__':
     keypad = Keypad()

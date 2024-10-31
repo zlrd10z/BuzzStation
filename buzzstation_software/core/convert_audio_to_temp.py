@@ -6,7 +6,8 @@ from decimal import Decimal
 #transorm note to speed for pygame mixer
 def note_to_speed(note_n_octave):
     notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-    print(note_n_octave)
+    if ' ' in note_n_octave:
+        note_n_octave = note_n_octave.replace(' ', '')
     note = note_n_octave[:-1]
     octave = int(note_n_octave[-1])
     # result of 2 / 11, differnce is speed of note vibration between two quarter notes:

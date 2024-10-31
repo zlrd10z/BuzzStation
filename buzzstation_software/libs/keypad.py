@@ -8,8 +8,8 @@ import os
 class Keypad:
     GPIO.setmode(GPIO.BCM)
     # Default settings:
-    cols = (26, 0, 5)
-    rows = (6, 19, 13, 21)
+    cols = (26, 5, 13)
+    rows = (19, 21, 0, 6)
     path_stored_config = os.path.dirname(__file__) + '/sorted_pins'
 
     # If file with non-default setting exits, load this settings:

@@ -75,6 +75,7 @@ def player_audiofiles(queue_player):
                 if sample_filename is not None:
                     channel = pygame.mixer.find_channel()
                     channel.set_volume(vol)
+                    print(samples)
                     channel.play(samples[sample_filename][note])
             case 5:
                 # Update samples dictionary with actual temp dir content:

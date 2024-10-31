@@ -78,7 +78,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
                 new_pattern_number = pattern_number + 1
         return new_pattern_number
     
-    def clone_pattern(song_data, pattern_number, selected):
+    def clone_pattern(song_data, pattern_number, selected, pattern):
         new_pattern_number = pattern_number
         for i in range(1, 998):
             if not song_data.drums_pattern_operations('exists', i):
@@ -148,7 +148,7 @@ def menu(song_data, samples, pattern, pattern_number, song_name,
                         result = toggle_patterns(song_data, pattern_number, selected)
                     # clone pattern:
                     if selected == 2:
-                        result = clone_pattern(song_data, pattern_number, selected)
+                        result = clone_pattern(song_data, pattern_number, selected, pattern)
                     return result
                 #clear pattern:
                 elif selected == 3:

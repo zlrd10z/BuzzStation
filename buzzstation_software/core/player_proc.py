@@ -51,7 +51,7 @@ def player_audiofiles(queue_player):
                 sample_filenames[sample_number] = sample_name
                 if sample_name not in samples:
                     samples[sample_name] = {}
-                samples[sample_name]['C5'] = pygame.mixer.Sound(temp_dir + sample_path + '_C5')
+                samples[sample_name]['C5'] = pygame.mixer.Sound(temp_dir + sample_path)
             # Update paths for all of sample_filenames
             case 3:
                 sample_paths = data[1]
@@ -64,7 +64,8 @@ def player_audiofiles(queue_player):
                         sample_filenames[i] = sample_name
                         if sample_name not in samples:
                             samples[sample_name] = {}
-                        samples[sample_name]['C5'] = pygame.mixer.Sound(sample_path+'_C5')
+                        samples[sample_name]['C5'] = pygame.mixer.Sound(sample_path)
+                print(samples)
             case 4:
                 # Play sample
                 playing_data = data[1]

@@ -79,7 +79,7 @@ def save_song(song_data, keypad):
                 line.append(' ')
             for i in range(17):
                 screen_matrix.append(line[:])
-            for i in range(len(path_to_file)):
+            for i in range(len(screen_matrix[0])):
                 screen_matrix[0][i] = path_to_file[i]
             ok_selected = warning_window.main(keypad, screen_matrix, 'overwrite song')
             if ok_selected:

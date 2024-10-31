@@ -110,7 +110,6 @@ class SongData:
         else:
             raise AttributeError(f'Attribute {var_name} does not exist.')
 
-    
     def drums_pattern_operations(self, operation, pattern_number, new_pattern=None):
         result = None
         pattern_number = str(pattern_number)
@@ -242,16 +241,17 @@ class SongData:
             for t in range(len(pattern)):
                 # for each quarter:
                 for q in range(len(pattern[t])):
-                    note = pattern[t][q][0]
-                    if note != 'C5':
-                        if operation == 'increase':
-                            increase(self, t, note)
-                        else:
-                            note_to_remove = decrease(self, t, note)
-                            if note_to_remove not in result and note_to_remove is not None:
-                                if result is None:
-                                    result = []
-                                result.append((t, note_to_remove))
+                    if len(pattern[t][q]) > 0:
+                        note = pattern[t][q][0]
+                        if note != 'C5':
+                            if operation == 'increase':
+                                increase(self, t, note)
+                            else:
+                                note_to_remove = decrease(self, t, note)
+                                if note_to_remove not in result and note_to_remove is not None:
+                                    if result is None:
+                                        result = []
+                                    result.append((t, note_to_remove))
         return result
 
     def new_nondefaults(self):

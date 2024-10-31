@@ -18,7 +18,7 @@ unsigned char singal_bytes_array[4] = {stop_transsmision_byte,
                                       };
 
 
-SoftwareSerial softSerial(3, 2); // Digital ports as 2 (RX) and 3 (TX)
+SoftwareSerial softSerial(2, 3); // Digital ports as 2 (RX) and 3 (TX)
 
 void setup() {
   Serial.begin(31250); // 31250 baudrate - MIDI baudrate
@@ -63,9 +63,9 @@ void process_data() {
     //Check how long this single signal is:
     send_two = false;
     send_three = false;
-    for (int i = 0; i++; i < 4){
+    for (int i = 0; i < 4; i++){
       if (buffer[index+3] == singal_bytes_array[i]){
-        send_two == true;
+        send_two = true;
         break;
       }
       else if (buffer[index+4] == singal_bytes_array[i]){
@@ -136,7 +136,7 @@ void all_notes_off(){
   unsigned char note_off_byte = 123;
   unsigned char control_byte = 0;
   int channel;
-  for(int i = 1; i++; i < 17){
+  for(int i = 1; i < 17; i++){
     channel = 175;
     channel += i;
     unsigned char channel_byte = (unsigned char) channel;

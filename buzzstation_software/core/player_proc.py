@@ -65,7 +65,6 @@ def player_audiofiles(queue_player):
                         if sample_name not in samples:
                             samples[sample_name] = {}
                         samples[sample_name]['C5'] = pygame.mixer.Sound(sample_path)
-                print(samples)
             case 4:
                 # Play sample
                 playing_data = data[1]
@@ -77,7 +76,6 @@ def player_audiofiles(queue_player):
                 if sample_filename is not None:
                     channel = pygame.mixer.find_channel()
                     channel.set_volume(vol)
-                    print(samples)
                     channel.play(samples[sample_filename][note])
             case 5:
                 # Update samples dictionary with actual temp dir content:
@@ -103,6 +101,7 @@ def player_audiofiles(queue_player):
                         samples[filename] = {}
                     else:
                         samples[filename][note] = pygame.mixer.Sound(temp_dir+sample_name)
+                print(samples)
 
 
 # function in this class communicates via queue with player_audiofiles() working in another process

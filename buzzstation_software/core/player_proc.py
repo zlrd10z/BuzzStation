@@ -65,6 +65,7 @@ def player_audiofiles(queue_player):
                         if sample_name not in samples:
                             samples[sample_name] = {}
                         samples[sample_name]['C5'] = pygame.mixer.Sound(sample_path)
+                print(samples)
             case 4:
                 # Play sample
                 playing_data = data[1]

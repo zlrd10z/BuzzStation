@@ -55,6 +55,7 @@ def player_audiofiles(queue_player):
             # Update paths for all of sample_filenames
             case 3:
                 sample_paths = data[1]
+                samples = {}
                 for i in range(len(sample_paths)):
                     if sample_paths[i] == 'Empty':
                         sample_filenames[i] = None
@@ -95,7 +96,6 @@ def player_audiofiles(queue_player):
             case 6:
                 # Create fresh sample dictionary with samples from temp:
                 filenames_in_temp = get_filenames_in_temp()
-                samples = {}
                 for sample_name in filenames_in_temp:
                     filename, note = get_sample_note_as_two_var(sample_name)
                     if filename not in samples:

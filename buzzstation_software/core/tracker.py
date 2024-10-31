@@ -16,6 +16,7 @@ clear_screen = lambda: os.system('clear')
 
 # Converst single non C5 note for single track
 def convert_nondefault(song_data, track, note):
+    print(note)
     samples = song_data.get_data('samples')
     sample_path = samples[track]
     if sample_path != 'Empty':

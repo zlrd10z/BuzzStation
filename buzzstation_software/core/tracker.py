@@ -456,7 +456,9 @@ def insert_key(song_data, send_to_player, tracker_cursor, keys, pattern, pattern
             last_added_note_data = song_data.last_added('tracker', tracker_cursor[0])[:]
             pattern[tracker_cursor[0]][tracker_cursor[1] - 1] = last_added_note_data
             note = last_added_note_data[0]
-            if note != 'C5':
+            if ' ' in note:
+                note = note.replace(' ', '')
+            elif note != 'C5':
                 should_convert_sample = song_data.nondefault_note_counter(operation='increase', 
                                                          track=tracker_cursor[0], 
                                                          note=note

@@ -25,7 +25,7 @@ def draw():
     scrmx.draw_box(screen_matrix)
     scrmx.draw_instr(screen_matrix, 'BuzzStation')
     draw_ascii_art(screen_matrix, 8, 6)
-    os.system('clear') #clear screen
+    #os.system('clear') #clear screen
     scrmx.print_screen_matrix(screen_matrix) #display loading screen
 
 if __name__ == '__main__':

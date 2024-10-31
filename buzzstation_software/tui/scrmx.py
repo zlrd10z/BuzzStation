@@ -72,5 +72,14 @@ def print_screen_matrix(screen_matrix):
         print(frame, flush=True)
         frame = ''
 
+#Debug:
+def print_screen_matrix(screen_matrix):
+    frame = ''
+    for i in range(len(screen_matrix)):
+        for j in range(len(screen_matrix[0])):
+            frame += screen_matrix[i][j]
+        print(frame)
+        frame = ''
+
 def clear_screen():
     print('\033[H', end='')

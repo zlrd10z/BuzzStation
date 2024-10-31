@@ -72,6 +72,7 @@ def player_audiofiles(queue_player):
                 note = playing_data[1]
                 vol = playing_data[2]
                 sample_filename = sample_filenames[sample_number]
+                print(samples)
                 if sample_filename is not None:
                     channel = pygame.mixer.find_channel()
                     channel.set_volume(vol)

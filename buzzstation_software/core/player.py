@@ -262,27 +262,28 @@ def play_song(song_data, send_to_player, nmc):
             
             # Turn off MIDI notes:
             for i in range(1, 17):
-                if i < len(playlist) and instruments[i] != 'Empty':
-                    if p < len(playlist[i]):
-                        notes_to_turn_off = song_data.pianoroll_pattern_operations(operation = 'get notes', 
-                                                                                   track = i - 1, 
-                                                                                   pattern_number = playlist[i][p], 
-                                                                                   quarter = q, 
-                                                                                   target_notes_to_turn_off = True
-                                                                                   )
-                        midi_output_channel = instruments[i]
-                        midi_output = int(midi_output_channel[1])
-                        midi_channel = int(midi_output_channel[3:])
-                        midi_channel = convert_notechannel_to_bytes(midi_channel)
-                        if notes_to_turn_off is not None:
-                            for note in notes_to_turn_off:
-                                note_in_bytes = nmc.get_note_in_bytes(note)
-                                vol_in_bytes = bytes([0])
-                                midi_data = midi_channel + note_in_bytes + vol_in_bytes
-                                if midi_output == 1:
-                                    midi_output1.send_data(midi_data)
-                                else:
-                                    midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
+                if i < len(playlist) and i < len(instruments):
+                    if instruments[i] != 'Empty':
+                        if p < len(playlist[i]):
+                            notes_to_turn_off = song_data.pianoroll_pattern_operations(operation = 'get notes', 
+                                                                                       track = i - 1, 
+                                                                                       pattern_number = playlist[i][p], 
+                                                                                       quarter = q, 
+                                                                                       target_notes_to_turn_off = True
+                                                                                       )
+                            midi_output_channel = instruments[i]
+                            midi_output = int(midi_output_channel[1])
+                            midi_channel = int(midi_output_channel[3:])
+                            midi_channel = convert_notechannel_to_bytes(midi_channel)
+                            if notes_to_turn_off is not None:
+                                for note in notes_to_turn_off:
+                                    note_in_bytes = nmc.get_note_in_bytes(note)
+                                    vol_in_bytes = bytes([0])
+                                    midi_data = midi_channel + note_in_bytes + vol_in_bytes
+                                    if midi_output == 1:
+                                        midi_output1.send_data(midi_data)
+                                    else:
+                                        midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
 
 
             # Stop Playing: 

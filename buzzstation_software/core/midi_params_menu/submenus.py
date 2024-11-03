@@ -2,7 +2,7 @@ from libs.keypad import Keypad
 from tui.midi_params_menu import sliders
 from tui import scrmx
 from core.song_data import SongData
-from core.midi_params_menu.send_picked_instrument import send_single_contrl_param
+from core.midi_params_menu.send_controllers_data import send_single_contrl_param
 import os
 
 '''

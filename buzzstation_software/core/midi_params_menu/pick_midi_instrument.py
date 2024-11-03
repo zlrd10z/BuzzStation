@@ -1,7 +1,7 @@
 from libs.keypad import Keypad
 import os
 from tui.midi_params_menu import tui_pick_midi_instrument
-from core.midi_params_menu.send_picked_instrument import send_picked_instrument
+from core.midi_params_menu.send_controllers_data import send_picked_instrument
 
 
 def create_instruments_dic():

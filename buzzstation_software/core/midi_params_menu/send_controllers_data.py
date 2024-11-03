@@ -114,8 +114,6 @@ def send_single_contrl_param(song_data, title, param, param_val, midi_output_cha
     midi_output = midi_output_channel[1]
     midi_channel = midi_output_channel[3:]
     midi_channel = int(midi_channel)
-    print(midi_output, midi_channel)
-    while True: pass
     param_val = scale_percents_to_byte(param_val)
     second_byte = cc_second_byte[title][param]
     if midi_output == '1':

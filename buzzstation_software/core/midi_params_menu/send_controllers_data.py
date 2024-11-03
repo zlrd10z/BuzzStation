@@ -5,7 +5,6 @@ from core.midi_and_sync import midi_output2and3
 CHANNEL_CHG = 175 #176 for channel 1 and so on up to channel 16
 BYTE_MIDI_OUT_2 = bytes([245])
 BYTE_MIDI_OUT_2 = bytes([246])
-STOP_BYTE = 
 
 #Controlers and it's bytes:
 #param_collection     #param_category     #param: param_byte

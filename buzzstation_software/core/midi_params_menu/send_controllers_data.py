@@ -104,6 +104,7 @@ def send_midi_instruments(song_data):
 def send_picked_instrument(song_data, midi_output_channel, midi_instrument_decimal):
     midi_output = midi_output_channel[1]
     midi_channel = midi_output_channel[3:]
+    midi_channel = int(midi_channel)
     if midi_output == '1':
         midi_output1.send_data(bytes([191 + midi_channel, midi_instrument_decimal]))
     else:
@@ -112,6 +113,7 @@ def send_picked_instrument(song_data, midi_output_channel, midi_instrument_decim
 def send_single_contrl_param(song_data, title, param, param_val, midi_output_channel):
     midi_output = midi_output_channel[1]
     midi_channel = midi_output_channel[3:]
+    midi_channel = int(midi_channel)
     param_val = scale_percents_to_byte(param_val)
     second_byte = cc_second_byte[title][param]
     if midi_output == '1':

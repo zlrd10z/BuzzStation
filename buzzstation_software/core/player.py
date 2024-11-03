@@ -74,7 +74,6 @@ def play_pattern(song_data, send_to_player, nmc):
         #for each quarter:
         for q in range(16):
             # Send sync signal through audio jack output:
-            sync.sync_out()
             # get pattern for each note, so notes changes are possible while playing: 
             pattern = song_data.drums_pattern_operations('get pattern', pattern_number)
             # for max 16 samples:
@@ -89,10 +88,12 @@ def play_pattern(song_data, send_to_player, nmc):
                     if ' ' in sample_note:
                         sample_note = sample_note[:2]
                     send_to_player.play_note(s, sample_note, vol)
+            sync.sync_out()
             if not should_continue_playing(song_data):
                 break
 
             wait_for_next_quarter(song_data)
+            sync.sync_out()
             if not should_continue_playing(song_data):
                 send_to_player.stop_playing()
                 break
@@ -126,6 +127,7 @@ def play_pattern(song_data, send_to_player, nmc):
 
             #wait to next quarter:
             wait_for_next_quarter(song_data)
+            sync.sync_out()
             # turn off notes:
             if len(pattern_notes_to_turn_off[q]) > 0:
                 notes = pattern_notes_to_turn_off[q]
@@ -207,6 +209,7 @@ def play_song(song_data, send_to_player, nmc):
         # for each quarter in pattern, 16 quarter notes per pattern:
         for q in range(16):
             # for each instrument (16 slots for instruments):
+            sync.sync_out()
             for i in range(16):
                 # AUDIO FILES:
                 # first slot is for audio samples, rest are for midi instruments, so they are diffrently handled:
@@ -259,6 +262,7 @@ def play_song(song_data, send_to_player, nmc):
                 break
 
             wait_for_next_quarter(song_data)
+            sync.sync_out()
             
             # Turn off MIDI notes:
             for i in range(1, 17):

@@ -101,3 +101,21 @@ def send_midi_instruments(song_data):
         else:
             midi_output = int(midi_output)
             midi_output2and3.send_data_to_arduino(song_data, bytes([191 + midi_channel, midi_instrument]), midi_output)
+
+def send_picked_instrument(song_data, midi_output_channel, midi_instrument_decimal):
+    midi_output = midi_output_and_channel[1]
+    midi_channel = midi_output_and_channel[3:]
+    if midi_output == '1':
+        midi_output1.send_data(bytes([191 + midi_channel, midi_instrument_decimal]))
+    else:
+        midi_output2and3.send_data_to_arduino(song_data, bytes([191 + midi_channel, midi_instrument_decimal]), int(midi_output))
+
+def send_single_contrl_param(song_data, title, param, param_val, midi_output_channel):
+    midi_output = midi_output_and_channel[1]
+    midi_channel = midi_output_and_channel[3:]
+    param_val = scale_percents_to_byte(param_val)
+    second_byte = cc_second_byte[title][param]
+    if midi_output == '1':
+        midi_output1.send_data(bytes([CHANNEL_CHG + midi_channel, second_byte, param_val]))
+    else:
+        midi_output2and3.send_data_to_arduino(song_data, bytes([CHANNEL_CHG + midi_channel, second_byte, param_val]), int(midi_output))

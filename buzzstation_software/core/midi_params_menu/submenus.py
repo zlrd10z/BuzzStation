@@ -2,6 +2,7 @@ from libs.keypad import Keypad
 from tui.midi_params_menu import sliders
 from tui import scrmx
 from core.song_data import SongData
+from core.midi_params_menu.send_picked_instrument import send_single_contrl_param
 import os
 
 '''
@@ -52,7 +53,7 @@ def left_right_keys(prev_len, subcategory_params):
         subcategory_params = dict(first_four_params)
     return subcategory_params
 
-def main(keypad, song_data, track, title):
+def main(keypad, song_data, track, title, midi_output_channel):
     subcategory_params = song_data.midi_misc_settings_operations(option='get', track=track, target_title=title)
     dict_keys = [*subcategory_params]
     sliders_number = len(subcategory_params)
@@ -115,6 +116,7 @@ def main(keypad, song_data, track, title):
                 params_to_update = song_data.midi_misc_settings_operations(option='get', track=track, target_title=title)
                 params_to_update.update(subcategory_params)
                 song_data.midi_misc_settings_operations(option='update', track=track, target_title=title, new_value=params_to_update)
+                send_single_contrl_param(song_data, title, param, param_val, midi_output_channel)
             #[Esc] key - quit:
             if key == '1':
                 break

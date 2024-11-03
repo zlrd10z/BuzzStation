@@ -9,6 +9,7 @@ import time
 import os
 from core import player
 import serial
+import logging
 
 
 # Remove all temporary audio files from .temp directory:
@@ -27,6 +28,11 @@ def default_dirs():
         os.system('mkdir ' + cwd + '/.temp')
 
 def main():
+
+    logging.basicConfig(filename='errors.log',
+                        level=logging.ERROR,
+                        format='%(asctime)s - %(levelname)s - %(message)s'
+                        )
     # Clear temp dir:
     clear_temp()
 

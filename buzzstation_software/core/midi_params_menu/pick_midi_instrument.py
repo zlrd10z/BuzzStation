@@ -1,6 +1,7 @@
 from libs.keypad import Keypad
 import os
 from tui.midi_params_menu import tui_pick_midi_instrument
+from core.midi_params_menu.send_picked_instrument import send_picked_instrument
 
 
 def create_instruments_dic():
@@ -65,12 +66,15 @@ def menu_instrument_types(keys, midi_instruments, midi_output, currently_selecte
             if key == '1':
                 break
             tui_pick_midi_instrument.main(midi_instruments, midi_output, selected, 
-                              currently_selected_midi_instrument
-                             )
+                                          currently_selected_midi_instrument
+                                         )
     
-def main(keys, midi_output, currently_selected_midi_instrument):
+def main(keys, song_data, midi_output, currently_selected_midi_instrument):
     midi_instruments = create_instruments_dic()
     result = menu_instrument_types(keys, midi_instruments, midi_output, currently_selected_midi_instrument)
+    if result is not None:
+        instrument_midi_dec = result[1]
+        send_picked_instrument(song_data, midi_output, instrument_midi_dec)
     return result
     
 if __name__ == '__main__':

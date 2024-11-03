@@ -63,12 +63,12 @@ def main(keypad, song_data, midi_out_chnl='M1c1', selected_midi_instrument=('Syn
             if key == '5' or key == '3':
                 if selected == 2:
                     midi_instruments = song_data.get_data('playlist_list_of_midi_assigned')
-                    tmp_selected_midi_instrument = pick_midi_instrument.main(keypad, midi_out_chnl, selected_midi_instrument)
+                    tmp_selected_midi_instrument = pick_midi_instrument.main(keypad, song_data, midi_out_chnl, selected_midi_instrument)
                     if tmp_selected_midi_instrument is not None:
                         midi_instruments[midi_out_chnl] = tmp_selected_midi_instrument
                         selected_midi_instrument = tmp_selected_midi_instrument[0]
                         song_data.put_data('playlist_list_of_midi_assigned', midi_instruments)
                 elif selected > 2:
                     category = menu_categories[selected]
-                    submenus.main(keypad, song_data, track, category)
+                    submenus.main(keypad, song_data, track, category, midi_out_chnl)
             tui_midi_menu.main(midi_out_chnl, selected_midi_instrument, track, selected)

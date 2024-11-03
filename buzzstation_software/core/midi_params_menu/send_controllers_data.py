@@ -116,7 +116,8 @@ def send_single_contrl_param(song_data, title, param, param_val, midi_output_cha
     midi_channel = int(midi_channel)
     param_val = scale_percents_to_byte(param_val)
     second_byte = cc_second_byte[title][param]
+    data_to_send = bytes([CHANNEL_CHG + midi_channel, second_byte]) + param_val
     if midi_output == '1':
-        midi_output1.send_data(bytes([CHANNEL_CHG + midi_channel, second_byte, param_val]))
+        midi_output1.send_data(data_to_send)
     else:
-        midi_output2and3.send_data_to_arduino(song_data, bytes([CHANNEL_CHG + midi_channel, second_byte, param_val]), int(midi_output))
+        midi_output2and3.send_data_to_arduino(song_data, data_to_send, int(midi_output))

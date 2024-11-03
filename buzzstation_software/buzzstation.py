@@ -30,7 +30,7 @@ def default_dirs():
 def main():
 
     logging.basicConfig(filename='errors.log',
-                        level=logging.ERROR,
+                        level=logging.DEBUG,
                         format='%(asctime)s - %(levelname)s - %(message)s'
                         )
     # Clear temp dir:

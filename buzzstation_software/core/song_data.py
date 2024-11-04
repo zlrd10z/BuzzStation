@@ -16,7 +16,8 @@ class SongData:
         self.__instrument_played = None
         self.__serial_usb = None
         self.__playing_track = 0
-        self.__playing_pattern = 1 
+        self.__playing_pattern = 1
+        self.__playing_song_from_lvl = 0
 
         #==================================================
         # Curosrs:

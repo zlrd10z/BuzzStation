@@ -120,20 +120,6 @@ def create_empty_song_playlist(song_data):
     song_playlist.append(track_for_instrument)
     song_data.put_data('song_playlist', song_playlist)
 
-#If there is nothing saved after the first 16 fields, delete after 16 fields the rest of the playlist consisting of empty characters to save memory:
-def shorten_playlist_if_possible(playlist):
-    # Check if playlist can be shorten:
-    for i in range(len(playlist)):
-        can_be_shorten = True
-        for j in range(16):
-            if playlist[i][len(playlist) - 1 - j] != ' ':
-                can_be_shorten = False
-        # Cut last 16 empty fields:
-        if can_be_shorten:
-            for i in range(len(playlist)):
-                playlist[i] = playlist[i][:-16]
-                
-        return playlist
 
 # This function check if any value from potentiometer, and if it's true, it's displaying new value on screen: 
 def pots_values_tui(song_data, previous_printed_values, playlist_cursor, 
@@ -160,19 +146,20 @@ def pots_values_tui(song_data, previous_printed_values, playlist_cursor,
         previous_printed_values[2] = bvol
     return previous_printed_values
 
-def direction_keypad(key, playlist_cursor, song_playlist, playlist_list_of_instruments):
+def direction_keypad(key, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments):
     # keypad 2 and 8 are up and down keypad, keypad 4 and 6 are left and right keypad
     if key == '2':
         # Move cursor up:
         if playlist_cursor[1] > 0:
             playlist_cursor[1] -=  1
-            if playlist_cursor[1] < (len(song_playlist[0]) -1) - 16:
-                song_playlist = shorten_playlist_if_possible(song_playlist)
+            song_data.put_data('playing_song_from_lvl', menu_cursor[1]-1)
+
     if key == '8':
         # Move cursor down:
         if playlist_list_of_instruments[playlist_cursor[0]] != 'Empty':
             if playlist_cursor[0] < 15:
                 playlist_cursor[1] += 1
+                song_data.put_data('playing_song_from_lvl', menu_cursor[1]-1)
         #create list with 
         if playlist_cursor[1] > len(song_playlist[0]):
             for i in range(len(song_playlist)):
@@ -441,7 +428,7 @@ def menu(keypad, song_data, playlist_cursor, song_playlist, playlist_list_of_ins
             # direction key - down:
             elif key == '8':
                 if menu_cursor[0] + 1 < 4:
-                    menu_cursor[0] += 1    
+                    menu_cursor[0] += 1
             # esc key or menu key:
             elif key == '1' or key == '#':
                 # Exit menu:
@@ -513,7 +500,7 @@ def main(keypad, song_data, data_for_threads):
         if key != '':
             # keypad 2 and 8 are up and down keypad, keypad 4 and 6 are left and right keypad
             if key == '2' or key == '4' or key == '6' or key == '8':
-                playlist_cursor = direction_keypad(key, playlist_cursor, song_playlist, playlist_list_of_instruments)        
+                playlist_cursor = direction_keypad(key, song_data, playlist_cursor, song_playlist, playlist_list_of_instruments)        
             # Key with [E] sticker on it - edit selected pattern:
             elif key == '3':
                 create_empty_song_playlist(song_data)
@@ -528,6 +515,9 @@ def main(keypad, song_data, data_for_threads):
                         playlist = result[1]
                     else:
                         playlist_list_of_instruments = result[1]
+            # key [esc]: play playlist from first lvl:
+            elif key == '1':
+                song_data.put_data('playing_song_from_lvl', 0)
             # Key with [C] sticker - clear track on which cursor is present:
             elif key == '0':
                 # get currently displayed GUI:

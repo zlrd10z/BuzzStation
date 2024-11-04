@@ -152,14 +152,14 @@ def direction_keypad(key, song_data, playlist_cursor, song_playlist, playlist_li
         # Move cursor up:
         if playlist_cursor[1] > 0:
             playlist_cursor[1] -=  1
-            song_data.put_data('playing_song_from_lvl', menu_cursor[1]-1)
+            song_data.put_data('playing_song_from_lvl', playlist_cursor[1]-1)
 
     if key == '8':
         # Move cursor down:
         if playlist_list_of_instruments[playlist_cursor[0]] != 'Empty':
             if playlist_cursor[0] < 15:
                 playlist_cursor[1] += 1
-                song_data.put_data('playing_song_from_lvl', menu_cursor[1]-1)
+                song_data.put_data('playing_song_from_lvl', playlist_cursor[1]-1)
         #create list with 
         if playlist_cursor[1] > len(song_playlist[0]):
             for i in range(len(song_playlist)):

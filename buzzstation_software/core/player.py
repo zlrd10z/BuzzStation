@@ -195,9 +195,9 @@ def play_song(song_data, send_to_player, nmc):
     # If there is no pattern, don't do anything:
     if last_pattern_index == None: 
         return None
-
+    start_playing_from = song_data.get_data('playing_song_from_lvl')
     # for each pattern in playlist for lonest track:
-    for p in range(last_pattern_index+1):
+    for p in range(start_playing_from, last_pattern_index+1):
         # Get drums pattern:
         if p < len(playlist[0]):
             if(playlist[0][p] != ' '):

@@ -268,29 +268,28 @@ def edit_key(keypad, song_data, pattern_number,
                         # Shorten the note by a quarter note:
                         elif key == '7' or key == '4':
                             if pattern[selected_beat][i][1] > 1:
-                                delete_from_pattern(pattern_notes_to_turn_off, pattern[selected_beat][i][1] - 1, pattern[selected_beat][i][0])
+                                delete_from_pattern(pattern_notes_to_turn_off, pattern[selected_beat][i][1] - 1 + selected_beat, pattern[selected_beat][i][0])
                                 pattern[selected_beat][i][1] -= 1
-                                pattern_notes_to_turn_off[pattern[selected_beat][i][1] - 1].append(pattern[selected_beat][i][0])
+                                pattern_notes_to_turn_off[pattern[selected_beat][i][1] - 1 + selected_beat].append(pattern[selected_beat][i][0])
                         # lengthen the note by a quarter note:
                         elif key == '9' or key == '6': 
                             if 16 - selected_beat > pattern[selected_beat][i][1]:
                                 # check if there is no note behind this note:
                                 if len(pattern[selected_beat + pattern[selected_beat][i][1]]) > 0:
                                     same_note_exists_one_quarter_behind = False
-                                    for i in range(len(pattern[selected_beat + pattern[selected_beat][i][1]])):
-                                        if pattern[selected_beat + pattern[selected_beat][i][1]][i][0] == selected_note_and_octave:
+                                    for j in range(len(pattern[selected_beat + pattern[selected_beat][i][1]])):
+                                        if pattern[selected_beat + pattern[selected_beat][i][1]][j][0] == selected_note_and_octave:
                                             same_note_exists_one_quarter_behind = True
                                             break
                                     if same_note_exists_one_quarter_behind == False:
                                         # Remove previous note's length and update with new one:
-                                        delete_from_pattern(pattern_notes_to_turn_off, pattern[selected_beat][i][1] - 1, pattern[selected_beat][i][0])
+                                        delete_from_pattern(pattern_notes_to_turn_off, pattern[selected_beat][i][1] - 1 + selected_beat, pattern[selected_beat][i][0])
                                         pattern[selected_beat][i][1] += 1
-                                        pattern_notes_to_turn_off[pattern[selected_beat][i][1] - 1].append(pattern[selected_beat][i][0])
+                                        pattern_notes_to_turn_off[pattern[selected_beat][i][1] - 1 + selected_beat].append(pattern[selected_beat][i][0])
                                 else:
-                                    delete_from_pattern(pattern_notes_to_turn_off, pattern[selected_beat][i][1] - 1, pattern[selected_beat][i][0])
+                                    delete_from_pattern(pattern_notes_to_turn_off, pattern[selected_beat][i][1] - 1 + selected_beat, pattern[selected_beat][i][0])
                                     pattern[selected_beat][i][1] += 1
-                                    pattern_notes_to_turn_off[pattern[selected_beat][i][1] - 1].append(pattern[selected_beat][i][0])
-
+                                    pattern_notes_to_turn_off[pattern[selected_beat][i][1] - 1 + selected_beat].append(pattern[selected_beat][i][0])
                         # Update pattern with start of notes and with end of notes in data storage:
                         song_data.pianoroll_pattern_operations(operation='update pattern', 
                                                                track=track, 
@@ -491,12 +490,9 @@ def main(keypad, song_data, pattern_number, midi_and_channel, track):
                                           selected_note_and_octave, selected_beat, pattern, pattern_notes_to_turn_off,
                                           track
                                          )
-                
                 if new_pattern_number is not None:
                     return new_pattern_number
-            
             # when key was pressed, update GUI displayed:
-            
             tui(song_data, pattern_number, midi_and_channel,
                 selected_note_and_octave, selected_beat,
                 pattern[:], selected_menu_button=None

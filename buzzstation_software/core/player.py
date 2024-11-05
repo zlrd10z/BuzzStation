@@ -342,9 +342,10 @@ def main_loop(data_for_thread):
                 song_output2n3_data.clear()
             if len(patt_output2n3_data) > 0:
                 patt_output2n3_data.clear()
+        else:
+            time.sleep(0.1)
         # check if song was was loaded by pickle / new song was creaated
         # if yes, then upload.
         if song_data != data_for_thread[0]:
             song_data = data_for_thread[0]
-        else:
-            time.sleep(0.1)
+

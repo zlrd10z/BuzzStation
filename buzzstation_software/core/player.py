@@ -6,9 +6,9 @@ from core.midi_and_sync  import sync
 from core.player_proc import SendToPlayer
 
 # bytes used to communication with arduino:
-stop_byte = bytes([221])
-byte_midi_output_2 = bytes([222])
-byte_midi_output_3 = bytes([223])
+stop_byte = bytes([244])
+byte_midi_output_2 = bytes([245])
+byte_midi_output_3 = bytes([246])
 
 # This function creates list of hex numbers, 
 # each hex number element coresponding to decimal index number
@@ -128,8 +128,12 @@ def play_pattern(song_data, send_to_player, nmc, patt_output2n3_data):
                         elif midi_output == 3:
                             midi_data = byte_midi_output_3 + midi_data
                         patt_output2n3_data.append(midi_data)
+                        
             if len(patt_output2n3_data) > 0:
-                midi_output2and3.send_data_to_arduino(song_data, patt_output2n3_data)
+                data_to_send = bytes([])
+                for note_bytes in patt_output2n3_data:
+                    data_to_send += note_bytes
+                midi_output2and3.send_data_to_arduino(song_data, data_to_send)
                 patt_output2n3_data.clear()
 
             #wait to next quarter:
@@ -269,7 +273,10 @@ def play_song(song_data, send_to_player, nmc, song_output2n3_data):
                                                 midi_data = byte_midi_output_3 + midi_data
                                             song_output2n3_data.append(midi_data)
                 if len(song_output2n3_data) > 0:
-                    midi_output2and3.send_data_to_arduino(song_data, song_output2n3_data)
+                    data_to_send = bytes([])
+                    for note_bytes in song_output2n3_data:
+                        data_to_send += note_bytes
+                    midi_output2and3.send_data_to_arduino(song_data, data_to_send)
                     song_output2n3_data.clear()
 
             # Stop Playing:
@@ -322,16 +329,16 @@ def play_song(song_data, send_to_player, nmc, song_output2n3_data):
                 break
 
 def main_loop(data_for_thread):
+    song_output2n3_data = []
+    patt_output2n3_data = []
     song_data = data_for_thread[0]
     queue_player = song_data.get_data('queue_player')
     send_to_player = SendToPlayer(queue_player)
     nmc = NoteMidiConverter()
     while True:
         if song_data.get_data('is_playing') and song_data.get_data('is_song_playing'):
-            song_output2n3_data = []
             play_song(song_data, send_to_player, nmc, song_output2n3_data)
         elif song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
-            patt_output2n3_data = []
             play_pattern(song_data, send_to_player, nmc, patt_output2n3_data)
         elif not song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
             song_output2n3_data.clear()

@@ -193,7 +193,7 @@ def direction_keys(key, selected_beat, selected_note_and_octave, notes):
         if index > 0:
             note = notes[index - 1]
         else:
-            if int(octave) > 2:
+            if int(octave) > 1:
                 note = notes[-1]
                 octave = int(octave) - 1
         selected_note_and_octave = note + str(octave)

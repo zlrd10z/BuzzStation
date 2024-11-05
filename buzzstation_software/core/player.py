@@ -180,6 +180,7 @@ def find_last_patt_lvl(playlist):
                     last_pattern_index = pattern
                     break
                 else:
+                    playlist[track][pattern] = int(playlist[track][pattern])
                     if playlist[track][pattern] > last_pattern_index:
                         last_pattern_index = playlist[track][pattern]
                         break

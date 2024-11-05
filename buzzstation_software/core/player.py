@@ -338,11 +338,13 @@ def main_loop(data_for_thread):
         elif song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
             play_pattern(song_data, send_to_player, nmc, patt_output2n3_data)
         elif not song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
-            song_output2n3_data.clear()
-            patt_output2n3_data.clear()
+            if len(song_output2n3_data) > 0:
+                song_output2n3_data.clear()
+            if len(patt_output2n3_data) > 0:
+                patt_output2n3_data.clear()
         # check if song was was loaded by pickle / new song was creaated
         # if yes, then upload.
-        elif song_data != data_for_thread[0]:
+        if song_data != data_for_thread[0]:
             song_data = data_for_thread[0]
         else:
             time.sleep(0.1)

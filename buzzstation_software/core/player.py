@@ -49,7 +49,7 @@ class NoteMidiConverter:
         note_in_bytes = bytes([note_in_bytes])
         return note_in_bytes
     
-def play_pattern(song_data, send_to_player, nmc):
+def play_pattern(song_data, send_to_player, nmc, patt_output2n3_data):
     even = False
     def wait_for_next_quarter(song_data):
         nonlocal even
@@ -98,7 +98,7 @@ def play_pattern(song_data, send_to_player, nmc):
                 send_to_player.stop_playing()
                 break
     
-    def play_midi(song_data, track_number, pattern_number, nmc):
+    def play_midi(song_data, track_number, pattern_number, nmc, patt_output2n3_data):
         pattern = song_data.pianoroll_pattern_operations('get pattern for single track', track_number, pattern_number)
         pattern_notes_to_turn_off = song_data.pianoroll_pattern_operations(operation = 'get pattern for single track', 
                                                                            track = track_number, 
@@ -123,7 +123,14 @@ def play_pattern(song_data, send_to_player, nmc):
                     if midi_output == 1:
                         midi_output1.send_data(midi_data)
                     else:
-                        midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
+                        if midi_output == 2:
+                            midi_data = byte_midi_output_2 + midi_data
+                        elif midi_output == 3:
+                            midi_data = byte_midi_output_3 + midi_data
+                        patt_output2n3_data.append(midi_data)
+            if len(patt_output2n3_data) > 0:
+                midi_output2and3.send_data_to_arduino(song_data, patt_output2n3_data)
+                patt_output2n3_data.clear()
 
             #wait to next quarter:
             wait_for_next_quarter(song_data)
@@ -139,7 +146,12 @@ def play_pattern(song_data, send_to_player, nmc):
                     if midi_output == 1:
                         midi_output1.send_data(midi_data)
                     else:
-                        midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
+                        if midi_output == 2:
+                            midi_data = byte_midi_output_2 + midi_data
+                        elif midi_output == 3:
+                            midi_data = byte_midi_output_3 + midi_data
+                        patt_output2n3_data.append(midi_data)
+
 
 
             if not should_continue_playing(song_data):
@@ -154,7 +166,7 @@ def play_pattern(song_data, send_to_player, nmc):
         play_drums(song_data, pattern_number, send_to_player)
     else:
         track_number -= 1
-        play_midi(song_data, track_number, pattern_number, nmc)
+        play_midi(song_data, track_number, pattern_number, nmc, patt_output2n3_data)
 
 #goes thorug playlist and check on which level last pattern was added on the longest track:
 def find_last_patt_lvl(playlist):
@@ -171,7 +183,7 @@ def find_last_patt_lvl(playlist):
                         break
     return last_pattern_index
 
-def play_song(song_data, send_to_player, nmc):
+def play_song(song_data, send_to_player, nmc, song_output2n3_data):
     even = False
     def wait_for_next_quarter(song_data):
         nonlocal even
@@ -251,7 +263,14 @@ def play_song(song_data, send_to_player, nmc):
                                         if midi_output == 1:
                                             midi_output1.send_data(midi_data)
                                         else:
-                                            midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
+                                            if midi_output == 2:
+                                                midi_data = byte_midi_output_2 + midi_data
+                                            elif midi_output == 3:
+                                                midi_data = byte_midi_output_3 + midi_data
+                                            song_output2n3_data.append(midi_data)
+                if len(song_output2n3_data) > 0:
+                    midi_output2and3.send_data_to_arduino(song_data, song_output2n3_data)
+                    song_output2n3_data.clear()
 
             # Stop Playing:
             if not song_data.get_data('is_playing') or not song_data.get_data('is_song_playing'):
@@ -287,7 +306,11 @@ def play_song(song_data, send_to_player, nmc):
                                     if midi_output == 1:
                                         midi_output1.send_data(midi_data)
                                     else:
-                                        midi_output2and3.send_data_to_arduino(song_data, midi_data, midi_output)
+                                        if midi_output == 2:
+                                            midi_data = byte_midi_output_2 + midi_data
+                                        elif midi_output == 3:
+                                            midi_data = byte_midi_output_3 + midi_data
+                                        song_output2n3_data.append(midi_data)
 
 
             # Stop Playing: 
@@ -305,9 +328,14 @@ def main_loop(data_for_thread):
     nmc = NoteMidiConverter()
     while True:
         if song_data.get_data('is_playing') and song_data.get_data('is_song_playing'):
-            play_song(song_data, send_to_player, nmc)
+            song_output2n3_data = []
+            play_song(song_data, send_to_player, nmc, song_output2n3_data)
         elif song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
-            play_pattern(song_data, send_to_player, nmc)
+            patt_output2n3_data = []
+            play_pattern(song_data, send_to_player, nmc, patt_output2n3_data)
+        elif not song_data.get_data('is_playing') and not song_data.get_data('is_song_playing'):
+            song_output2n3_data.clear()
+            patt_output2n3_data.clear()
         # check if song was was loaded by pickle / new song was creaated
         # if yes, then upload.
         elif song_data != data_for_thread[0]:

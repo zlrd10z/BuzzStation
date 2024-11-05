@@ -23,7 +23,6 @@ def send_data_to_arduino(song_data, data, output=None):
             data += stop_byte        
             # Sending data to arduino:
             serial_usb.write(data)
-            time.sleep(0.006) #time for arduino to process data before next send
 
         except Exception as exception:
             print(exception)

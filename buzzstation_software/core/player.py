@@ -93,7 +93,6 @@ def play_pattern(song_data, send_to_player, nmc, patt_output2n3_data):
                 break
 
             wait_for_next_quarter(song_data)
-            sync.sync_out()
             if not should_continue_playing(song_data):
                 send_to_player.stop_playing()
                 break
@@ -138,7 +137,6 @@ def play_pattern(song_data, send_to_player, nmc, patt_output2n3_data):
 
             #wait to next quarter:
             wait_for_next_quarter(song_data)
-            sync.sync_out()
             # turn off notes:
             if len(pattern_notes_to_turn_off[q]) > 0:
                 notes = pattern_notes_to_turn_off[q]
@@ -272,12 +270,12 @@ def play_song(song_data, send_to_player, nmc, song_output2n3_data):
                                             elif midi_output == 3:
                                                 midi_data = byte_midi_output_3 + midi_data
                                             song_output2n3_data.append(midi_data)
-                if len(song_output2n3_data) > 0:
-                    data_to_send = bytes([])
-                    for note_bytes in song_output2n3_data:
-                        data_to_send += note_bytes
-                    midi_output2and3.send_data_to_arduino(song_data, data_to_send)
-                    song_output2n3_data.clear()
+            if len(song_output2n3_data) > 0:
+                data_to_send = bytes([])
+                for note_bytes in song_output2n3_data:
+                    data_to_send += note_bytes
+                midi_output2and3.send_data_to_arduino(song_data, data_to_send)
+                song_output2n3_data.clear()
 
             # Stop Playing:
             if not song_data.get_data('is_playing') or not song_data.get_data('is_song_playing'):
@@ -288,7 +286,6 @@ def play_song(song_data, send_to_player, nmc, song_output2n3_data):
                 break
 
             wait_for_next_quarter(song_data)
-            sync.sync_out()
             
             # Turn off MIDI notes:
             for i in range(1, 17):

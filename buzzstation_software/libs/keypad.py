@@ -9,7 +9,7 @@ class Keypad:
     GPIO.setmode(GPIO.BCM)
     # Default settings:
     cols = (26, 5, 13)
-    rows = (19, 21, 0, 6)
+    rows = (19, 11, 0, 6)
     path_stored_config = os.path.dirname(__file__) + '/sorted_pins'
 
     # If file with non-default setting exits, load this settings:
@@ -56,39 +56,28 @@ class Keypad:
             GPIO.cleanup()
 
     # Detects row pin and col pin for selected pressed key
-    def detect_rol_col(self, key, sel_p=None, pins=None):
-        if pins is None:
-            number_of_pins = len(self.cols + self.rows)
-        else:
-            number_of_pins = len(pins)
-        input(f'Press [{key}] on keypad, then press [enter] key on keyboard to continue...')
-        for p in range(number_of_pins):
-            if pins is None:
-                pins = self.cols + self.rows
-                pins = list(pins)
-            if sel_p is not None:
-                if p > len(pins) -1:
-                    return [-1, -2]
-                elif sel_p != pins[p]:
-                    continue
-            if p in pins:
-                pins.remove(p)
-            for i in range(len(pins)):
-                GPIO.setup(pins[i], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.setup(pins[p], GPIO.OUT)
-            GPIO.output(pins[p], GPIO.LOW)
-            time.sleep(0.1)
-            for i in range(len(pins)):
-                if not GPIO.input(pins[i]) and pins[p] != pins[i]:
-                    time.sleep(0.01)
-                    print('='*64)
-                    GPIO.output(pins[p], GPIO.HIGH)
-                    print(pins[i], pins[p])
-                    print('-'*64)
-                    return [pins[i], pins[p]]
-            GPIO.output(pins[p], GPIO.HIGH)
-            time.sleep(0.01)
+    def detect_rol_col(self, key, suspected_cols, suspected_rows):
+        if not isinstance(suspected_cols, list):
+            suspected_cols = [suspected_cols]
+        if not isinstance(suspected_rows, list):
+            suspected_rows = [suspected_rows]
 
+        print('='*60)
+        input(f'Press [{key}] on keypad, then press [enter] key on keyboard to continue.')
+        for c in range(len(suspected_cols)):
+            GPIO.setup(suspected_cols[c], GPIO.OUT)
+            GPIO.output(suspected_cols[c], GPIO.LOW)
+            for r in range(len(suspected_rows)):
+                if suspected_rows[r] == suspected_cols[c]:
+                    continue #same pin
+                GPIO.setup(suspected_rows[r], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+                time.sleep(0.1)
+                if not GPIO.input(suspected_rows[r]):
+                    pins = [suspected_cols[c], suspected_rows[r]]
+                    print(pins)
+                    return pins
+            GPIO.output(suspected_cols[c], GPIO.HIGH)
+            time.sleep(0.1)
 
     '''
     This method, if the keyboard has been connected to a good range of pins,
@@ -99,58 +88,52 @@ class Keypad:
     '''
 
     def detect_colls_rows(self):
-        pins = self.cols + self.rows
+        unsorted_pins = list(self.cols) + list(self.rows)
         rows = []
         cols = []
-        detect_rol_col = self.detect_rol_col
-        # Search for column and row for 1 key, not knowing which one is which:
-        pins_temp = detect_rol_col(1)
+        
+        # Search for column and row for [1] key, not knowing which one is which:
+        temp_pins = self.detect_rol_col(1, unsorted_pins, unsorted_pins)
 
-        '''
-        Search for col and row for 4 key, col for keys 4 is the same as for key 2,
-        row for [1] and [4] is now known.
-        '''
-        pins_temp_2 = detect_rol_col(4)
-        for i in range(2):
-            for j in range(2):
-                if pins_temp[i] == pins_temp_2[j]:
-                    if pins_temp[i] not in cols:
-                        cols.append(pins_temp[i])
-                    ind1 = pins_temp.index(pins_temp[i])
-                    ind2 = pins_temp_2.index(pins_temp[i])
-                    pins_temp_2.pop(ind2)
-                    pins_temp.pop(ind1)
-                    rows.append(pins_temp[0])
-                    rows.append(pins_temp_2[0])
+        # To determine which pin is column pin, detect pin and col for key [4] in the same column:
+        temp_pins_2 = self.detect_rol_col(4, temp_pins, unsorted_pins)
+
+        # Search for the column pin:
+        for i in range(len(temp_pins)):
+            for j in range(len(temp_pins_2)):
+                if temp_pins[i] == temp_pins_2[j]:
+                    cols.append(temp_pins[i])
+                    temp_pins_2.remove(temp_pins[i])
+                    unsorted_pins.remove(temp_pins[i])
+                    temp_pins.remove(temp_pins[i])
                     break
-            if len(pins_temp) < 2 or len(pins_temp_2) < 2:
-                break
 
-        '''
-        Search for row with key [7] and row with key [*] (first column keys):
-        '''
-        for i in range(2):
-            keys = (7, '*')
-            pins_temp = detect_rol_col(keys[i], cols[0])
-            if pins_temp is not None:
-                pins_temp.remove(cols[0])
-                rows.append(pins_temp[0])
+        # Update rows list with two discovered pins:
+        rows += temp_pins + temp_pins_2
 
-        # Now pins are segregatet for cols and rows
-        rest_cols = list(set(pins) - set(rows))
-        rest_cols.remove(cols[0])
-        cols = cols + rest_cols
-        # but two column pins may be mixed up:
-        if detect_rol_col(key=8, sel_p=None, pins=[rows[2]]) is not None:
-            temp_col = cols[1]
-            cols[1] = cols[2]
-            cols[2] = temp_col
-        sorted_pins = [cols, rows]
+        # Update unosrted pins:
+        unsorted_pins = list(set(unsorted_pins) - set(rows))
+
+        # Find row 3 and 4 - key [7] and [*]:
+        keys = (7, '*')
+        for key in keys:
+            temp_pins = self.detect_rol_col(key, cols[0], unsorted_pins)
+            unsorted_pins.remove(temp_pins[1])
+            rows.append(temp_pins[1])
+
+        # Find col 2:
+        temp_pins = self.detect_rol_col(0, unsorted_pins, rows[-1])
+        cols.append(temp_pins[0])
+        unsorted_pins.remove(temp_pins[0])
+
+        # last pin left unsorted is col 3:
+        cols = cols + unsorted_pins
 
         self.rows = rows
         self.cols = cols
         # Save with picle
         with open(self.path_stored_config, 'wb') as config_to_save:
+            sorted_pins = cols + rows
             pickle.dump(sorted_pins, config_to_save)
 
     def test_keys(self):
@@ -165,7 +148,7 @@ if __name__ == '__main__':
         choice = input('1. Detect colls and rows.  \n2. Check if keys working.\nq. Quit\n')
         if choice == '1':
             50*'-'
-            try: 
+            try:
                 keypad.detect_colls_rows()
                 while True:
                     print(50*'-')
@@ -175,10 +158,12 @@ if __name__ == '__main__':
                         keypad.test_keys()
                     elif choice == 'n':
                         break
+            
             except Exception as e:
                 print('Check your connection and please try again.')
                 print('Error: ', e)
                 GPIO.cleanup()
+        
         if choice == '2':
             50*'-'
             keypad.test_keys()

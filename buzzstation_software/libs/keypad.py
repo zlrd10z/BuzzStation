@@ -133,7 +133,7 @@ class Keypad:
         self.cols = cols
         # Save with picle
         with open(self.path_stored_config, 'wb') as config_to_save:
-            sorted_pins = cols + rows
+            sorted_pins = (cols, rows)
             pickle.dump(sorted_pins, config_to_save)
 
     def test_keys(self):

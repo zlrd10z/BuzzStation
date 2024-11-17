@@ -1,10 +1,9 @@
 from txtcolor import text_bg_color
 from txtcolor import text_font_color
 
-# Constants:
+# Constans:
 TUI_WIDTH = 64
 TUI_HIGHT = 17
-MOVE_LINE_BEG = '\r'
 
 # Lambdas:
 move_up = lambda n: '\033[F'*n
@@ -26,29 +25,24 @@ def overprint(y, x, text, bg_color=None, font_color=None):
         text = text_bg_color(bg_color, text)
     if font_color is not None:
         text = text_font_color(font_color, text)
-
-    # y is provided as coordinate, where y = 0 is first line from top
-    y_prod = TUI_HIGHT-1-y
-    if y_prod > 0:
-        move_cursor += move_up(y_prod)
-        move_back_cursor += move_down(y_prod)
+    move_cursor += move_down(y-1)
+    move_back_cursor += move_down(TUI_HIGHT-y+1)
     if x > 0:
         move_cursor += move_right(x)
-        move_back_cursor += MOVE_LINE_BEG
+    print('\033[H', end='')
     print(move_cursor, end='', flush=True)
-    print(text)
-    print(move_back_cursor, end='', flush=True)
+    print(text, end='', flush=True)
+    print(move_back_cursor, end='\r', flush=True)
 
 # Testing:
-
 def test_frame():
-    print('\033[48;5;93m', end='')
+    print('\033[48;5;93m')
     for i in range(16):
-        print(''*64)
-    print(''*64, end='', flush=True)
-    print("\033[0m")
+        n = 64 - len(str(i))-1
+        print(i, ' '*n)
+    print('16', ' '*60, "\033[0m", flush=True)
 
 if __name__ == '__main__':
     test_frame()
-    overprint(y=1, x=1, text='test', bg_color='green')
-    #while True: pass
+    overprint(y=0, x=30, text='test', bg_color='green')
+    while True: pass

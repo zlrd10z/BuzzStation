@@ -50,7 +50,7 @@ def pots_operations(data_for_thread):
         bvol_old_value = song_data.get_data('bvol')
         bvol_new_value = int(potentiometer_values_transform.volume_from_potentiometer0(pots_values[1]))
         if bvol_new_value - bvol_old_value > 1 or bvol_old_value - bvol_new_value > 1:
-            if bvol < 0:
+            if bvol_new_value < 0:
                 bvol_new_value = 0
             bvol = bvol_new_value
             song_data.put_data('bvol', bvol)

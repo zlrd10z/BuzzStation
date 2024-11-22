@@ -34,5 +34,5 @@ This project requires the following Python libraries:
 - `pygame 2.1.2`  # Pymixer from pygame used for playing audio samples
 - `pydub 0.24.1` # pydub for audio converting
 
-## Notes:
-This code is designed to run on Rasbian Lite with kmscon for proper display of all Unicode characters.
+## Note:
+This code is designed to run on Rasbian Lite with Kmscon for proper display of all Unicode characters.

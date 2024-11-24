@@ -20,14 +20,14 @@ class PotsAverage:
         self.vol.append(pots_readings[2])
 
     def get_values(self):
-        for i in range(5):
-            self.put_readings()
+        self.put_readings()
         self.bpm_avr = sum(self.bpm) / len(self.bpm)
         self.swing_avr = sum(self.swing) / len(self.swing)
         self.vol_avr = sum(self.vol) / len(self.vol)
-        self.bpm.clear()
-        self.swing.clear()
-        self.vol.clear()
+        if len(self.bpm) > 9:
+            self.bpm.clear()
+            self.swing.clear()
+            self.vol.clear()
         return (self.bpm_avr, self.swing_avr, self.vol_avr)
 
 def pots_operations(data_for_thread):
